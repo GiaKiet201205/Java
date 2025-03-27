@@ -3,9 +3,9 @@ package GUI;
 import javax.swing.*;
 import java.awt.*;
 
-public class TrangChuGUI extends JFrame {
+public class NguoiDungGUI extends JFrame {
 
-    public TrangChuGUI() {
+    public NguoiDungGUI() {
         setTitle("Fashion Store");
         setSize(900, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -19,28 +19,9 @@ public class TrangChuGUI extends JFrame {
         // Logo
         JLabel logoLabel = new JLabel("SSS", SwingConstants.CENTER);
         logoLabel.setFont(new Font("Serif", Font.BOLD, 30));
-        // Login & Register Buttons
-        JPanel authPanel = new JPanel();
-        authPanel.setBackground(Color.WHITE);
-        JButton loginButton = new JButton("Đăng nhập");
-        JButton registerButton = new JButton("Đăng ký");
-        Font buttonFont = new Font("Serif", Font.BOLD, 16);
-        loginButton.setFont(buttonFont);
-        registerButton.setFont(buttonFont);
-        
-        Dimension buttonSize = new Dimension(100,30);
-        loginButton.setPreferredSize(buttonSize);
-        registerButton.setPreferredSize(buttonSize);
-
-        loginButton.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        registerButton.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-
-        authPanel.add(loginButton);
-        authPanel.add(registerButton);
 
         // Header Layout
         headerPanel.add(logoLabel, BorderLayout.CENTER);
-        headerPanel.add(authPanel, BorderLayout.EAST);
         add(headerPanel, BorderLayout.NORTH);
 
         // Menu Panel (with search & cart)
@@ -71,7 +52,7 @@ public class TrangChuGUI extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            new TrangChuGUI().setVisible(true);
+            new NguoiDungGUI().setVisible(true);
         });
     }
 }
