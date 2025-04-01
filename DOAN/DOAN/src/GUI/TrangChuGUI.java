@@ -15,7 +15,7 @@ public class TrangChuGUI extends JFrame {
 
         // Panel Header
         JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(Color.WHITE);
+        headerPanel.setBackground(new Color(144, 238, 144));
         headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // Logo
@@ -24,14 +24,14 @@ public class TrangChuGUI extends JFrame {
         
         // Login & Register Buttons
         JPanel authPanel = new JPanel();
-        authPanel.setBackground(Color.WHITE);
+        authPanel.setBackground(new Color(144, 238, 144));
         JButton loginButton = new JButton("Đăng nhập");
         JButton registerButton = new JButton("Đăng ký");
         Font buttonFont = new Font("Serif", Font.BOLD, 16);
         loginButton.setFont(buttonFont);
         registerButton.setFont(buttonFont);
         
-        Dimension buttonSize = new Dimension(100,30);
+        Dimension buttonSize = new Dimension(100, 30);
         loginButton.setPreferredSize(buttonSize);
         registerButton.setPreferredSize(buttonSize);
 
@@ -58,8 +58,28 @@ public class TrangChuGUI extends JFrame {
             menuButton.setBorderPainted(false);
             menuButton.setFont(new Font("Serif", Font.PLAIN, 18));
             menuPanel.add(menuButton);
-        }
 
+            // Thêm ActionListener cho Blog
+            if (item.equals("Blog")) {
+                menuButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        showBlogContent();
+                    }
+                });
+            }
+
+            // Thêm ActionListener cho CSKH
+            if (item.equals("CSKH")) {
+                menuButton.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        showCSKHContent();
+                    }
+                });
+            }
+        }
+        
         // ComboBox Sản phẩm
         String[] categories = {"Chọn danh mục", "Quần Áo", "Giày Dép", "Phụ Kiện"};
         JComboBox<String> categoryComboBox = new JComboBox<>(categories);
@@ -79,7 +99,7 @@ public class TrangChuGUI extends JFrame {
                 }
             }
         });
-        
+
         // Search & Cart Components (Inline with Menu)
         JTextField searchField = new JTextField(20);
         JButton searchButton = new JButton("🔍");
@@ -165,6 +185,16 @@ public class TrangChuGUI extends JFrame {
         frame.setLocationRelativeTo(null);
         frame.add(new PhuKienGUI());
         frame.setVisible(true);
+    }
+
+    // Hiển thị nội dung Blog
+    private void showBlogContent() {
+        JOptionPane.showMessageDialog(this, "Đây là page của chúng tôi: ShopQuanAo123");
+    }
+
+    // Hiển thị nội dung CSKH
+    private void showCSKHContent() {
+        JOptionPane.showMessageDialog(this, "Bạn có thể liên lạc với chúng tôi qua DISCORD:java");
     }
 
     public static void main(String[] args) {
