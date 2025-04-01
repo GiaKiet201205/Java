@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package GUI;
 
 import javax.swing.*;
@@ -10,17 +6,17 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SanPhamGUI extends JPanel {
-    private List<String> danhSachSanPham;
+public class PhuKienGUI extends JPanel {
+    private List<String> danhSachPhuKien;
     private JPanel gridPanel;
-    private JButton btnPrev, btnNext;
+    private JButton Prev, Next;
     private JLabel lblPage;
     private int currentPage = 1;
-    private int itemsPerPage = 9; // 3x3 sản phẩm mỗi trang
+    private final int itemsPerPage = 9; // 3x3 sản phẩm mỗi trang
 
-    public SanPhamGUI() {
+    public PhuKienGUI() {
         setLayout(new BorderLayout());
-        danhSachSanPham = getSanPhamMau(); // Danh sách sản phẩm giả lập
+        danhSachPhuKien = getDanhSachPhuKien(); // Danh sách sản phẩm giả lập
 
         gridPanel = new JPanel(new GridLayout(3, 3, 10, 10));
         gridPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -28,27 +24,27 @@ public class SanPhamGUI extends JPanel {
 
         // Thanh điều hướng trang
         JPanel navigationPanel = new JPanel();
-        btnPrev = new JButton("<< Trang trước");
-        btnNext = new JButton("Trang sau >>");
+        Prev = new JButton("<< Trang trước");
+        Next = new JButton("Trang sau >>");
         lblPage = new JLabel("Trang: " + currentPage);
         
-        btnPrev.addActionListener(e -> {
+        Prev.addActionListener(e -> {
             if (currentPage > 1) {
                 currentPage--;
                 loadSanPham();
             }
         });
 
-        btnNext.addActionListener(e -> {
+        Next.addActionListener(e -> {
             if (currentPage < getTotalPage()) {
                 currentPage++;
                 loadSanPham();
             }
         });
 
-        navigationPanel.add(btnPrev);
+        navigationPanel.add(Prev);
         navigationPanel.add(lblPage);
-        navigationPanel.add(btnNext);
+        navigationPanel.add(Next);
         add(navigationPanel, BorderLayout.SOUTH);
 
         // Load trang đầu tiên
@@ -60,10 +56,10 @@ public class SanPhamGUI extends JPanel {
         gridPanel.removeAll();
 
         int start = (currentPage - 1) * itemsPerPage;
-        int end = Math.min(start + itemsPerPage, danhSachSanPham.size());
+        int end = Math.min(start + itemsPerPage, danhSachPhuKien.size());
 
         for (int i = start; i < end; i++) {
-            String tenSanPham = danhSachSanPham.get(i);
+            String tenSanPham = danhSachPhuKien.get(i);
             JPanel itemPanel = taoKhungSanPham(tenSanPham);
             gridPanel.add(itemPanel);
         }
@@ -90,28 +86,26 @@ public class SanPhamGUI extends JPanel {
 
     // Tính số trang
     private int getTotalPage() {
-        return (int) Math.ceil(danhSachSanPham.size() / (double) itemsPerPage);
+        return (int) Math.ceil((double) danhSachPhuKien.size() / itemsPerPage);
     }
 
     // Tạo danh sách sản phẩm (chỉ có tên sản phẩm)
-    private List<String> getSanPhamMau() {
+    private List<String> getDanhSachPhuKien() {
         List<String> list = new ArrayList<>();
         for (int i = 1; i <= 20; i++) {
-            list.add("Sản phẩm " + i);
+            list.add("Phụ kiện " + i);
         }
         return list;
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Sản Phẩm");
+            JFrame frame = new JFrame("Danh Mục Phụ Kiện");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(600, 500);
             frame.setLocationRelativeTo(null); // Căn giữa màn hình
 
-            SanPhamGUI sanPhamGUI = new SanPhamGUI();
-            frame.add(sanPhamGUI);
-
+            frame.add(new PhuKienGUI());
             frame.setVisible(true);
         });
     }
