@@ -29,6 +29,9 @@ public class QuanTriVienGUI extends JFrame {
     private JTextField txtSearchID;
     private DefaultTableModel hoaDonTableModel;
     private JTable hoaDonTable;
+    private JPanel sanPhamPanel; 
+    private DefaultTableModel sanPhamTableModel;  
+    private JTable sanPhamTable;  
     
     private Color menuColor = new Color(204, 204, 204);
     private Color headerColor = new Color(240, 240, 240);
@@ -57,8 +60,10 @@ public class QuanTriVienGUI extends JFrame {
         // Create different panels for each menu item
         createNhaCungCapPanel();
         createHoaDonPanel();
+        createSanPhamPanel();
         
         // Add all panels to the CardLayout
+        contentPanel.add(sanPhamPanel, "SanPham");
         contentPanel.add(nhaCungCapPanel, "NhaCungCap");
         contentPanel.add(hoaDonPanel,"HoaDon");
         
@@ -125,13 +130,10 @@ public class QuanTriVienGUI extends JFrame {
         homePanel.add(btnHome);
         menuPanel.add(homePanel);
         
-        // Add action listeners
-        btnSanPham.addActionListener(e -> {
-            // Here you would show the corresponding panel
-            // For demo purposes, just show the NhaCungCap panel
-            cardLayout.show(contentPanel, "NhaCungCap");
-        });
-        
+
+    btnSanPham.addActionListener(e -> {
+        cardLayout.show(contentPanel, "SanPham");
+    });
         btnNhaCungCap.addActionListener(e -> {
             cardLayout.show(contentPanel, "NhaCungCap");
         });
@@ -174,6 +176,248 @@ public class QuanTriVienGUI extends JFrame {
         panel.add(button);
         menuPanel.add(panel);
     }
+    
+    private void createSanPhamPanel() {
+    sanPhamPanel = new JPanel(new BorderLayout());
+    
+    // Create top panel for title and functions
+    JPanel topPanel = new JPanel(new BorderLayout());
+    topPanel.setBackground(headerColor);
+    topPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+    
+    // Add "Chức năng" label
+    JLabel lblChucNang = new JLabel("Chức năng");
+    topPanel.add(lblChucNang, BorderLayout.WEST);
+    
+    // Add function buttons
+    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    buttonPanel.setOpaque(false);
+    
+    // Add button
+    JButton btnAdd = new JButton();
+//    btnAdd.setIcon(new ImageIcon(getClass().getResource("/icons/add.png")));
+    btnAdd.setToolTipText("Thêm");
+    buttonPanel.add(btnAdd);
+    
+    // Delete button
+    JButton btnDelete = new JButton();
+//    btnDelete.setIcon(new ImageIcon(getClass().getResource("/icons/delete.png")));
+    btnDelete.setToolTipText("Xóa");
+    buttonPanel.add(btnDelete);
+    
+    // Edit button
+    JButton btnEdit = new JButton();
+//    btnEdit.setIcon(new ImageIcon(getClass().getResource("/icons/edit.png")));
+    btnEdit.setToolTipText("Sửa");
+    buttonPanel.add(btnEdit);
+    
+    // Add labels below buttons
+    JPanel labelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    labelPanel.setOpaque(false);
+    labelPanel.add(new JLabel("Thêm"));
+    labelPanel.add(Box.createHorizontalStrut(20));
+    labelPanel.add(new JLabel("Xóa"));
+    labelPanel.add(Box.createHorizontalStrut(20));
+    labelPanel.add(new JLabel("Sửa"));
+    
+    JPanel functionPanel = new JPanel(new BorderLayout());
+    functionPanel.setOpaque(false);
+    functionPanel.add(buttonPanel, BorderLayout.NORTH);
+    functionPanel.add(labelPanel, BorderLayout.SOUTH);
+    
+    topPanel.add(functionPanel, BorderLayout.CENTER);
+    
+    // Add search panel to top right
+    JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    searchPanel.setOpaque(false);
+    
+    JLabel lblTimKiem = new JLabel("Tìm kiếm");
+    searchPanel.add(lblTimKiem);
+    
+    // Create combo box with search options
+    JComboBox<String> cmbSearchType = new JComboBox<>(new String[]{"ID sản phẩm", "Tên sản phẩm"});
+    cmbSearchType.setPreferredSize(new Dimension(120, 25));
+    searchPanel.add(cmbSearchType);
+    
+    // Search text field
+    JTextField txtSearchProduct = new JTextField();
+    txtSearchProduct.setPreferredSize(new Dimension(200, 25));
+    searchPanel.add(txtSearchProduct);
+    
+    // Search button
+    JButton btnSearch = new JButton("Tìm kiếm");
+    btnSearch.setBackground(new Color(240, 240, 240));
+    searchPanel.add(btnSearch);
+    
+    // Reset button
+    JButton btnReset = new JButton("Làm mới");
+    btnReset.setBackground(new Color(240, 240, 240));
+    searchPanel.add(btnReset);
+    
+    topPanel.add(searchPanel, BorderLayout.EAST);
+    
+    sanPhamPanel.add(topPanel, BorderLayout.NORTH);
+    
+    // Create table for product data
+    String[] columns = {"ID sản phẩm", "Tên sản phẩm", "Giá", "Số lượng tồn kho", "ID danh mục"};
+    sanPhamTableModel = new DefaultTableModel(columns, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false; // Make all cells non-editable
+        }
+    };
+    
+    sanPhamTable = new JTable(sanPhamTableModel);
+    sanPhamTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    sanPhamTable.setRowHeight(25);
+    
+    // Center the text in cells
+    DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+    centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+    for (int i = 0; i < sanPhamTable.getColumnCount(); i++) {
+        sanPhamTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+    }
+    
+    // Add sample data for demonstration
+    addSampleSanPhamData();
+    
+    JScrollPane scrollPane = new JScrollPane(sanPhamTable);
+    sanPhamPanel.add(scrollPane, BorderLayout.CENTER);
+    
+    // Add action listeners for buttons
+    btnSearch.addActionListener(e -> searchSanPham(
+            cmbSearchType.getSelectedItem().toString(), 
+            txtSearchProduct.getText()));
+    
+    btnReset.addActionListener(e -> {
+        txtSearchProduct.setText("");
+        sanPhamTableModel.setRowCount(0);
+        addSampleSanPhamData();
+    });
+    
+    btnAdd.addActionListener(e -> addSanPham());
+    btnDelete.addActionListener(e -> deleteSanPham(sanPhamTable.getSelectedRow()));
+    btnEdit.addActionListener(e -> editSanPham(sanPhamTable.getSelectedRow()));
+    
+    // Add listener for Enter key in search field
+    txtSearchProduct.addKeyListener(new KeyAdapter() {
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                searchSanPham(
+                        cmbSearchType.getSelectedItem().toString(), 
+                        txtSearchProduct.getText());
+            }
+        }
+    });
+}
+
+private void addSampleSanPhamData() {
+    // Add sample data for demonstration
+    Object[][] sampleData = {
+        {"SP001", "Áo polo", "24,990,000 VND", "50", "DM001"},
+        {"SP002", "Áo polo", "32,490,000 VND", "25", "DM002"},
+        {"SP003", "Áo polo", "5,590,000 VND", "100", "DM003"},
+        {"SP004", "Áo polo\"", "18,900,000 VND", "15", "DM004"},
+        {"SP005", "Áo polo", "84,990,000 VND", "10", "DM005"},
+        {"SP006", "Áo polo\"", "8,990,000 VND", "30", "DM002"},
+        {"SP007", "Áo polo", "2,490,000 VND", "65", "DM002"},
+        {"SP008", "Áo polo", "2,300,000 VND", "45", "DM002"}
+    };
+    
+    for (Object[] row : sampleData) {
+        sanPhamTableModel.addRow(row);
+    }
+}
+
+private void searchSanPham(String searchType, String keyword) {
+    if (keyword.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Vui lòng nhập từ khóa tìm kiếm", 
+                "Thông báo", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    // In a real application, this would query the database
+    // For demonstration, we'll just filter the existing rows
+    sanPhamTableModel.setRowCount(0);
+    
+    // Determine which column to search based on search type
+    int columnIndex = 0; // Default to ID column
+    if (searchType.equals("Tên sản phẩm")) {
+        columnIndex = 1;
+    }
+    
+    // Get all sample data and filter
+    Object[][] allData = {
+        {"SP001", "Áo polo", "24,990,000 VND", "50", "DM001"},
+        {"SP002", "Áo polo", "32,490,000 VND", "25", "DM002"},
+        {"SP003", "Áo polo", "5,590,000 VND", "100", "DM003"},
+        {"SP004", "Áo polo", "18,900,000 VND", "15", "DM004"},
+        {"SP005", "Áo polo", "84,990,000 VND", "10", "DM005"},
+        {"SP006", "Áo polo", "8,990,000 VND", "30", "DM002"},
+        {"SP007", "Áo polo", "2,490,000 VND", "65", "DM002"},
+        {"SP008", "Áo polo", "2,300,000 VND", "45", "DM002"}
+    };
+    
+    final int finalColumnIndex = columnIndex;
+    
+    for (Object[] row : allData) {
+        if (row[finalColumnIndex].toString().toLowerCase().contains(keyword.toLowerCase())) {
+            sanPhamTableModel.addRow(row);
+        }
+    }
+    
+    if (sanPhamTableModel.getRowCount() == 0) {
+        JOptionPane.showMessageDialog(this, "Không tìm thấy sản phẩm phù hợp", 
+                "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+        // Restore all data
+        for (Object[] row : allData) {
+            sanPhamTableModel.addRow(row);
+        }
+    }
+}
+
+private void addSanPham() {
+    // In a real application, this would open a form to add a new product
+    JOptionPane.showMessageDialog(this, "Đang mở form thêm sản phẩm mới", 
+            "Thêm sản phẩm", JOptionPane.INFORMATION_MESSAGE);
+}
+
+private void deleteSanPham(int selectedRow) {
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Vui lòng chọn một sản phẩm để xóa", 
+                "Thông báo", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    String productId = sanPhamTableModel.getValueAt(selectedRow, 0).toString();
+    String productName = sanPhamTableModel.getValueAt(selectedRow, 1).toString();
+    
+    int confirm = JOptionPane.showConfirmDialog(this, 
+            "Bạn có chắc chắn muốn xóa sản phẩm: " + productName + " (" + productId + ")?", 
+            "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
+    
+    if (confirm == JOptionPane.YES_OPTION) {
+        // In a real application, this would delete from the database
+        sanPhamTableModel.removeRow(selectedRow);
+        JOptionPane.showMessageDialog(this, "Đã xóa sản phẩm thành công", 
+                "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+    }
+}
+
+private void editSanPham(int selectedRow) {
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Vui lòng chọn một sản phẩm để sửa", 
+                "Thông báo", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    String productId = sanPhamTableModel.getValueAt(selectedRow, 0).toString();
+    
+    // In a real application, this would open a form to edit the product
+    JOptionPane.showMessageDialog(this, "Đang mở form sửa sản phẩm: " + productId, 
+            "Sửa sản phẩm", JOptionPane.INFORMATION_MESSAGE);
+}
     
     private void createNhaCungCapPanel() {
         nhaCungCapPanel = new JPanel(new BorderLayout());
