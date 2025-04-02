@@ -38,9 +38,18 @@ public class QuanTriVienGUI extends JFrame {
     private JPanel nhapHangPanel;
     private DefaultTableModel nhapHangTableModel;
     private JTable nhapHangTable;
+    private JPanel chiTietNhapHangPanel;
+    private DefaultTableModel chiTietNhapHangTableModel;
+    private JTable chiTietNhapHangTable;
+    private JPanel nhanVienPanel;
+    private DefaultTableModel nhanVienTableModel;
+    private JTable nhanVienTable;
+    private JPanel khachHangPanel;
+    private DefaultTableModel khachHangTableModel;
+    private JTable khachHangTable;
     
-    private Color menuColor = new Color(204, 204, 204);
-    private Color headerColor = new Color(240, 240, 240);
+    private Color menuColor = new Color(255, 255, 255);
+    private Color headerColor = new Color(160, 250, 160);
     private Font menuFont = new Font("Arial", Font.PLAIN, 16);
     private Font titleFont = new Font("Arial", Font.BOLD, 24);
     private Font menuItemFont = new Font("Arial", Font.PLAIN, 16);
@@ -69,6 +78,9 @@ public class QuanTriVienGUI extends JFrame {
         createChiTietHoaDonPanel();
         createNhaCungCapPanel();
         createNhapHangPanel();
+        createChiTietNhapHangPanel();
+        createNhanVienPanel();
+        createKhachHangPanel();
         
         // Add all panels to the CardLayout
         contentPanel.add(sanPhamPanel, "SanPham");
@@ -76,6 +88,9 @@ public class QuanTriVienGUI extends JFrame {
         contentPanel.add(hoaDonPanel,"HoaDon");
         contentPanel.add(chiTietHoaDonPanel, "ChiTietHoaDon");
         contentPanel.add(nhapHangPanel, "NhapHang");
+        contentPanel.add(chiTietNhapHangPanel, "ChiTietNhapHang");
+        contentPanel.add(nhanVienPanel, "NhanVien");
+        contentPanel.add(khachHangPanel, "KhachHang");
         
         // Default view
         cardLayout.show(contentPanel, "SanPham");
@@ -89,7 +104,7 @@ public class QuanTriVienGUI extends JFrame {
         mainPanel.add(menuPanel, BorderLayout.WEST);
         
         // Admin Title
-        JPanel adminPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel adminPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); // Căn giữa
         adminPanel.setBackground(menuColor);
         adminPanel.setMaximumSize(new Dimension(200, 60));
         lblAdmin = new JLabel("Admin");
@@ -97,6 +112,7 @@ public class QuanTriVienGUI extends JFrame {
         adminPanel.add(lblAdmin);
         menuPanel.add(adminPanel);
         menuPanel.add(Box.createVerticalStrut(20));
+
         
         // Create menu items
         btnSanPham = createMenuButton("Sản phẩm");
@@ -157,7 +173,17 @@ public class QuanTriVienGUI extends JFrame {
     btnNhapHang.addActionListener(e -> {
     cardLayout.show(contentPanel, "NhapHang");
     });
+    btnChiTietNhapHang.addActionListener(e -> {
+    cardLayout.show(contentPanel, "ChiTietNhapHang");
+    });
+    btnNhanVien.addActionListener(e -> {
+    cardLayout.show(contentPanel, "NhanVien");
+    });
+    btnKhachHang.addActionListener(e -> {
+    cardLayout.show(contentPanel, "KhachHang");
+    });
     }
+    
     
     private JButton createMenuButton(String text) {
         JButton button = new JButton(text);
@@ -1277,7 +1303,601 @@ private void editNhapHang(int selectedRow) {
     JOptionPane.showMessageDialog(this, "Đang mở form sửa phiếu nhập hàng: " + nhapHangId, 
             "Sửa phiếu nhập hàng", JOptionPane.INFORMATION_MESSAGE);
 }
+
+private void createChiTietNhapHangPanel() {
+    chiTietNhapHangPanel = new JPanel(new BorderLayout());
     
+    // Create top panel for title and functions
+    JPanel topPanel = new JPanel(new BorderLayout());
+    topPanel.setBackground(headerColor);
+    topPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+    
+    // Add "Chức năng" label
+    JLabel lblChucNang = new JLabel("Chức năng");
+    topPanel.add(lblChucNang, BorderLayout.WEST);
+    
+    // Add function buttons
+    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    buttonPanel.setOpaque(false);
+    
+    // Add button
+    JButton btnAdd = new JButton();
+//    btnAdd.setIcon(new ImageIcon(getClass().getResource("/icons/add.png")));
+    btnAdd.setToolTipText("Thêm");
+    buttonPanel.add(btnAdd);
+    
+    // Delete button
+    JButton btnDelete = new JButton();
+//    btnDelete.setIcon(new ImageIcon(getClass().getResource("/icons/delete.png")));
+    btnDelete.setToolTipText("Xóa");
+    buttonPanel.add(btnDelete);
+    
+    // Edit button
+    JButton btnEdit = new JButton();
+//    btnEdit.setIcon(new ImageIcon(getClass().getResource("/icons/edit.png")));
+    btnEdit.setToolTipText("Sửa");
+    buttonPanel.add(btnEdit);
+    
+    // Add labels below buttons
+    JPanel labelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    labelPanel.setOpaque(false);
+    labelPanel.add(new JLabel("Thêm"));
+    labelPanel.add(Box.createHorizontalStrut(20));
+    labelPanel.add(new JLabel("Xóa"));
+    labelPanel.add(Box.createHorizontalStrut(20));
+    labelPanel.add(new JLabel("Sửa"));
+    
+    JPanel functionPanel = new JPanel(new BorderLayout());
+    functionPanel.setOpaque(false);
+    functionPanel.add(buttonPanel, BorderLayout.NORTH);
+    functionPanel.add(labelPanel, BorderLayout.SOUTH);
+    
+    topPanel.add(functionPanel, BorderLayout.CENTER);
+    
+    // Add search panel to top right
+    JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    searchPanel.setOpaque(false);
+    
+    JLabel lblTimKiem = new JLabel("Tìm kiếm");
+    searchPanel.add(lblTimKiem);
+    
+    // Create combo box with search options
+    JComboBox<String> cmbSearchType = new JComboBox<>(new String[]{"ID CTNH", "ID Nhập hàng", "ID sản phẩm"});
+    cmbSearchType.setPreferredSize(new Dimension(120, 25));
+    searchPanel.add(cmbSearchType);
+    
+    // Search text field
+    JTextField txtSearchCTNH = new JTextField();
+    txtSearchCTNH.setPreferredSize(new Dimension(200, 25));
+    searchPanel.add(txtSearchCTNH);
+    
+    // Search button
+    JButton btnSearch = new JButton("Tìm kiếm");
+    btnSearch.setBackground(new Color(240, 240, 240));
+    searchPanel.add(btnSearch);
+    
+    // Reset button
+    JButton btnReset = new JButton("Làm mới");
+    btnReset.setBackground(new Color(240, 240, 240));
+    searchPanel.add(btnReset);
+    
+    topPanel.add(searchPanel, BorderLayout.EAST);
+    
+    chiTietNhapHangPanel.add(topPanel, BorderLayout.NORTH);
+    
+    // Create table for import detail data
+    String[] columns = {"ID CTNH", "ID Nhập hàng", "ID sản phẩm", "Số lượng nhập", "Giá nhập", "Thành tiền"};
+    chiTietNhapHangTableModel = new DefaultTableModel(columns, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false; // Make all cells non-editable
+        }
+    };
+    
+    chiTietNhapHangTable = new JTable(chiTietNhapHangTableModel);
+    chiTietNhapHangTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    chiTietNhapHangTable.setRowHeight(25);
+    
+    // Center the text in cells
+    DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+    centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+    for (int i = 0; i < chiTietNhapHangTable.getColumnCount(); i++) {
+        chiTietNhapHangTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+    }
+    
+    JScrollPane scrollPane = new JScrollPane(chiTietNhapHangTable);
+    chiTietNhapHangPanel.add(scrollPane, BorderLayout.CENTER);
+    
+    // Add action listeners for buttons
+    btnSearch.addActionListener(e -> searchChiTietNhapHang(
+            cmbSearchType.getSelectedItem().toString(), 
+            txtSearchCTNH.getText()));
+    
+    btnReset.addActionListener(e -> {
+        txtSearchCTNH.setText("");
+        chiTietNhapHangTableModel.setRowCount(0);
+    });
+    
+    btnAdd.addActionListener(e -> addChiTietNhapHang());
+    btnDelete.addActionListener(e -> deleteChiTietNhapHang(chiTietNhapHangTable.getSelectedRow()));
+    btnEdit.addActionListener(e -> editChiTietNhapHang(chiTietNhapHangTable.getSelectedRow()));
+    
+    // Add listener for Enter key in search field
+    txtSearchCTNH.addKeyListener(new KeyAdapter() {
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                searchChiTietNhapHang(
+                        cmbSearchType.getSelectedItem().toString(), 
+                        txtSearchCTNH.getText());
+            }
+        }
+    });
+}
+
+private void searchChiTietNhapHang(String searchType, String keyword) {
+    if (keyword.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Vui lòng nhập từ khóa tìm kiếm", 
+                "Thông báo", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    // Trong ứng dụng thực tế, đây sẽ truy vấn cơ sở dữ liệu
+    JOptionPane.showMessageDialog(this, 
+            "Đang tìm kiếm chi tiết nhập hàng theo " + searchType + " với từ khóa: " + keyword,
+            "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+}
+
+private void addChiTietNhapHang() {
+    // Trong ứng dụng thực tế, đây sẽ mở một form để thêm chi tiết nhập hàng mới
+    JOptionPane.showMessageDialog(this, "Đang mở form thêm chi tiết nhập hàng mới", 
+            "Thêm chi tiết nhập hàng", JOptionPane.INFORMATION_MESSAGE);
+}
+
+private void deleteChiTietNhapHang(int selectedRow) {
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Vui lòng chọn một chi tiết nhập hàng để xóa", 
+                "Thông báo", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    // Trong ứng dụng thực tế, đây sẽ lấy thông tin từ dòng được chọn
+    JOptionPane.showMessageDialog(this, "Đã xóa chi tiết nhập hàng thành công", 
+            "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+    chiTietNhapHangTableModel.removeRow(selectedRow);
+}
+
+private void editChiTietNhapHang(int selectedRow) {
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Vui lòng chọn một chi tiết nhập hàng để sửa", 
+                "Thông báo", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    // Trong ứng dụng thực tế, đây sẽ lấy ID từ dòng được chọn
+    JOptionPane.showMessageDialog(this, "Đang mở form sửa chi tiết nhập hàng", 
+            "Sửa chi tiết nhập hàng", JOptionPane.INFORMATION_MESSAGE);
+}
+    
+private void createNhanVienPanel() {
+    nhanVienPanel = new JPanel(new BorderLayout());
+    
+    // Create top panel for title and functions
+    JPanel topPanel = new JPanel(new BorderLayout());
+    topPanel.setBackground(headerColor);
+    topPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+    
+    // Add "Chức năng" label
+    JLabel lblChucNang = new JLabel("Chức năng");
+    topPanel.add(lblChucNang, BorderLayout.WEST);
+    
+    // Add function buttons
+    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    buttonPanel.setOpaque(false);
+    
+    // Add button
+    JButton btnAdd = new JButton();
+//    btnAdd.setIcon(new ImageIcon(getClass().getResource("/icons/add.png")));
+    btnAdd.setToolTipText("Thêm");
+    buttonPanel.add(btnAdd);
+    
+    // Delete button
+    JButton btnDelete = new JButton();
+//    btnDelete.setIcon(new ImageIcon(getClass().getResource("/icons/delete.png")));
+    btnDelete.setToolTipText("Xóa");
+    buttonPanel.add(btnDelete);
+    
+    // Edit button
+    JButton btnEdit = new JButton();
+//    btnEdit.setIcon(new ImageIcon(getClass().getResource("/icons/edit.png")));
+    btnEdit.setToolTipText("Sửa");
+    buttonPanel.add(btnEdit);
+    
+    // Add labels below buttons
+    JPanel labelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    labelPanel.setOpaque(false);
+    labelPanel.add(new JLabel("Thêm"));
+    labelPanel.add(Box.createHorizontalStrut(20));
+    labelPanel.add(new JLabel("Xóa"));
+    labelPanel.add(Box.createHorizontalStrut(20));
+    labelPanel.add(new JLabel("Sửa"));
+    
+    JPanel functionPanel = new JPanel(new BorderLayout());
+    functionPanel.setOpaque(false);
+    functionPanel.add(buttonPanel, BorderLayout.NORTH);
+    functionPanel.add(labelPanel, BorderLayout.SOUTH);
+    
+    topPanel.add(functionPanel, BorderLayout.CENTER);
+    
+    // Add search panel to top right
+    JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    searchPanel.setOpaque(false);
+    
+    JLabel lblTimKiem = new JLabel("Tìm kiếm");
+    searchPanel.add(lblTimKiem);
+    
+    // Create combo box with search options
+    JComboBox<String> cmbSearchType = new JComboBox<>(new String[]{"ID nhân viên", "Tên nhân viên", "Chức vụ"});
+    cmbSearchType.setPreferredSize(new Dimension(120, 25));
+    searchPanel.add(cmbSearchType);
+    
+    // Search text field
+    JTextField txtSearchNV = new JTextField();
+    txtSearchNV.setPreferredSize(new Dimension(200, 25));
+    searchPanel.add(txtSearchNV);
+    
+    // Search button
+    JButton btnSearch = new JButton("Tìm kiếm");
+    btnSearch.setBackground(new Color(240, 240, 240));
+    searchPanel.add(btnSearch);
+    
+    // Reset button
+    JButton btnReset = new JButton("Làm mới");
+    btnReset.setBackground(new Color(240, 240, 240));
+    searchPanel.add(btnReset);
+    
+    topPanel.add(searchPanel, BorderLayout.EAST);
+    
+    nhanVienPanel.add(topPanel, BorderLayout.NORTH);
+    
+    // Create table for staff data
+    String[] columns = {"ID Nhân viên", "Tên", "Email", "SĐT", "Chức vụ", "Lương"};
+    nhanVienTableModel = new DefaultTableModel(columns, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false; // Make all cells non-editable
+        }
+    };
+    
+    nhanVienTable = new JTable(nhanVienTableModel);
+    nhanVienTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    nhanVienTable.setRowHeight(25);
+    
+    // Center the text in cells
+    DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+    centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+    for (int i = 0; i < nhanVienTable.getColumnCount(); i++) {
+        nhanVienTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+    }
+    
+    JScrollPane scrollPane = new JScrollPane(nhanVienTable);
+    nhanVienPanel.add(scrollPane, BorderLayout.CENTER);
+    
+    // Add action listeners for buttons
+    btnSearch.addActionListener(e -> searchNhanVien(
+            cmbSearchType.getSelectedItem().toString(), 
+            txtSearchNV.getText()));
+    
+    btnReset.addActionListener(e -> {
+        txtSearchNV.setText("");
+        nhanVienTableModel.setRowCount(0);
+    });
+    
+    btnAdd.addActionListener(e -> addNhanVien());
+    btnDelete.addActionListener(e -> deleteNhanVien(nhanVienTable.getSelectedRow()));
+    btnEdit.addActionListener(e -> editNhanVien(nhanVienTable.getSelectedRow()));
+    
+    // Add listener for Enter key in search field
+    txtSearchNV.addKeyListener(new KeyAdapter() {
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                searchNhanVien(
+                        cmbSearchType.getSelectedItem().toString(), 
+                        txtSearchNV.getText());
+            }
+        }
+    });
+}
+
+private void searchNhanVien(String searchType, String keyword) {
+    if (keyword.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Vui lòng nhập từ khóa tìm kiếm", 
+                "Thông báo", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    // Trong ứng dụng thực tế, đây sẽ truy vấn cơ sở dữ liệu
+    JOptionPane.showMessageDialog(this, 
+            "Đang tìm kiếm nhân viên theo " + searchType + " với từ khóa: " + keyword,
+            "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+}
+
+private void addNhanVien() {
+    // Trong ứng dụng thực tế, đây sẽ mở một form để thêm nhân viên mới
+    JOptionPane.showMessageDialog(this, "Đang mở form thêm nhân viên mới", 
+            "Thêm nhân viên", JOptionPane.INFORMATION_MESSAGE);
+}
+
+private void deleteNhanVien(int selectedRow) {
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Vui lòng chọn một nhân viên để xóa", 
+                "Thông báo", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    // Trong ứng dụng thực tế, đây sẽ lấy thông tin từ dòng được chọn
+    JOptionPane.showMessageDialog(this, "Đã xóa nhân viên thành công", 
+            "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+    nhanVienTableModel.removeRow(selectedRow);
+}
+
+private void editNhanVien(int selectedRow) {
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Vui lòng chọn một nhân viên để sửa", 
+                "Thông báo", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    // Trong ứng dụng thực tế, đây sẽ lấy ID từ dòng được chọn
+    JOptionPane.showMessageDialog(this, "Đang mở form sửa thông tin nhân viên", 
+            "Sửa nhân viên", JOptionPane.INFORMATION_MESSAGE);
+}
+
+private void createKhachHangPanel() {
+    khachHangPanel = new JPanel(new BorderLayout());
+    
+    // Create top panel for title and functions
+    JPanel topPanel = new JPanel(new BorderLayout());
+    topPanel.setBackground(headerColor);
+    topPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+    
+    // Add "Chức năng" label
+    JLabel lblChucNang = new JLabel("Chức năng");
+    topPanel.add(lblChucNang, BorderLayout.WEST);
+    
+    // Add function buttons
+    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    buttonPanel.setOpaque(false);
+    
+    // Add button
+    JButton btnAdd = new JButton();
+//    btnAdd.setIcon(new ImageIcon(getClass().getResource("/icons/add.png")));
+    btnAdd.setToolTipText("Thêm");
+    buttonPanel.add(btnAdd);
+    
+    // Delete button
+    JButton btnDelete = new JButton();
+//    btnDelete.setIcon(new ImageIcon(getClass().getResource("/icons/delete.png")));
+    btnDelete.setToolTipText("Xóa");
+    buttonPanel.add(btnDelete);
+    
+    // Edit button
+    JButton btnEdit = new JButton();
+//    btnEdit.setIcon(new ImageIcon(getClass().getResource("/icons/edit.png")));
+    btnEdit.setToolTipText("Sửa");
+    buttonPanel.add(btnEdit);
+    
+    // Add labels below buttons
+    JPanel labelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    labelPanel.setOpaque(false);
+    labelPanel.add(new JLabel("Thêm"));
+    labelPanel.add(Box.createHorizontalStrut(20));
+    labelPanel.add(new JLabel("Xóa"));
+    labelPanel.add(Box.createHorizontalStrut(20));
+    labelPanel.add(new JLabel("Sửa"));
+    
+    JPanel functionPanel = new JPanel(new BorderLayout());
+    functionPanel.setOpaque(false);
+    functionPanel.add(buttonPanel, BorderLayout.NORTH);
+    functionPanel.add(labelPanel, BorderLayout.SOUTH);
+    
+    topPanel.add(functionPanel, BorderLayout.CENTER);
+    
+    // Add search panel to top right
+    JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    searchPanel.setOpaque(false);
+    
+    JLabel lblTimKiem = new JLabel("Tìm kiếm");
+    searchPanel.add(lblTimKiem);
+    
+    // Create combo box with search options
+    JComboBox<String> cmbSearchType = new JComboBox<>(new String[]{"ID khách hàng", "Tên khách hàng", "SĐT"});
+    cmbSearchType.setPreferredSize(new Dimension(120, 25));
+    searchPanel.add(cmbSearchType);
+    
+    // Search text field
+    JTextField txtSearchKH = new JTextField();
+    txtSearchKH.setPreferredSize(new Dimension(200, 25));
+    searchPanel.add(txtSearchKH);
+    
+    // Search button
+    JButton btnSearch = new JButton("Tìm kiếm");
+    btnSearch.setBackground(new Color(240, 240, 240));
+    searchPanel.add(btnSearch);
+    
+    // Reset button
+    JButton btnReset = new JButton("Làm mới");
+    btnReset.setBackground(new Color(240, 240, 240));
+    searchPanel.add(btnReset);
+    
+    topPanel.add(searchPanel, BorderLayout.EAST);
+    
+    khachHangPanel.add(topPanel, BorderLayout.NORTH);
+    
+    // Create table for customer data
+    String[] columns = {"ID khách hàng", "Tên", "Email", "SĐT", "Password", "Username"};
+    khachHangTableModel = new DefaultTableModel(columns, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false; // Make all cells non-editable
+        }
+    };
+    
+    khachHangTable = new JTable(khachHangTableModel);
+    khachHangTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    khachHangTable.setRowHeight(25);
+    
+    // Center the text in cells
+    DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+    centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+    for (int i = 0; i < khachHangTable.getColumnCount(); i++) {
+        khachHangTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+    }
+    
+    // Add sample data for demonstration
+    addSampleKhachHangData();
+    
+    JScrollPane scrollPane = new JScrollPane(khachHangTable);
+    khachHangPanel.add(scrollPane, BorderLayout.CENTER);
+    
+    // Add action listeners for buttons
+    btnSearch.addActionListener(e -> searchKhachHang(
+            cmbSearchType.getSelectedItem().toString(),
+            txtSearchKH.getText()));
+    
+    btnReset.addActionListener(e -> {
+        txtSearchKH.setText("");
+        khachHangTableModel.setRowCount(0);
+        addSampleKhachHangData();
+    });
+    
+    btnAdd.addActionListener(e -> addKhachHang());
+    btnDelete.addActionListener(e -> deleteKhachHang(khachHangTable.getSelectedRow()));
+    btnEdit.addActionListener(e -> editKhachHang(khachHangTable.getSelectedRow()));
+    
+    // Add listener for Enter key in search field
+    txtSearchKH.addKeyListener(new KeyAdapter() {
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                searchKhachHang(
+                        cmbSearchType.getSelectedItem().toString(),
+                        txtSearchKH.getText());
+            }
+        }
+    });
+}
+
+private void addSampleKhachHangData() {
+    // Add sample data for demonstration
+    Object[][] sampleData = {
+        {"KH001", "Nguyễn Văn A", "nguyenvana@email.com", "0901234567", "********", "nguyenvana"},
+        {"KH002", "Trần Thị B", "tranthib@email.com", "0912345678", "********", "tranthib"},
+        {"KH003", "Lê Văn C", "levanc@email.com", "0923456789", "********", "levanc"},
+        {"KH004", "Phạm Thị D", "phamthid@email.com", "0934567890", "********", "phamthid"},
+        {"KH005", "Hoàng Văn E", "hoangvane@email.com", "0945678901", "********", "hoangvane"},
+        {"KH006", "Ngô Thị F", "ngothif@email.com", "0956789012", "********", "ngothif"},
+        {"KH007", "Vũ Văn G", "vuvang@email.com", "0967890123", "********", "vuvang"},
+        {"KH008", "Đặng Thị H", "dangthih@email.com", "0978901234", "********", "dangthih"}
+    };
+    
+    for (Object[] row : sampleData) {
+        khachHangTableModel.addRow(row);
+    }
+}
+
+private void searchKhachHang(String searchType, String keyword) {
+    if (keyword.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Vui lòng nhập từ khóa tìm kiếm", 
+                "Thông báo", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    // In a real application, this would query the database
+    // For demonstration, we'll just filter the existing rows
+    khachHangTableModel.setRowCount(0);
+    
+    // Determine which column to search based on search type
+    int columnIndex = 0; // Default to ID column
+    if (searchType.equals("Tên khách hàng")) {
+        columnIndex = 1;
+    } else if (searchType.equals("SĐT")) {
+        columnIndex = 3;
+    }
+    
+    // Get all sample data and filter
+    Object[][] allData = {
+        {"KH001", "Nguyễn Văn A", "nguyenvana@email.com", "0901234567", "********", "nguyenvana"},
+        {"KH002", "Trần Thị B", "tranthib@email.com", "0912345678", "********", "tranthib"},
+        {"KH003", "Lê Văn C", "levanc@email.com", "0923456789", "********", "levanc"},
+        {"KH004", "Phạm Thị D", "phamthid@email.com", "0934567890", "********", "phamthid"},
+        {"KH005", "Hoàng Văn E", "hoangvane@email.com", "0945678901", "********", "hoangvane"},
+        {"KH006", "Ngô Thị F", "ngothif@email.com", "0956789012", "********", "ngothif"},
+        {"KH007", "Vũ Văn G", "vuvang@email.com", "0967890123", "********", "vuvang"},
+        {"KH008", "Đặng Thị H", "dangthih@email.com", "0978901234", "********", "dangthih"}
+    };
+    
+    final int finalColumnIndex = columnIndex;
+    
+    for (Object[] row : allData) {
+        if (row[finalColumnIndex].toString().toLowerCase().contains(keyword.toLowerCase())) {
+            khachHangTableModel.addRow(row);
+        }
+    }
+    
+    if (khachHangTableModel.getRowCount() == 0) {
+        JOptionPane.showMessageDialog(this, "Không tìm thấy khách hàng phù hợp", 
+                "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+        // Restore all data
+        for (Object[] row : allData) {
+            khachHangTableModel.addRow(row);
+        }
+    }
+}
+
+private void addKhachHang() {
+    // In a real application, this would open a form to add a new customer
+    JOptionPane.showMessageDialog(this, "Đang mở form thêm khách hàng mới", 
+            "Thêm khách hàng", JOptionPane.INFORMATION_MESSAGE);
+}
+
+private void deleteKhachHang(int selectedRow) {
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Vui lòng chọn một khách hàng để xóa", 
+                "Thông báo", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    String khId = khachHangTableModel.getValueAt(selectedRow, 0).toString();
+    String khName = khachHangTableModel.getValueAt(selectedRow, 1).toString();
+    
+    int confirm = JOptionPane.showConfirmDialog(this, 
+            "Bạn có chắc chắn muốn xóa khách hàng: " + khName + " (" + khId + ")?", 
+            "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
+    
+    if (confirm == JOptionPane.YES_OPTION) {
+        // In a real application, this would delete from the database
+        khachHangTableModel.removeRow(selectedRow);
+        JOptionPane.showMessageDialog(this, "Đã xóa khách hàng thành công", 
+                "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+    }
+}
+
+private void editKhachHang(int selectedRow) {
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Vui lòng chọn một khách hàng để sửa", 
+                "Thông báo", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    String khId = khachHangTableModel.getValueAt(selectedRow, 0).toString();
+    
+    // In a real application, this would open a form to edit the customer
+    JOptionPane.showMessageDialog(this, "Đang mở form sửa khách hàng: " + khId, 
+            "Sửa khách hàng", JOptionPane.INFORMATION_MESSAGE);
+}
+
     // Main method to test the GUI
     public static void main(String[] args) {
         try {

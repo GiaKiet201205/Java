@@ -17,6 +17,15 @@ public class GiayDepGUI extends JPanel {
     public GiayDepGUI() {
         setLayout(new BorderLayout());
         danhSachSanPham = getSanPhamMau(); // Danh sách sản phẩm giả lập
+        
+        // **Header (Thanh tiêu đề)**
+        JPanel headerPanel = new JPanel();
+        headerPanel.setBackground(new Color(100, 200, 100)); // Màu xanh lá nhạt
+        JLabel titleLabel = new JLabel("GIÀY DÉP", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setForeground(Color.WHITE);
+        headerPanel.add(titleLabel);
+        add(headerPanel, BorderLayout.NORTH);
 
         gridPanel = new JPanel(new GridLayout(3, 3, 10, 10));
         gridPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -27,6 +36,12 @@ public class GiayDepGUI extends JPanel {
         Prev = new JButton("<< Trang trước");
         Next = new JButton("Trang sau >>");
         lblPage = new JLabel("Trang: " + currentPage);
+        
+        // Chỉnh màu nút điều hướng
+        Prev.setBackground(new Color(100, 200, 100));
+        Prev.setForeground(Color.WHITE);
+        Next.setBackground(new Color(100, 200, 100));
+        Next.setForeground(Color.WHITE);
         
         Prev.addActionListener(e -> {
             if (currentPage > 1) {
@@ -72,7 +87,8 @@ public class GiayDepGUI extends JPanel {
     // Tạo khung sản phẩm đơn giản
     private JPanel taoKhungSanPham(String tenSanPham) {
         JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        panel.setBorder(BorderFactory.createLineBorder(Color.WHITE));
+        panel.setBackground(Color.WHITE);
         panel.setLayout(new BorderLayout());
 
         JLabel lblTen = new JLabel(tenSanPham, SwingConstants.CENTER);
