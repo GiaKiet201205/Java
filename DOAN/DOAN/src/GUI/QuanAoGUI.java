@@ -17,6 +17,14 @@ public class QuanAoGUI extends JPanel {
     public QuanAoGUI() {
         setLayout(new BorderLayout());
         danhSachSanPham = getDanhSachQuanAo(); // Gộp danh sách quần & áo
+        
+        JPanel headerPanel = new JPanel();
+        headerPanel.setBackground(new Color(100, 200, 100)); // Màu xanh lá nhạt
+        JLabel titleLabel = new JLabel("QUẦN ÁO", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setForeground(Color.WHITE);
+        headerPanel.add(titleLabel);
+        add(headerPanel, BorderLayout.NORTH);
 
         gridPanel = new JPanel(new GridLayout(3, 3, 10, 10));
         gridPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -27,6 +35,11 @@ public class QuanAoGUI extends JPanel {
         Prev = new JButton("<< Trang trước");
         Next = new JButton("Trang sau >>");
         lblPage = new JLabel("Trang: " + currentPage);
+        
+        Prev.setBackground(new Color(100, 200, 100));
+        Prev.setForeground(Color.WHITE);
+        Next.setBackground(new Color(100, 200, 100));
+        Next.setForeground(Color.WHITE);
         
         Prev.addActionListener(e -> {
             if (currentPage > 1) {

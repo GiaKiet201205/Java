@@ -15,7 +15,7 @@ public class TrangChuGUI extends JFrame {
 
         // Panel Header
         JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(new Color(144, 238, 144));
+        headerPanel.setBackground(new Color(160, 250, 160));
         headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // Logo
@@ -24,13 +24,18 @@ public class TrangChuGUI extends JFrame {
         
         // Login & Register Buttons
         JPanel authPanel = new JPanel();
-        authPanel.setBackground(new Color(144, 238, 144));
+        authPanel.setBackground(new Color(160, 250, 160));
         JButton loginButton = new JButton("Đăng nhập");
         JButton registerButton = new JButton("Đăng ký");
         Font buttonFont = new Font("Serif", Font.BOLD, 16);
         loginButton.setFont(buttonFont);
         registerButton.setFont(buttonFont);
         
+        loginButton.setBackground(new Color(100, 200, 100)); 
+        loginButton.setForeground(Color.WHITE); // Chữ trắng
+        registerButton.setBackground(new Color(100, 200, 100));
+        registerButton.setForeground(Color.WHITE);
+
         Dimension buttonSize = new Dimension(100, 30);
         loginButton.setPreferredSize(buttonSize);
         registerButton.setPreferredSize(buttonSize);
@@ -58,6 +63,10 @@ public class TrangChuGUI extends JFrame {
             menuButton.setBorderPainted(false);
             menuButton.setFont(new Font("Serif", Font.PLAIN, 18));
             menuPanel.add(menuButton);
+            menuButton.setOpaque(true);
+            menuButton.setBackground(new Color(100, 200, 100)); 
+            menuButton.setForeground(Color.WHITE);
+
 
             // Thêm ActionListener cho Blog
             if (item.equals("Blog")) {
@@ -85,7 +94,11 @@ public class TrangChuGUI extends JFrame {
         JComboBox<String> categoryComboBox = new JComboBox<>(categories);
         categoryComboBox.setFont(new Font("Serif", Font.PLAIN, 16));
         menuPanel.add(categoryComboBox);
-
+        categoryComboBox.setBackground(new Color(100, 200, 100)); 
+        categoryComboBox.setForeground(Color.WHITE);
+        
+        menuPanel.add(categoryComboBox);
+                
         categoryComboBox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -108,6 +121,11 @@ public class TrangChuGUI extends JFrame {
         menuPanel.add(searchField);
         menuPanel.add(searchButton);
         menuPanel.add(cartButton);
+        searchButton.setBackground(new Color(100, 200, 100));
+        searchButton.setForeground(Color.WHITE);
+        cartButton.setBackground(new Color(100, 200, 100));
+        cartButton.setForeground(Color.WHITE);
+
 
         add(menuPanel, BorderLayout.CENTER);
 

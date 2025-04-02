@@ -2,8 +2,25 @@ package GUI;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+class BackgroundPanel extends JPanel {
+    private Image backgroundImage;
+
+    public BackgroundPanel(String imagePath) {
+        backgroundImage = new ImageIcon(getClass().getResource(imagePath)).getImage();
+        if (backgroundImage == null) {
+            System.out.println("Lỗi: Không tìm thấy ảnh nền!");
+        }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+    }
+}
 
 public class DangNhapGUI extends JFrame {
     public DangNhapGUI() {
@@ -13,80 +30,84 @@ public class DangNhapGUI extends JFrame {
         setLocationRelativeTo(null);
         setResizable(false);
 
-        // Panel chính (dùng BorderLayout)
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(Color.LIGHT_GRAY);
+        // Sử dụng JPanel có ảnh nền tự động co giãn
+        BackgroundPanel backgroundPanel = new BackgroundPanel("/images/anhnendnhap.jpeg");
+        backgroundPanel.setLayout(new BorderLayout());
 
-        // Panel logo (bên trái, ở giữa theo chiều dọc)
-        JPanel leftPanel = new JPanel(new GridBagLayout());
-        leftPanel.setBackground(Color.LIGHT_GRAY);
-        JLabel logoLabel = new JLabel("SSS");
-        logoLabel.setFont(new Font("Serif", Font.BOLD, 36));
-        leftPanel.add(logoLabel);
-        
-        // Panel phải (Form đăng nhập)
-        JPanel rightPanel = new JPanel();
-        rightPanel.setBackground(Color.LIGHT_GRAY);
-        rightPanel.setLayout(new GridBagLayout());
+        // Panel đăng nhập
+        JPanel loginPanel = new JPanel(new GridBagLayout());
+        loginPanel.setOpaque(false); // Không che nền
+        loginPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.anchor = GridBagConstraints.WEST;
 
-        // Tiêu đề "Đăng Nhập"
         JLabel titleLabel = new JLabel("Đăng Nhập");
         titleLabel.setFont(new Font("Serif", Font.BOLD, 24));
+        titleLabel.setForeground(Color.BLACK);
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 2;
-        rightPanel.add(titleLabel, gbc);
+        loginPanel.add(titleLabel, gbc);
 
         // Tên đăng nhập
         gbc.gridwidth = 1;
         gbc.gridy++;
-        rightPanel.add(new JLabel("Tên đăng nhập"), gbc);
+        JLabel userLabel = new JLabel("Tên đăng nhập");
+        userLabel.setForeground(Color.BLACK);
+        loginPanel.add(userLabel, gbc);
         gbc.gridx = 1;
         JTextField usernameField = new JTextField(15);
-        rightPanel.add(usernameField, gbc);
+        loginPanel.add(usernameField, gbc);
 
         // Mật khẩu
         gbc.gridx = 0;
         gbc.gridy++;
-        rightPanel.add(new JLabel("Mật khẩu"), gbc);
+        JLabel passLabel = new JLabel("Mật khẩu");
+        passLabel.setForeground(Color.BLACK);
+        loginPanel.add(passLabel, gbc);
         gbc.gridx = 1;
         JPasswordField passwordField = new JPasswordField(15);
-        rightPanel.add(passwordField, gbc);
+        loginPanel.add(passwordField, gbc);
 
-        // Nút Đăng nhập
+        // Nút đăng nhập
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridwidth = 2;
         JButton loginButton = new JButton("Đăng nhập");
-        rightPanel.add(loginButton, gbc);
+        loginButton.setBackground(new Color(120, 200, 120));
+        loginButton.setForeground(Color.BLACK);
+        loginButton.setFocusPainted(false);
+        loginButton.setBorder(BorderFactory.createLineBorder(new Color(0, 150, 0), 2));
+        loginButton.setPreferredSize(new Dimension(109, 30));
+        loginPanel.add(loginButton, gbc);
 
-        // Quên mật khẩu (có thể ấn được)
+        // Quên mật khẩu
         gbc.gridy++;
         JLabel forgotPasswordLabel = new JLabel("Quên mật khẩu...");
-        forgotPasswordLabel.setForeground(Color.BLUE);
+        forgotPasswordLabel.setForeground(Color.BLACK);
         forgotPasswordLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        forgotPasswordLabel.addMouseListener(new MouseAdapter() {
+        loginPanel.add(forgotPasswordLabel, gbc);
+
+        // Xử lý sự kiện nút đăng nhập
+        loginButton.addActionListener(new ActionListener() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                JOptionPane.showMessageDialog(null, "Chức năng quên mật khẩu đang phát triển!");
+            public void actionPerformed(ActionEvent e) {
+                String username = usernameField.getText();
+                String password = new String(passwordField.getPassword());
+                System.out.println("Tên đăng nhập: " + username);
+                System.out.println("Mật khẩu: " + password);
+                // Thêm xử lý xác thực đăng nhập ở đây
             }
         });
-        rightPanel.add(forgotPasswordLabel, gbc);
 
-        // Thêm các panel vào giao diện chính
-        mainPanel.add(leftPanel, BorderLayout.WEST);
-        mainPanel.add(rightPanel, BorderLayout.CENTER);
-
-        // Hiển thị giao diện
-        add(mainPanel);
+        // Thêm panel vào backgroundPanel
+        backgroundPanel.add(loginPanel, BorderLayout.CENTER);
+        setContentPane(backgroundPanel);
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            new DangNhapGUI().setVisible(true);
-        });
+        SwingUtilities.invokeLater(() -> new DangNhapGUI().setVisible(true));
     }
 }

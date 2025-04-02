@@ -36,7 +36,7 @@ public class TrucTiepGUI extends JFrame {
         
         // Header panel with title
         JPanel headerPanel = new JPanel();
-        headerPanel.setBackground(new Color(159, 235, 124)); // Light green color
+        headerPanel.setBackground(new Color(100, 200, 100)); // Light green color
         headerPanel.setPreferredSize(new Dimension(800, 80));
         JLabel titleLabel = new JLabel("QUẢN LÝ BÁN HÀNG");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 36));
@@ -192,7 +192,7 @@ public class TrucTiepGUI extends JFrame {
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         btnAddOrder = new JButton("Thêm đơn hàng");
         btnAddOrder.setFont(buttonFont);
-        btnAddOrder.setBackground(new Color(159, 235, 124));
+        btnAddOrder.setBackground(new Color(100, 200, 100));
         btnAddOrder.setForeground(Color.WHITE);
         btnAddOrder.setPreferredSize(new Dimension(180, 50));
         btnAddOrder.setBorderPainted(false);

@@ -33,8 +33,8 @@ public class QuanTriVienGUI extends JFrame {
     private DefaultTableModel sanPhamTableModel;  
     private JTable sanPhamTable;  
     
-    private Color menuColor = new Color(204, 204, 204);
-    private Color headerColor = new Color(240, 240, 240);
+    private Color menuColor = new Color(255, 255, 255);
+    private Color headerColor = new Color(160, 250, 160);
     private Font menuFont = new Font("Arial", Font.PLAIN, 16);
     private Font titleFont = new Font("Arial", Font.BOLD, 24);
     private Font menuItemFont = new Font("Arial", Font.PLAIN, 16);
@@ -79,7 +79,7 @@ public class QuanTriVienGUI extends JFrame {
         mainPanel.add(menuPanel, BorderLayout.WEST);
         
         // Admin Title
-        JPanel adminPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel adminPanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); // Căn giữa
         adminPanel.setBackground(menuColor);
         adminPanel.setMaximumSize(new Dimension(200, 60));
         lblAdmin = new JLabel("Admin");
@@ -87,6 +87,7 @@ public class QuanTriVienGUI extends JFrame {
         adminPanel.add(lblAdmin);
         menuPanel.add(adminPanel);
         menuPanel.add(Box.createVerticalStrut(20));
+
         
         // Create menu items
         btnSanPham = createMenuButton("Sản phẩm");
