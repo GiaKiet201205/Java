@@ -47,6 +47,11 @@ public class QuanTriVienGUI extends JFrame {
     private JPanel khachHangPanel;
     private DefaultTableModel khachHangTableModel;
     private JTable khachHangTable;
+    private JPanel phuongThucTTPanel;
+    private DefaultTableModel phuongThucTTTableModel;
+    private JTable phuongThucTTTable;
+    private JPanel thongKePanel;
+    private JScrollPane thongKeScrollPane;
     
     private Color menuColor = new Color(255, 255, 255);
     private Color headerColor = new Color(160, 250, 160);
@@ -81,6 +86,9 @@ public class QuanTriVienGUI extends JFrame {
         createChiTietNhapHangPanel();
         createNhanVienPanel();
         createKhachHangPanel();
+        createPhuongThucTTPanel();
+        createThongKePanel();
+        
         
         // Add all panels to the CardLayout
         contentPanel.add(sanPhamPanel, "SanPham");
@@ -91,6 +99,8 @@ public class QuanTriVienGUI extends JFrame {
         contentPanel.add(chiTietNhapHangPanel, "ChiTietNhapHang");
         contentPanel.add(nhanVienPanel, "NhanVien");
         contentPanel.add(khachHangPanel, "KhachHang");
+        contentPanel.add(phuongThucTTPanel, "PhuongThucTT");
+        contentPanel.add(thongKeScrollPane, "ThongKe");
         
         // Default view
         cardLayout.show(contentPanel, "SanPham");
@@ -123,7 +133,6 @@ public class QuanTriVienGUI extends JFrame {
         btnChiTietNhapHang = createMenuButton("Chi tiết nhập hàng");
         btnNhanVien = createMenuButton("Nhân viên");
         btnKhachHang = createMenuButton("Khách hàng");
-        btnDanhMuc = createMenuButton("Danh mục");
         btnPhuongThucTT = createMenuButton("Phương thức tt");
         btnThongKe = createMenuButton("Thống kê");
         
@@ -136,7 +145,6 @@ public class QuanTriVienGUI extends JFrame {
         addMenuButton(btnChiTietNhapHang);
         addMenuButton(btnNhanVien);
         addMenuButton(btnKhachHang);
-        addMenuButton(btnDanhMuc);
         addMenuButton(btnPhuongThucTT);
         addMenuButton(btnThongKe);
         
@@ -182,8 +190,14 @@ public class QuanTriVienGUI extends JFrame {
     btnKhachHang.addActionListener(e -> {
     cardLayout.show(contentPanel, "KhachHang");
     });
+        btnPhuongThucTT.addActionListener(e -> {
+    cardLayout.show(contentPanel, "PhuongThucTT");
+    });
+        btnThongKe.addActionListener(e -> {
+    cardLayout.show(contentPanel, "ThongKe");
+});
     }
-    
+
     
     private JButton createMenuButton(String text) {
         JButton button = new JButton(text);
@@ -1896,6 +1910,589 @@ private void editKhachHang(int selectedRow) {
     // In a real application, this would open a form to edit the customer
     JOptionPane.showMessageDialog(this, "Đang mở form sửa khách hàng: " + khId, 
             "Sửa khách hàng", JOptionPane.INFORMATION_MESSAGE);
+}
+
+private void createPhuongThucTTPanel() {
+    phuongThucTTPanel = new JPanel(new BorderLayout());
+    
+    // Create top panel for title and functions
+    JPanel topPanel = new JPanel(new BorderLayout());
+    topPanel.setBackground(headerColor);
+    topPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+    
+    // Add "Chức năng" label
+    JLabel lblChucNang = new JLabel("Chức năng");
+    topPanel.add(lblChucNang, BorderLayout.WEST);
+    
+    // Add function buttons
+    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    buttonPanel.setOpaque(false);
+    
+    // Add button
+    JButton btnAdd = new JButton();
+    btnAdd.setToolTipText("Thêm");
+    buttonPanel.add(btnAdd);
+    
+    // Delete button
+    JButton btnDelete = new JButton();
+    btnDelete.setToolTipText("Xóa");
+    buttonPanel.add(btnDelete);
+    
+    // Edit button
+    JButton btnEdit = new JButton();
+    btnEdit.setToolTipText("Sửa");
+    buttonPanel.add(btnEdit);
+    
+    // Add labels below buttons
+    JPanel labelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    labelPanel.setOpaque(false);
+    labelPanel.add(new JLabel("Thêm"));
+    labelPanel.add(Box.createHorizontalStrut(20));
+    labelPanel.add(new JLabel("Xóa"));
+    labelPanel.add(Box.createHorizontalStrut(20));
+    labelPanel.add(new JLabel("Sửa"));
+    
+    JPanel functionPanel = new JPanel(new BorderLayout());
+    functionPanel.setOpaque(false);
+    functionPanel.add(buttonPanel, BorderLayout.NORTH);
+    functionPanel.add(labelPanel, BorderLayout.SOUTH);
+    
+    topPanel.add(functionPanel, BorderLayout.CENTER);
+    
+    // Add search panel to top right
+    JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    searchPanel.setOpaque(false);
+    
+    JLabel lblTimKiem = new JLabel("Tìm kiếm");
+    searchPanel.add(lblTimKiem);
+    
+    // Create combo box with search options
+    JComboBox<String> cmbSearchType = new JComboBox<>(new String[]{"ID thanh toán", "Loại thanh toán", "Trạng thái thanh toán"});
+    cmbSearchType.setPreferredSize(new Dimension(150, 25));
+    searchPanel.add(cmbSearchType);
+    
+    // Search text field
+    JTextField txtSearchPayment = new JTextField();
+    txtSearchPayment.setPreferredSize(new Dimension(200, 25));
+    searchPanel.add(txtSearchPayment);
+    
+    // Search button
+    JButton btnSearch = new JButton("Tìm kiếm");
+    btnSearch.setBackground(new Color(240, 240, 240));
+    searchPanel.add(btnSearch);
+    
+    // Reset button
+    JButton btnReset = new JButton("Làm mới");
+    btnReset.setBackground(new Color(240, 240, 240));
+    searchPanel.add(btnReset);
+    
+    topPanel.add(searchPanel, BorderLayout.EAST);
+    
+    phuongThucTTPanel.add(topPanel, BorderLayout.NORTH);
+    
+    // Create table for payment method data
+    String[] columns = {"ID thanh toán", "ID đơn hàng", "Loại thanh toán", "Trạng thái thanh toán", "Kiểu mua hàng"};
+    phuongThucTTTableModel = new DefaultTableModel(columns, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false; // Make all cells non-editable
+        }
+    };
+    
+    phuongThucTTTable = new JTable(phuongThucTTTableModel);
+    phuongThucTTTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    phuongThucTTTable.setRowHeight(25);
+    
+    // Center the text in cells
+    DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+    centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+    for (int i = 0; i < phuongThucTTTable.getColumnCount(); i++) {
+        phuongThucTTTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+    }
+    
+    // Add sample data for demonstration
+    addSamplePhuongThucTTData();
+    
+    JScrollPane scrollPane = new JScrollPane(phuongThucTTTable);
+    phuongThucTTPanel.add(scrollPane, BorderLayout.CENTER);
+    
+    // Add action listeners for buttons
+    btnSearch.addActionListener(e -> searchPhuongThucTT(
+            cmbSearchType.getSelectedItem().toString(), 
+            txtSearchPayment.getText()));
+    
+    btnReset.addActionListener(e -> {
+        txtSearchPayment.setText("");
+        phuongThucTTTableModel.setRowCount(0);
+        addSamplePhuongThucTTData();
+    });
+    
+    btnAdd.addActionListener(e -> addPhuongThucTT());
+    btnDelete.addActionListener(e -> deletePhuongThucTT(phuongThucTTTable.getSelectedRow()));
+    btnEdit.addActionListener(e -> editPhuongThucTT(phuongThucTTTable.getSelectedRow()));
+    
+    // Add listener for Enter key in search field
+    txtSearchPayment.addKeyListener(new KeyAdapter() {
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                searchPhuongThucTT(
+                        cmbSearchType.getSelectedItem().toString(), 
+                        txtSearchPayment.getText());
+            }
+        }
+    });
+}
+
+private void addSamplePhuongThucTTData() {
+    // Add sample data for demonstration
+    Object[][] sampleData = {
+        {"TT001",  "HD001", "Tiền mặt", "Đã thanh toán"},
+        {"TT002", "HD002", "Chuyển khoản", "Đã thanh toán"},
+        {"TT003",  "HD003", "Thẻ tín dụng", "Đã thanh toán"},
+        {"TT004",  "HD004", "Ví điện tử", "Chưa thanh toán"},
+        {"TT005",  "HD005", "Tiền mặt", "Đã thanh toán"},
+        {"TT006",  "HD006", "Chuyển khoản", "Đang xử lý"},
+        {"TT007",  "HD007", "Thẻ tín dụng", "Đã thanh toán"},
+        {"TT008",  "HD008", "Ví điện tử", "Chưa thanh toán"}
+    };
+    
+    for (Object[] row : sampleData) {
+        phuongThucTTTableModel.addRow(row);
+    }
+}
+
+private void searchPhuongThucTT(String searchType, String keyword) {
+    if (keyword.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Vui lòng nhập từ khóa tìm kiếm", 
+                "Thông báo", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    // In a real application, this would query the database
+    // For demonstration, we'll just filter the existing rows
+    phuongThucTTTableModel.setRowCount(0);
+    
+    // Determine which column to search based on search type
+    int columnIndex = 0; // Default to ID column
+    if (searchType.equals("Loại thanh toán")) {
+        columnIndex = 3;
+    } else if (searchType.equals("Trạng thái thanh toán")) {
+        columnIndex = 4;
+    }
+    
+    // Get all sample data and filter
+    Object[][] allData = {
+        {"TT001",  "HD001", "Tiền mặt", "Đã thanh toán"},
+        {"TT002", "HD002", "Chuyển khoản", "Đã thanh toán"},
+        {"TT003",  "HD003", "Thẻ tín dụng", "Đã thanh toán"},
+        {"TT004",  "HD004", "Ví điện tử", "Chưa thanh toán"},
+        {"TT005",  "HD005", "Tiền mặt", "Đã thanh toán"},
+        {"TT006",  "HD006", "Chuyển khoản", "Đang xử lý"},
+        {"TT007",  "HD007", "Thẻ tín dụng", "Đã thanh toán"},
+        {"TT008",  "HD008", "Ví điện tử", "Chưa thanh toán"}
+    };
+    
+    final int finalColumnIndex = columnIndex;
+    
+    for (Object[] row : allData) {
+        if (row[finalColumnIndex].toString().toLowerCase().contains(keyword.toLowerCase())) {
+            phuongThucTTTableModel.addRow(row);
+        }
+    }
+    
+    if (phuongThucTTTableModel.getRowCount() == 0) {
+        JOptionPane.showMessageDialog(this, "Không tìm thấy phương thức thanh toán phù hợp", 
+                "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+        // Restore all data
+        for (Object[] row : allData) {
+            phuongThucTTTableModel.addRow(row);
+        }
+    }
+}
+
+private void addPhuongThucTT() {
+    // In a real application, this would open a form to add a new payment method
+    JOptionPane.showMessageDialog(this, "Đang mở form thêm phương thức thanh toán mới", 
+            "Thêm phương thức thanh toán", JOptionPane.INFORMATION_MESSAGE);
+}
+
+private void deletePhuongThucTT(int selectedRow) {
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Vui lòng chọn một phương thức thanh toán để xóa", 
+                "Thông báo", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    String paymentId = phuongThucTTTableModel.getValueAt(selectedRow, 0).toString();
+    String paymentName = phuongThucTTTableModel.getValueAt(selectedRow, 1).toString();
+    
+    int confirm = JOptionPane.showConfirmDialog(this, 
+            "Bạn có chắc chắn muốn xóa phương thức thanh toán: " + paymentName + " (" + paymentId + ")?", 
+            "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
+    
+    if (confirm == JOptionPane.YES_OPTION) {
+        // In a real application, this would delete from the database
+        phuongThucTTTableModel.removeRow(selectedRow);
+        JOptionPane.showMessageDialog(this, "Đã xóa phương thức thanh toán thành công", 
+                "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+    }
+}
+
+private void editPhuongThucTT(int selectedRow) {
+    if (selectedRow == -1) {
+        JOptionPane.showMessageDialog(this, "Vui lòng chọn một phương thức thanh toán để sửa", 
+                "Thông báo", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+    
+    String paymentId = phuongThucTTTableModel.getValueAt(selectedRow, 0).toString();
+    
+    // In a real application, this would open a form to edit the payment method
+    JOptionPane.showMessageDialog(this, "Đang mở form sửa phương thức thanh toán: " + paymentId, 
+            "Sửa phương thức thanh toán", JOptionPane.INFORMATION_MESSAGE);
+}
+
+private void createThongKePanel() {
+    thongKePanel = new JPanel();
+    thongKePanel.setLayout(new BoxLayout(thongKePanel, BoxLayout.Y_AXIS));
+    thongKePanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+    
+    // Tạo ScrollPane để có thể cuộn nếu nội dung nhiều
+    thongKeScrollPane = new JScrollPane(thongKePanel);
+    thongKeScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+    thongKeScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    thongKeScrollPane.setBorder(null);
+    
+    // Tạo tiêu đề chính
+    JLabel lblMainTitle = new JLabel("THỐNG KÊ TỔNG HỢP", JLabel.CENTER);
+    lblMainTitle.setFont(new Font("Arial", Font.BOLD, 24));
+    lblMainTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+    thongKePanel.add(lblMainTitle);
+    thongKePanel.add(Box.createVerticalStrut(20));
+    
+    // 1. Thống kê doanh thu
+    createDoanhThuSection();
+    
+    // 2. Thống kê sản phẩm
+    createSanPhamSection();
+    
+    // 3. Thống kê đơn hàng
+    createDonHangSection();
+    
+    // 4. Thống kê nhân viên bán hàng
+    createNhanVienSection();
+}
+
+private void createDoanhThuSection() {
+    // Tiêu đề phần
+    JLabel lblTitle = new JLabel("THỐNG KÊ DOANH THU");
+    lblTitle.setFont(new Font("Arial", Font.BOLD, 18));
+    lblTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+    thongKePanel.add(lblTitle);
+    thongKePanel.add(Box.createVerticalStrut(10));
+    
+    // Panel điều khiển
+    JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    controlPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+    controlPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    
+    controlPanel.add(new JLabel("Thống kê theo:"));
+    String[] filterOptions = {"Ngày", "Tháng", "Năm", "Nhân viên", "Sản phẩm", "Nhóm sản phẩm"};
+    JComboBox<String> cmbFilter = new JComboBox<>(filterOptions);
+    cmbFilter.setPreferredSize(new Dimension(150, 25));
+    controlPanel.add(cmbFilter);
+    
+    controlPanel.add(Box.createHorizontalStrut(20));
+    
+    JButton btnXem = new JButton("Xem");
+    btnXem.setBackground(new Color(60, 141, 188));
+    btnXem.setForeground(Color.WHITE);
+    controlPanel.add(btnXem);
+    
+    thongKePanel.add(controlPanel);
+    thongKePanel.add(Box.createVerticalStrut(10));
+    
+    // Bảng doanh thu
+    String[] columns = {"STT", "Thời gian/Đối tượng", "Tổng doanh thu", "Số đơn hàng", "Trung bình"};
+    DefaultTableModel doanhThuTableModel = new DefaultTableModel(columns, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
+    
+    JTable doanhThuTable = new JTable(doanhThuTableModel);
+    doanhThuTable.setRowHeight(30);
+    
+    // Định dạng căn giữa cho các cột
+    DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+    centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+    for (int i = 0; i < doanhThuTable.getColumnCount(); i++) {
+        doanhThuTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+    }
+    
+    // Thêm dữ liệu mẫu
+    Object[][] doanhThuData = {
+        {"1", "01/04/2025", "15,000,000 VND", "25", "600,000 VND"},
+        {"2", "02/04/2025", "18,500,000 VND", "30", "616,667 VND"},
+        {"3", "03/04/2025", "12,800,000 VND", "20", "640,000 VND"},
+        {"4", "04/04/2025", "22,000,000 VND", "35", "628,571 VND"},
+        {"5", "05/04/2025", "25,000,000 VND", "40", "625,000 VND"}
+    };
+    
+    for (Object[] row : doanhThuData) {
+        doanhThuTableModel.addRow(row);
+    }
+    
+    JScrollPane doanhThuScrollPane = new JScrollPane(doanhThuTable);
+    doanhThuScrollPane.setPreferredSize(new Dimension(750, 180));
+    doanhThuScrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, 180));
+    doanhThuScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+    
+    thongKePanel.add(doanhThuScrollPane);
+    thongKePanel.add(Box.createVerticalStrut(30));
+}
+
+private void createSanPhamSection() {
+    // Tiêu đề phần
+    JLabel lblTitle = new JLabel("THỐNG KÊ SẢN PHẨM");
+    lblTitle.setFont(new Font("Arial", Font.BOLD, 18));
+    lblTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+    thongKePanel.add(lblTitle);
+    thongKePanel.add(Box.createVerticalStrut(10));
+    
+    // Panel hiển thị các con số thống kê
+    JPanel statsPanel = new JPanel(new GridLayout(1, 3, 20, 0));
+    statsPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
+    statsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    
+    // Tạo 3 panel thống kê
+    JPanel topProductPanel = createStatBox("SẢN PHẨM BÁN CHẠY", "Áo polo", "150 sản phẩm");
+    JPanel lowProductPanel = createStatBox("SẢN PHẨM BÁN CHẬM", "Mũ vải", "5 sản phẩm");
+    JPanel inventoryPanel = createStatBox("TỔNG TỒN KHO", "1,250", "sản phẩm");
+    
+    statsPanel.add(topProductPanel);
+    statsPanel.add(lowProductPanel);
+    statsPanel.add(inventoryPanel);
+    
+    thongKePanel.add(statsPanel);
+    thongKePanel.add(Box.createVerticalStrut(10));
+    
+    // Bảng chi tiết sản phẩm
+    String[] columns = {"STT", "Mã sản phẩm", "Tên sản phẩm", "Số lượng bán", "Doanh thu", "Tồn kho"};
+    DefaultTableModel sanPhamTableModel = new DefaultTableModel(columns, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
+    
+    JTable sanPhamTable = new JTable(sanPhamTableModel);
+    sanPhamTable.setRowHeight(30);
+    
+    // Định dạng căn giữa cho các cột
+    DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+    centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+    for (int i = 0; i < sanPhamTable.getColumnCount(); i++) {
+        sanPhamTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+    }
+    
+    // Thêm dữ liệu mẫu
+    Object[][] sanPhamData = {
+        {"1", "SP001", "Áo polo", "150", "7,500,000 VND", "50"},
+        {"2", "SP002", "Áo thun", "120", "4,800,000 VND", "30"},
+        {"3", "SP003", "Quần jeans", "90", "9,000,000 VND", "25"},
+        {"4", "SP004", "Giày sneaker", "80", "16,000,000 VND", "15"},
+        {"5", "SP005", "Mũ vải", "5", "250,000 VND", "45"}
+    };
+    
+    for (Object[] row : sanPhamData) {
+        sanPhamTableModel.addRow(row);
+    }
+    
+    JScrollPane sanPhamScrollPane = new JScrollPane(sanPhamTable);
+    sanPhamScrollPane.setPreferredSize(new Dimension(750, 180));
+    sanPhamScrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, 180));
+    sanPhamScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+    
+    thongKePanel.add(sanPhamScrollPane);
+    thongKePanel.add(Box.createVerticalStrut(30));
+}
+
+private void createDonHangSection() {
+    // Tiêu đề phần
+    JLabel lblTitle = new JLabel("THỐNG KÊ ĐƠN HÀNG");
+    lblTitle.setFont(new Font("Arial", Font.BOLD, 18));
+    lblTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+    thongKePanel.add(lblTitle);
+    thongKePanel.add(Box.createVerticalStrut(10));
+    
+    // Panel hiển thị các con số thống kê
+    JPanel statsPanel = new JPanel(new GridLayout(1, 2, 20, 0));
+    statsPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
+    statsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    
+    // Tạo 2 panel thống kê
+    JPanel totalOrdersPanel = createStatBox("TỔNG ĐƠN HÀNG", "158", "đơn hàng");
+    
+    // Panel tỷ lệ đơn hàng
+    JPanel ratePanel = new JPanel();
+    ratePanel.setLayout(new BoxLayout(ratePanel, BoxLayout.Y_AXIS));
+    ratePanel.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
+    ratePanel.setBackground(Color.WHITE);
+    
+    JLabel rateTitle = new JLabel("TỶ LỆ ĐƠN HÀNG", JLabel.CENTER);
+    rateTitle.setFont(new Font("Arial", Font.BOLD, 14));
+    rateTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+    ratePanel.add(rateTitle);
+    
+    JPanel rateInfoPanel = new JPanel(new GridLayout(1, 2));
+    rateInfoPanel.setOpaque(false);
+    
+    JPanel successPanel = new JPanel();
+    successPanel.setLayout(new BoxLayout(successPanel, BoxLayout.Y_AXIS));
+    successPanel.setOpaque(false);
+    JLabel successLabel = new JLabel("Thành công:", JLabel.CENTER);
+    JLabel successRate = new JLabel("85%", JLabel.CENTER);
+    successRate.setFont(new Font("Arial", Font.BOLD, 20));
+    successRate.setForeground(new Color(40, 167, 69));
+    successPanel.add(successLabel);
+    successPanel.add(successRate);
+    
+    JPanel cancelPanel = new JPanel();
+    cancelPanel.setLayout(new BoxLayout(cancelPanel, BoxLayout.Y_AXIS));
+    cancelPanel.setOpaque(false);
+    JLabel cancelLabel = new JLabel("Hủy:", JLabel.CENTER);
+    JLabel cancelRate = new JLabel("15%", JLabel.CENTER);
+    cancelRate.setFont(new Font("Arial", Font.BOLD, 20));
+    cancelRate.setForeground(new Color(220, 53, 69));
+    cancelPanel.add(cancelLabel);
+    cancelPanel.add(cancelRate);
+    
+    rateInfoPanel.add(successPanel);
+    rateInfoPanel.add(cancelPanel);
+    ratePanel.add(rateInfoPanel);
+    
+    statsPanel.add(totalOrdersPanel);
+    statsPanel.add(ratePanel);
+    
+    thongKePanel.add(statsPanel);
+    thongKePanel.add(Box.createVerticalStrut(10));
+    
+    // Bảng chi tiết đơn hàng
+    String[] columns = {"STT", "Ngày", "Số đơn hàng", "Đơn thành công", "Đơn hủy", "Tỷ lệ thành công"};
+    DefaultTableModel donHangTableModel = new DefaultTableModel(columns, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
+    
+    JTable donHangTable = new JTable(donHangTableModel);
+    donHangTable.setRowHeight(30);
+    
+    // Định dạng căn giữa cho các cột
+    DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+    centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+    for (int i = 0; i < donHangTable.getColumnCount(); i++) {
+        donHangTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+    }
+    
+    // Thêm dữ liệu mẫu
+    Object[][] donHangData = {
+        {"1", "01/04/2025", "25", "22", "3", "88%"},
+        {"2", "02/04/2025", "30", "27", "3", "90%"},
+        {"3", "03/04/2025", "20", "16", "4", "80%"},
+        {"4", "04/04/2025", "35", "28", "7", "80%"},
+        {"5", "05/04/2025", "40", "34", "6", "85%"},
+        {"6", "06/04/2025", "8", "7", "1", "88%"}
+    };
+    
+    for (Object[] row : donHangData) {
+        donHangTableModel.addRow(row);
+    }
+    
+    JScrollPane donHangScrollPane = new JScrollPane(donHangTable);
+    donHangScrollPane.setPreferredSize(new Dimension(750, 180));
+    donHangScrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, 180));
+    donHangScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+    
+    thongKePanel.add(donHangScrollPane);
+    thongKePanel.add(Box.createVerticalStrut(30));
+}
+
+private void createNhanVienSection() {
+    // Tiêu đề phần
+    JLabel lblTitle = new JLabel("THỐNG KÊ NHÂN VIÊN BÁN HÀNG");
+    lblTitle.setFont(new Font("Arial", Font.BOLD, 18));
+    lblTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+    thongKePanel.add(lblTitle);
+    thongKePanel.add(Box.createVerticalStrut(10));
+    
+    // Bảng nhân viên
+    String[] columns = {"STT", "Mã NV", "Tên nhân viên", "Số đơn hàng", "Tổng doanh thu", "Trung bình/đơn"};
+    DefaultTableModel nhanVienTableModel = new DefaultTableModel(columns, 0) {
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
+    };
+    
+    JTable nhanVienTable = new JTable(nhanVienTableModel);
+    nhanVienTable.setRowHeight(30);
+    
+    // Định dạng căn giữa cho các cột
+    DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+    centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+    for (int i = 0; i < nhanVienTable.getColumnCount(); i++) {
+        nhanVienTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+    }
+    
+    // Thêm dữ liệu mẫu
+    Object[][] nhanVienData = {
+        {"1", "NV001", "Nguyễn Văn A", "42", "25,000,000 VND", "595,238 VND"},
+        {"2", "NV002", "Trần Thị B", "35", "18,900,000 VND", "540,000 VND"},
+        {"3", "NV003", "Lê Văn C", "28", "15,400,000 VND", "550,000 VND"},
+        {"4", "NV004", "Phạm Thị D", "30", "19,500,000 VND", "650,000 VND"},
+        {"5", "NV005", "Hoàng Văn E", "23", "14,200,000 VND", "617,391 VND"}
+    };
+    
+    for (Object[] row : nhanVienData) {
+        nhanVienTableModel.addRow(row);
+    }
+    
+    JScrollPane nhanVienScrollPane = new JScrollPane(nhanVienTable);
+    nhanVienScrollPane.setPreferredSize(new Dimension(750, 180));
+    nhanVienScrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, 180));
+    nhanVienScrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+    
+    thongKePanel.add(nhanVienScrollPane);
+    thongKePanel.add(Box.createVerticalStrut(20));
+}
+
+private JPanel createStatBox(String title, String value, String unit) {
+    JPanel panel = new JPanel();
+    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    panel.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200)));
+    panel.setBackground(Color.WHITE);
+    
+    JLabel titleLabel = new JLabel(title, JLabel.CENTER);
+    titleLabel.setFont(new Font("Arial", Font.BOLD, 14));
+    titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+    panel.add(titleLabel);
+    
+    JLabel valueLabel = new JLabel(value, JLabel.CENTER);
+    valueLabel.setFont(new Font("Arial", Font.BOLD, 20));
+    valueLabel.setForeground(new Color(0, 123, 255));
+    valueLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+    panel.add(valueLabel);
+    
+    JLabel unitLabel = new JLabel(unit, JLabel.CENTER);
+    unitLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+    panel.add(unitLabel);
+    
+    return panel;
 }
 
     // Main method to test the GUI
