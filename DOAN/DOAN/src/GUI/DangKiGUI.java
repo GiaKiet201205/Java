@@ -39,7 +39,7 @@ public class DangKiGUI extends JFrame {
                 }
             });
         } else {
-            System.err.println("Không tìm thấy ảnh logo!");
+            System.err.println("");
         }
 
         // Panel phải (Form đăng ký)
