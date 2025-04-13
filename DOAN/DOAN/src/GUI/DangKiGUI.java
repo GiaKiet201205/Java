@@ -101,6 +101,30 @@ public class DangKiGUI extends JFrame {
         registerButton.setBorder(BorderFactory.createLineBorder(new Color(0, 150, 0), 2));
         registerButton.setPreferredSize(new Dimension(109, 30)); // Bo góc nhẹ
         rightPanel.add(registerButton, gbc);
+        
+        // Xử lý sự kiện nút đăng kí
+         registerButton.addActionListener(e -> {
+        String fullName = fullNameField.getText();
+        String username = usernameField.getText();
+        String password = new String(passwordField.getPassword());
+        String phone = phoneField.getText();
+
+        // Kiểm tra dữ liệu cơ bản (có thể mở rộng thêm kiểm tra sau)
+        if (fullName.isEmpty() || username.isEmpty() || password.isEmpty() || phone.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Thông báo đăng kí thành công
+        JOptionPane.showMessageDialog(null, "Đăng ký thành công! Mời bạn đăng nhập.");
+
+        // Chuyển sang giao diện đăng nhập
+        DangNhapGUI dangNhapGUI = new DangNhapGUI();
+        dangNhapGUI.setVisible(true);
+
+        // Đóng giao diện đăng ký
+        dispose();
+        });
 
         // Thêm các panel vào BackgroundPanel
         backgroundPanel.add(leftPanel, BorderLayout.WEST);
@@ -108,34 +132,34 @@ public class DangKiGUI extends JFrame {
 
         // Hiển thị giao diện
         add(backgroundPanel);
-    }
+        }
 
-    public static void main(String[] args) {
+        public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             new DangKiGUI().setVisible(true);
-        });
-    }
-}
+                });
+            }
+        }
 
-// Class BackgroundPanel để vẽ ảnh nền
-class BackgroundPanel extends JPanel {
-    private Image backgroundImage;
+        // Class BackgroundPanel để vẽ ảnh nền
+        class BackgroundPanel extends JPanel {
+        private Image backgroundImage;
 
-    public BackgroundPanel(String imagePath) {
+        public BackgroundPanel(String imagePath) {
         URL imageURL = getClass().getResource(imagePath);
-        if (imageURL != null) {
-            backgroundImage = new ImageIcon(imageURL).getImage();
-        } else {
-            System.err.println("Không tìm thấy ảnh nền: " + imagePath);
+            if (imageURL != null) {
+                backgroundImage = new ImageIcon(imageURL).getImage();
+            } else {
+                System.err.println("Không tìm thấy ảnh nền: " + imagePath);
+            }
         }
-    }
 
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        if (backgroundImage != null) {
-            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+                if (backgroundImage != null) {
+                    g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+                }
+            }
         }
-    }
-}
 

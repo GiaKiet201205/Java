@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.URL;
 
 public class TrangChuGUI extends JFrame {
     public TrangChuGUI() {
@@ -21,7 +20,7 @@ public class TrangChuGUI extends JFrame {
         // Logo
         JLabel logoLabel = new JLabel("SSS", SwingConstants.CENTER);
         logoLabel.setFont(new Font("Serif", Font.BOLD, 30));
-        
+
         // Login & Register Buttons
         JPanel authPanel = new JPanel();
         authPanel.setBackground(new Color(160, 250, 160));
@@ -30,9 +29,9 @@ public class TrangChuGUI extends JFrame {
         Font buttonFont = new Font("Serif", Font.BOLD, 16);
         loginButton.setFont(buttonFont);
         registerButton.setFont(buttonFont);
-        
-        loginButton.setBackground(new Color(100, 200, 100)); 
-        loginButton.setForeground(Color.WHITE); // Chữ trắng
+
+        loginButton.setBackground(new Color(100, 200, 100));
+        loginButton.setForeground(Color.WHITE);
         registerButton.setBackground(new Color(100, 200, 100));
         registerButton.setForeground(Color.WHITE);
 
@@ -46,12 +45,32 @@ public class TrangChuGUI extends JFrame {
         authPanel.add(loginButton);
         authPanel.add(registerButton);
 
+        // Liên kết giao diện đăng nhập
+        loginButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DangNhapGUI dangNhap = new DangNhapGUI();
+                dangNhap.setVisible(true);
+                dispose(); // Đóng giao diện hiện tại nếu muốn
+            }
+        });
+
+        // Liên kết giao diện đăng ký
+        registerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DangKiGUI dangKi = new DangKiGUI();
+                dangKi.setVisible(true);
+                dispose(); // Đóng giao diện hiện tại nếu muốn
+            }
+        });
+
         // Header Layout
         headerPanel.add(logoLabel, BorderLayout.CENTER);
         headerPanel.add(authPanel, BorderLayout.EAST);
         add(headerPanel, BorderLayout.NORTH);
 
-        // Menu Panel (with search & cart)
+        // Menu Panel
         JPanel menuPanel = new JPanel();
         menuPanel.setBackground(Color.WHITE);
         menuPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10));
@@ -62,70 +81,63 @@ public class TrangChuGUI extends JFrame {
             menuButton.setContentAreaFilled(false);
             menuButton.setBorderPainted(false);
             menuButton.setFont(new Font("Serif", Font.PLAIN, 18));
-            menuPanel.add(menuButton);
             menuButton.setOpaque(true);
-            menuButton.setBackground(new Color(100, 200, 100)); 
+            menuButton.setBackground(new Color(100, 200, 100));
             menuButton.setForeground(Color.WHITE);
+            menuPanel.add(menuButton);
 
-
-            // Thêm ActionListener cho Blog
             if (item.equals("Blog")) {
-                menuButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        showBlogContent();
-                    }
-                });
-            }
-
-            // Thêm ActionListener cho CSKH
-            if (item.equals("CSKH")) {
-                menuButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        showCSKHContent();
-                    }
-                });
+                menuButton.addActionListener(e -> showBlogContent());
+            } else if (item.equals("CSKH")) {
+                menuButton.addActionListener(e -> showCSKHContent());
             }
         }
-        
-        // ComboBox Sản phẩm
+
+        // ComboBox sản phẩm
         String[] categories = {"Chọn danh mục", "Quần Áo", "Giày Dép", "Phụ Kiện"};
         JComboBox<String> categoryComboBox = new JComboBox<>(categories);
         categoryComboBox.setFont(new Font("Serif", Font.PLAIN, 16));
-        menuPanel.add(categoryComboBox);
-        categoryComboBox.setBackground(new Color(100, 200, 100)); 
+        categoryComboBox.setBackground(new Color(100, 200, 100));
         categoryComboBox.setForeground(Color.WHITE);
-        
         menuPanel.add(categoryComboBox);
-                
-        categoryComboBox.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String selectedCategory = (String) categoryComboBox.getSelectedItem();
-                if ("Quần Áo".equals(selectedCategory)) {
-                    showQuanAoGUI();
-                } else if ("Giày Dép".equals(selectedCategory)) {
-                    showGiayDepGUI();
-                } else if ("Phụ Kiện".equals(selectedCategory)) {
-                    showPhuKienGUI();
-                }
-            }
+
+        categoryComboBox.addActionListener(e -> {
+            String selected = (String) categoryComboBox.getSelectedItem();
+            if ("Quần Áo".equals(selected)) showQuanAoGUI();
+            else if ("Giày Dép".equals(selected)) showGiayDepGUI();
+            else if ("Phụ Kiện".equals(selected)) showPhuKienGUI();
         });
 
-        // Search & Cart Components (Inline with Menu)
+        // Search & Cart
         JTextField searchField = new JTextField(20);
         JButton searchButton = new JButton("🔍");
         JButton cartButton = new JButton("🛒");
+        searchButton.setBackground(new Color(100, 200, 100));
+        cartButton.setBackground(new Color(100, 200, 100));
+        searchButton.setForeground(Color.WHITE);
+        cartButton.setForeground(Color.WHITE);
 
         menuPanel.add(searchField);
         menuPanel.add(searchButton);
         menuPanel.add(cartButton);
-        searchButton.setBackground(new Color(100, 200, 100));
-        searchButton.setForeground(Color.WHITE);
-        cartButton.setBackground(new Color(100, 200, 100));
-        cartButton.setForeground(Color.WHITE);
 
+        add(menuPanel, BorderLayout.CENTER);
+        add(menuPanel, BorderLayout.CENTER);
+        add(menuPanel, BorderLayout.CENTER);
+        add(menuPanel, BorderLayout.CENTER);
+        add(menuPanel, BorderLayout.CENTER);
+        add(menuPanel, BorderLayout.CENTER);
+        add(menuPanel, BorderLayout.CENTER);
+        add(menuPanel, BorderLayout.CENTER);
+        add(menuPanel, BorderLayout.CENTER);
+        add(menuPanel, BorderLayout.CENTER);
+        menuPanel.add(cartButton);
+
+        add(menuPanel, BorderLayout.CENTER);
+        menuPanel.add(cartButton);
+
+        add(menuPanel, BorderLayout.CENTER);
+        menuPanel.add(cartButton);
 
         add(menuPanel, BorderLayout.CENTER);
 
@@ -135,13 +147,11 @@ public class TrangChuGUI extends JFrame {
         productPanel.setBackground(Color.WHITE);
         productPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Tiêu đề chính giữa
         JLabel productTitle = new JLabel("Các sản phẩm mẫu", SwingConstants.CENTER);
         productTitle.setFont(new Font("Serif", Font.BOLD, 20));
         productTitle.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
         productPanel.add(productTitle);
 
-        // Tạo panel con để căn giữa tiêu đề và hình ảnh
         JPanel productContainer = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
         productContainer.setBackground(Color.WHITE);
 
@@ -149,21 +159,17 @@ public class TrangChuGUI extends JFrame {
         String[] titles = {"Áo Polo Nam", "Áo Polo Nam", "Áo Polo Nam"};
 
         for (int i = 0; i < imagePaths.length; i++) {
-            URL imageUrl = getClass().getResource(imagePaths[i]);
+            java.net.URL imageUrl = getClass().getResource(imagePaths[i]);
             if (imageUrl != null) {
-                // Load ảnh
                 ImageIcon icon = new ImageIcon(imageUrl);
                 Image scaledImage = icon.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
                 ImageIcon resizedIcon = new ImageIcon(scaledImage);
                 JLabel productLabel = new JLabel(resizedIcon);
 
-                // Tiêu đề sản phẩm
                 JLabel titleLabel = new JLabel(titles[i], SwingConstants.CENTER);
                 titleLabel.setFont(new Font("Serif", Font.BOLD, 16));
 
-                // Panel chứa tiêu đề + ảnh
-                JPanel itemPanel = new JPanel();
-                itemPanel.setLayout(new BorderLayout());
+                JPanel itemPanel = new JPanel(new BorderLayout());
                 itemPanel.setBackground(Color.WHITE);
                 itemPanel.add(titleLabel, BorderLayout.NORTH);
                 itemPanel.add(productLabel, BorderLayout.CENTER);
@@ -171,7 +177,7 @@ public class TrangChuGUI extends JFrame {
                 productContainer.add(itemPanel);
             } else {
                 System.out.println("Không tìm thấy ảnh: " + imagePaths[i]);
-            }       
+            }
         }
 
         productPanel.add(productContainer);
@@ -186,7 +192,7 @@ public class TrangChuGUI extends JFrame {
         frame.add(new QuanAoGUI());
         frame.setVisible(true);
     }
-    
+
     private void showGiayDepGUI() {
         JFrame frame = new JFrame("Danh Mục Giày Dép");
         frame.setSize(600, 500);
@@ -195,7 +201,7 @@ public class TrangChuGUI extends JFrame {
         frame.add(new GiayDepGUI());
         frame.setVisible(true);
     }
-    
+
     private void showPhuKienGUI() {
         JFrame frame = new JFrame("Danh Mục Phụ Kiện");
         frame.setSize(600, 500);
@@ -205,19 +211,15 @@ public class TrangChuGUI extends JFrame {
         frame.setVisible(true);
     }
 
-    // Hiển thị nội dung Blog
     private void showBlogContent() {
         JOptionPane.showMessageDialog(this, "Đây là page của chúng tôi: ShopQuanAo123");
     }
 
-    // Hiển thị nội dung CSKH
     private void showCSKHContent() {
         JOptionPane.showMessageDialog(this, "Bạn có thể liên lạc với chúng tôi qua DISCORD:java");
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            new TrangChuGUI().setVisible(true);
-        });
+        SwingUtilities.invokeLater(() -> new TrangChuGUI().setVisible(true));
     }
 }
