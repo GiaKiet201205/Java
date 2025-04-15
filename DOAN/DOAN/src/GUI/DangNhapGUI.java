@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import GUI.TrangChuGUI;
 
 class BackgroundPanel extends JPanel {
     private Image backgroundImage;
@@ -89,16 +90,27 @@ public class DangNhapGUI extends JFrame {
         forgotPasswordLabel.setForeground(Color.BLACK);
         forgotPasswordLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
         loginPanel.add(forgotPasswordLabel, gbc);
-
+        
         // Xử lý sự kiện nút đăng nhập
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String username = usernameField.getText();
                 String password = new String(passwordField.getPassword());
-                System.out.println("Tên đăng nhập: " + username);
-                System.out.println("Mật khẩu: " + password);
-                // Thêm xử lý xác thực đăng nhập ở đây
+
+                // Giả lập kiểm tra tài khoản hợp lệ
+               if (username.equals("admin") && password.equals("123456")) {
+                  JOptionPane.showMessageDialog(null, "Đăng nhập thành công!");
+
+                   // Mở giao diện trang chủ
+                  TrangChuGUI trangChu = new TrangChuGUI();
+                  trangChu.setVisible(true);
+
+                 // Đóng giao diện đăng nhập
+                    dispose();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Tên đăng nhập hoặc mật khẩu sai!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
