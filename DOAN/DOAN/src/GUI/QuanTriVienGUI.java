@@ -1269,7 +1269,12 @@ private void addChiTietHoaDon() {
             JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
     if (result == JOptionPane.OK_OPTION) {
-        String thanhTien = String.format("%,d VND", Integer.parseInt(txtSoLuong.getText()) * Long.parseLong(txtGiaBan.getText()));
+        String soLuongStr = txtSoLuong.getText().trim();
+if (soLuongStr.isEmpty()) {
+    JOptionPane.showMessageDialog(null, "Vui lòng nhập số lượng!", "Lỗi nhập liệu", JOptionPane.ERROR_MESSAGE);
+    return;
+}
+        Object thanhTien = null;
 
         Object[] newRow = {
             txtIDCTDH.getText(), txtIDDH.getText(), txtIDSP.getText(),
@@ -1313,39 +1318,54 @@ private void editChiTietHoaDon(int selectedRow) {
     JTextField txtSoLuong = new JTextField(chiTietHoaDonTableModel.getValueAt(selectedRow, 3).toString());
     JTextField txtGiaBan = new JTextField(chiTietHoaDonTableModel.getValueAt(selectedRow, 4).toString().replace(" VND", ""));
 
-    JPanel panel = new JPanel(new GridLayout(0, 2));
-    panel.add(new JLabel("ID chi tiết hóa đơn:"));
-    panel.add(txtIDCTDH);
-    panel.add(new JLabel("ID đơn hàng:"));
-    panel.add(txtIDDH);
-    panel.add(new JLabel("ID sản phẩm:"));
-    panel.add(txtIDSP);
-    panel.add(new JLabel("Số lượng:"));
-    panel.add(txtSoLuong);
-    panel.add(new JLabel("Giá bán:"));
-    panel.add(txtGiaBan);
+   JPanel panel = new JPanel(new GridLayout(0, 2));
+panel.add(new JLabel("ID chi tiết hóa đơn:"));
+panel.add(txtIDCTDH);
+panel.add(new JLabel("ID đơn hàng:"));
+panel.add(txtIDDH);
+panel.add(new JLabel("ID sản phẩm:"));
+panel.add(txtIDSP);
+panel.add(new JLabel("Số lượng:"));
+panel.add(txtSoLuong);
+panel.add(new JLabel("Giá bán:"));
+panel.add(txtGiaBan);
 
-    int result = JOptionPane.showConfirmDialog(this, panel, "Sửa chi tiết hóa đơn",
-            JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+int result = JOptionPane.showConfirmDialog(this, panel, "Sửa chi tiết hóa đơn",
+        JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
-    if (result == JOptionPane.OK_OPTION) {
-        // Tính lại thành tiền
-        String thanhTien = String.format("%,d VND", Integer.parseInt(txtSoLuong.getText()) * Long.parseLong(txtGiaBan.getText()));
-        
-        // Cập nhật lại giá trị vào bảng
-        chiTietHoaDonTableModel.setValueAt(txtIDCTDH.getText(), selectedRow, 0);
-        chiTietHoaDonTableModel.setValueAt(txtIDDH.getText(), selectedRow, 1);
-        chiTietHoaDonTableModel.setValueAt(txtIDSP.getText(), selectedRow, 2);
-        chiTietHoaDonTableModel.setValueAt(txtSoLuong.getText(), selectedRow, 3);
-        chiTietHoaDonTableModel.setValueAt(txtGiaBan.getText() + " VND", selectedRow, 4);
-        chiTietHoaDonTableModel.setValueAt(thanhTien, selectedRow, 5);
+if (result == JOptionPane.OK_OPTION) {
+    String soLuongStr = txtSoLuong.getText().trim();
+    String giaBanStr = txtGiaBan.getText().trim();
 
-        JOptionPane.showMessageDialog(this, "Chi tiết hóa đơn đã được cập nhật", 
-                "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+    if (soLuongStr.isEmpty() || giaBanStr.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ số lượng và giá bán!",
+                "Lỗi", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    if (!soLuongStr.matches("\\d+") || !giaBanStr.matches("\\d+")) {
+        JOptionPane.showMessageDialog(this, "Số lượng và giá bán phải là số nguyên dương!",
+                "Lỗi", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    int soLuong = Integer.parseInt(soLuongStr);
+    long giaBan = Long.parseLong(giaBanStr);
+    String thanhTien = String.format("%,d VND", soLuong * giaBan);
+
+    // Cập nhật lại giá trị vào bảng
+    chiTietHoaDonTableModel.setValueAt(txtIDCTDH.getText(), selectedRow, 0);
+    chiTietHoaDonTableModel.setValueAt(txtIDDH.getText(), selectedRow, 1);
+    chiTietHoaDonTableModel.setValueAt(txtIDSP.getText(), selectedRow, 2);
+    chiTietHoaDonTableModel.setValueAt(soLuongStr, selectedRow, 3);
+    chiTietHoaDonTableModel.setValueAt(giaBanStr + " VND", selectedRow, 4);
+    chiTietHoaDonTableModel.setValueAt(thanhTien, selectedRow, 5);
+
+    JOptionPane.showMessageDialog(this, "Chi tiết hóa đơn đã được cập nhật",
+            "Thông báo", JOptionPane.INFORMATION_MESSAGE);
     }
 }
-
-private void createNhapHangPanel() {
+        private void createNhapHangPanel() {
     nhapHangPanel = new JPanel(new BorderLayout());
     
     // Create top panel for title and functions
@@ -1876,17 +1896,33 @@ private void addChiTietNhapHang() {
     int result = JOptionPane.showConfirmDialog(this, panel, "Thêm chi tiết nhập hàng mới",
             JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
-    if (result == JOptionPane.OK_OPTION) {
-        int soLuong = Integer.parseInt(txtSoLuong.getText());
-        int giaNhap = Integer.parseInt(txtGiaNhap.getText());
-        int thanhTien = soLuong * giaNhap;
+  if (result == JOptionPane.OK_OPTION) {
+    String soLuongStr = txtSoLuong.getText().trim();
+    String giaNhapStr = txtGiaNhap.getText().trim();
 
-        Object[] newRow = {
-            txtIDCTNH.getText(), txtIDNH.getText(), txtIDSP.getText(),
-            soLuong, giaNhap, thanhTien
-        };
-        chiTietNhapHangTableModel.addRow(newRow);
+    if (soLuongStr.isEmpty() || giaNhapStr.isEmpty()) {
+        JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ số lượng và giá nhập!");
+        return;
     }
+
+    int soLuong, giaNhap;
+
+    try {
+        soLuong = Integer.parseInt(soLuongStr);
+        giaNhap = Integer.parseInt(giaNhapStr);
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(null, "Số lượng và giá nhập phải là số nguyên hợp lệ!");
+        return;
+    }
+
+    int thanhTien = soLuong * giaNhap;
+
+    Object[] newRow = {
+        txtIDCTNH.getText(), txtIDNH.getText(), txtIDSP.getText(),
+        soLuong, giaNhap, thanhTien
+    };
+    chiTietNhapHangTableModel.addRow(newRow);
+}
 }
 
 private void editChiTietNhapHang(int selectedRow) {
