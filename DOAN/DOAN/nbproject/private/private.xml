@@ -3,13 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-<<<<<<< HEAD
-            <file>file:/E:/Java/DOAN/DOAN/src/GUI/TrangChuGUI.java</file>
-            <file>file:/E:/Java/DOAN/DOAN/src/GUI/GioHangGUI.java</file>
-            <file>file:/E:/Java/DOAN/DOAN/src/GUI/QuanTriVienGUI.java</file>
-=======
-            <file>file:/C:/Users/Nguyen%20Xuan%20Thuan/OneDrive%20-%20Saigon%20University/Desktop/Java/DOAN/DOAN/src/GUI/DangKiGUI.java</file>
->>>>>>> c81687849e01905927e99eb89a5fb19fa660085f
+            <file>file:/E:/Java/DOAN/DOAN/src/DTO/NhapHangDTO.java</file>
+            <file>file:/E:/Java/DOAN/DOAN/src/DTO/PhuongThucThanhToanDTO.java</file>
+            <file>file:/E:/Java/DOAN/DOAN/src/DTO/KhachHangDTO.java</file>
+            <file>file:/E:/Java/DOAN/DOAN/src/DTO/SanPhamDTO.java</file>
+            <file>file:/E:/Java/DOAN/DOAN/src/DTO/PhanQuyenDTO.java</file>
         </group>
     </open-files>
 </project-private>

@@ -150,19 +150,13 @@ DROP TABLE IF EXISTS `khach_hang`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `khach_hang` (
   `id_khach_hang` varchar(5) NOT NULL,
-  `id_phan_quyen` int NOT NULL,
   `ho_ten` varchar(45) NOT NULL,
   `email` varchar(45) NOT NULL,
   `sdt` varchar(10) NOT NULL,
-  `ten_user` varchar(20) NOT NULL,
-  `password` varchar(45) NOT NULL,
   PRIMARY KEY (`id_khach_hang`),
   UNIQUE KEY `id khach hang_UNIQUE` (`id_khach_hang`),
   UNIQUE KEY `email_UNIQUE` (`email`),
-  UNIQUE KEY `sđt_UNIQUE` (`sdt`),
-  UNIQUE KEY `ten user_UNIQUE` (`ten_user`),
-  KEY `fk_khachhang_phanquyen` (`id_phan_quyen`),
-  CONSTRAINT `fk_khachhang_phanquyen` FOREIGN KEY (`id_phan_quyen`) REFERENCES `phan_quyen` (`id_phan_quyen`) ON DELETE CASCADE ON UPDATE CASCADE
+  UNIQUE KEY `sđt_UNIQUE` (`sdt`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -172,7 +166,7 @@ CREATE TABLE `khach_hang` (
 
 LOCK TABLES `khach_hang` WRITE;
 /*!40000 ALTER TABLE `khach_hang` DISABLE KEYS */;
-INSERT INTO `khach_hang` VALUES ('88888',1,'Admin2','admin2@gmail.com','0888888888','admin2','admin2'),('99999',1,'Admin','admin@gmail.com','0999999999','admin','admin'),('KH001',2,'Nguyen Van A1','a1@gmail.com','0900000001','user1','pass1'),('KH002',2,'Nguyen Van A2','a2@gmail.com','0900000002','user2','pass2'),('KH003',2,'Nguyen Van A3','a3@gmail.com','0900000003','user3','pass3'),('KH004',2,'Nguyen Van A4','a4@gmail.com','0900000004','user4','pass4'),('KH005',2,'Nguyen Van A5','a5@gmail.com','0900000005','user5','pass5'),('KH006',2,'Nguyen Van A6','a6@gmail.com','0900000006','user6','pass6'),('KH007',2,'Nguyen Van A7','a7@gmail.com','0900000007','user7','pass7'),('KH008',2,'Nguyen Van A8','a8@gmail.com','0900000008','user8','pass8'),('KH009',2,'Nguyen Van A9','a9@gmail.com','0900000009','user9','pass9'),('KH010',2,'Nguyen Van A10','a10@gmail.com','0900000010','user10','pass10'),('KH011',2,'Nguyen Van A11','a11@gmail.com','0900000011','user11','pass11'),('KH012',2,'Nguyen Van A12','a12@gmail.com','0900000012','user12','pass12'),('KH013',2,'Nguyen Van A13','a13@gmail.com','0900000013','user13','pass13'),('KH014',2,'Nguyen Van A14','a14@gmail.com','0900000014','user14','pass14'),('KH015',2,'Nguyen Van A15','a15@gmail.com','0900000015','user15','pass15'),('KH016',2,'Nguyen Van A16','a16@gmail.com','0900000016','user16','pass16'),('KH017',2,'Nguyen Van A17','a17@gmail.com','0900000017','user17','pass17'),('KH018',2,'Nguyen Van A18','a18@gmail.com','0900000018','user18','pass18'),('KH019',2,'Nguyen Van A19','a19@gmail.com','0900000019','user19','pass19'),('KH020',2,'Nguyen Van A20','a20@gmail.com','0900000020','user20','pass20'),('KH021',2,'Nguyen Van A21','a21@gmail.com','0900000021','user21','pass21'),('KH022',2,'Nguyen Van A22','a22@gmail.com','0900000022','user22','pass22'),('KH023',2,'Nguyen Van A23','a23@gmail.com','0900000023','user23','pass23'),('KH024',2,'Nguyen Van A24','a24@gmail.com','0900000024','user24','pass24'),('KH025',2,'Nguyen Van A25','a25@gmail.com','0900000025','user25','pass25'),('KH026',2,'Nguyen Van A26','a26@gmail.com','0900000026','user26','pass26'),('KH027',2,'Nguyen Van A27','a27@gmail.com','0900000027','user27','pass27'),('KH028',2,'Nguyen Van A28','a28@gmail.com','0900000028','user28','pass28'),('KH029',2,'Nguyen Van A29','a29@gmail.com','0900000029','user29','pass29'),('KH030',2,'Nguyen Van A30','a30@gmail.com','0900000030','user30','pass30'),('KH031',2,'Nguyen Van A31','a31@gmail.com','0900000031','user31','pass31'),('KH032',2,'Nguyen Van A32','a32@gmail.com','0900000032','user32','pass32'),('KH033',2,'Nguyen Van A33','a33@gmail.com','0900000033','user33','pass33'),('KH034',2,'Nguyen Van A34','a34@gmail.com','0900000034','user34','pass34'),('KH035',2,'Nguyen Van A35','a35@gmail.com','0900000035','user35','pass35'),('KH036',2,'Nguyen Van A36','a36@gmail.com','0900000036','user36','pass36'),('KH037',2,'Nguyen Van A37','a37@gmail.com','0900000037','user37','pass37'),('KH038',2,'Nguyen Van A38','a38@gmail.com','0900000038','user38','pass38'),('KH039',2,'Nguyen Van A39','a39@gmail.com','0900000039','user39','pass39'),('KH040',2,'Nguyen Van A40','a40@gmail.com','0900000040','user40','pass40');
+INSERT INTO `khach_hang` VALUES ('99999','Admin','admin@gmail.com','0999999999'),('KH001','Nguyen Van A1','a1@gmail.com','0900000001'),('KH002','Nguyen Van A2','a2@gmail.com','0900000002'),('KH003','Nguyen Van A3','a3@gmail.com','0900000003'),('KH004','Nguyen Van A4','a4@gmail.com','0900000004'),('KH005','Nguyen Van A5','a5@gmail.com','0900000005'),('KH006','Nguyen Van A6','a6@gmail.com','0900000006'),('KH007','Nguyen Van A7','a7@gmail.com','0900000007'),('KH008','Nguyen Van A8','a8@gmail.com','0900000008'),('KH009','Nguyen Van A9','a9@gmail.com','0900000009'),('KH010','Nguyen Van A10','a10@gmail.com','0900000010'),('KH011','Nguyen Van A11','a11@gmail.com','0900000011'),('KH012','Nguyen Van A12','a12@gmail.com','0900000012'),('KH013','Nguyen Van A13','a13@gmail.com','0900000013'),('KH014','Nguyen Van A14','a14@gmail.com','0900000014'),('KH015','Nguyen Van A15','a15@gmail.com','0900000015'),('KH016','Nguyen Van A16','a16@gmail.com','0900000016'),('KH017','Nguyen Van A17','a17@gmail.com','0900000017'),('KH018','Nguyen Van A18','a18@gmail.com','0900000018'),('KH019','Nguyen Van A19','a19@gmail.com','0900000019'),('KH020','Nguyen Van A20','a20@gmail.com','0900000020'),('KH021','Nguyen Van A21','a21@gmail.com','0900000021'),('KH022','Nguyen Van A22','a22@gmail.com','0900000022'),('KH023','Nguyen Van A23','a23@gmail.com','0900000023'),('KH024','Nguyen Van A24','a24@gmail.com','0900000024'),('KH025','Nguyen Van A25','a25@gmail.com','0900000025'),('KH026','Nguyen Van A26','a26@gmail.com','0900000026'),('KH027','Nguyen Van A27','a27@gmail.com','0900000027'),('KH028','Nguyen Van A28','a28@gmail.com','0900000028'),('KH029','Nguyen Van A29','a29@gmail.com','0900000029'),('KH030','Nguyen Van A30','a30@gmail.com','0900000030'),('KH031','Nguyen Van A31','a31@gmail.com','0900000031'),('KH032','Nguyen Van A32','a32@gmail.com','0900000032'),('KH033','Nguyen Van A33','a33@gmail.com','0900000033'),('KH034','Nguyen Van A34','a34@gmail.com','0900000034'),('KH035','Nguyen Van A35','a35@gmail.com','0900000035'),('KH036','Nguyen Van A36','a36@gmail.com','0900000036'),('KH037','Nguyen Van A37','a37@gmail.com','0900000037'),('KH038','Nguyen Van A38','a38@gmail.com','0900000038'),('KH039','Nguyen Van A39','a39@gmail.com','0900000039'),('KH040','Nguyen Van A40','a40@gmail.com','0900000040');
 /*!40000 ALTER TABLE `khach_hang` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -329,6 +323,7 @@ CREATE TABLE `san_pham` (
   `id_san_pham` varchar(5) NOT NULL,
   `id_danh_muc` varchar(5) NOT NULL,
   `id_nha_cung_cap` varchar(5) NOT NULL,
+  `hinh_anh` varchar(100) NOT NULL,
   `gia` varchar(45) NOT NULL,
   `ten_san_pham` varchar(45) NOT NULL,
   `so_luong_ton_kho` varchar(45) NOT NULL,
@@ -347,8 +342,38 @@ CREATE TABLE `san_pham` (
 
 LOCK TABLES `san_pham` WRITE;
 /*!40000 ALTER TABLE `san_pham` DISABLE KEYS */;
-INSERT INTO `san_pham` VALUES ('SP001','DM002','CC001','85000','Sản phẩm 1','29'),('SP002','DM001','CC001','85000','Sản phẩm 2','4'),('SP003','DM003','CC001','85000','Sản phẩm 3','1'),('SP004','DM004','CC001','85000','Sản phẩm 4','80'),('SP005','DM005','CC001','85000','Sản phẩm 5','3'),('SP006','DM002','CC002','85000','Sản phẩm 6','40'),('SP007','DM001','CC002','85000','Sản phẩm 7','33'),('SP008','DM003','CC002','85000','Sản phẩm 8','59'),('SP009','DM004','CC002','85000','Sản phẩm 9','14'),('SP010','DM005','CC002','85000','Sản phẩm 10','27'),('SP011','DM002','CC003','150000','Sản phẩm 11','90'),('SP012','DM001','CC003','150000','Sản phẩm 12','55'),('SP013','DM003','CC003','150000','Sản phẩm 13','38'),('SP014','DM004','CC003','150000','Sản phẩm 14','14'),('SP015','DM005','CC003','150000','Sản phẩm 15','27'),('SP016','DM002','CC004','150000','Sản phẩm 16','76'),('SP017','DM001','CC004','150000','Sản phẩm 17','5'),('SP018','DM003','CC004','150000','Sản phẩm 18','2'),('SP019','DM004','CC004','150000','Sản phẩm 19','88'),('SP020','DM005','CC004','150000','Sản phẩm 20','41'),('SP021','DM002','CC005','150000','Sản phẩm 21','87'),('SP022','DM001','CC005','150000','Sản phẩm 22','83'),('SP023','DM003','CC005','150000','Sản phẩm 23','83'),('SP024','DM004','CC005','150000','Sản phẩm 24','30'),('SP025','DM005','CC005','150000','Sản phẩm 25','24'),('SP026','DM002','CC006','280000','Sản phẩm 26','80'),('SP027','DM001','CC006','280000','Sản phẩm 27','5'),('SP028','DM003','CC006','280000','Sản phẩm 28','69'),('SP029','DM004','CC006','280000','Sản phẩm 29','53'),('SP030','DM005','CC006','280000','Sản phẩm 30','80'),('SP031','DM002','CC007','280000','Sản phẩm 31','39'),('SP032','DM001','CC007','280000','Sản phẩm 32','22'),('SP033','DM003','CC007','280000','Sản phẩm 33','58'),('SP034','DM004','CC007','280000','Sản phẩm 34','93'),('SP035','DM005','CC007','280000','Sản phẩm 35','37'),('SP036','DM002','CC008','280000','Sản phẩm 36','57'),('SP037','DM001','CC008','280000','Sản phẩm 37','41'),('SP038','DM003','CC008','280000','Sản phẩm 38','64'),('SP039','DM004','CC008','280000','Sản phẩm 39','44'),('SP040','DM005','CC008','280000','Sản phẩm 40','55');
+INSERT INTO `san_pham` VALUES ('SP001','DM002','CC001','','85000','Sản phẩm 1','29'),('SP002','DM001','CC001','','85000','Sản phẩm 2','4'),('SP003','DM003','CC001','','85000','Sản phẩm 3','1'),('SP004','DM004','CC001','','85000','Sản phẩm 4','80'),('SP005','DM005','CC001','','85000','Sản phẩm 5','3'),('SP006','DM002','CC002','','85000','Sản phẩm 6','40'),('SP007','DM001','CC002','','85000','Sản phẩm 7','33'),('SP008','DM003','CC002','','85000','Sản phẩm 8','59'),('SP009','DM004','CC002','','85000','Sản phẩm 9','14'),('SP010','DM005','CC002','','85000','Sản phẩm 10','27'),('SP011','DM002','CC003','','150000','Sản phẩm 11','90'),('SP012','DM001','CC003','','150000','Sản phẩm 12','55'),('SP013','DM003','CC003','','150000','Sản phẩm 13','38'),('SP014','DM004','CC003','','150000','Sản phẩm 14','14'),('SP015','DM005','CC003','','150000','Sản phẩm 15','27'),('SP016','DM002','CC004','','150000','Sản phẩm 16','76'),('SP017','DM001','CC004','','150000','Sản phẩm 17','5'),('SP018','DM003','CC004','','150000','Sản phẩm 18','2'),('SP019','DM004','CC004','','150000','Sản phẩm 19','88'),('SP020','DM005','CC004','','150000','Sản phẩm 20','41'),('SP021','DM002','CC005','','150000','Sản phẩm 21','87'),('SP022','DM001','CC005','','150000','Sản phẩm 22','83'),('SP023','DM003','CC005','','150000','Sản phẩm 23','83'),('SP024','DM004','CC005','','150000','Sản phẩm 24','30'),('SP025','DM005','CC005','','150000','Sản phẩm 25','24'),('SP026','DM002','CC006','','280000','Sản phẩm 26','80'),('SP027','DM001','CC006','','280000','Sản phẩm 27','5'),('SP028','DM003','CC006','','280000','Sản phẩm 28','69'),('SP029','DM004','CC006','','280000','Sản phẩm 29','53'),('SP030','DM005','CC006','','280000','Sản phẩm 30','80'),('SP031','DM002','CC007','','280000','Sản phẩm 31','39'),('SP032','DM001','CC007','','280000','Sản phẩm 32','22'),('SP033','DM003','CC007','','280000','Sản phẩm 33','58'),('SP034','DM004','CC007','','280000','Sản phẩm 34','93'),('SP035','DM005','CC007','','280000','Sản phẩm 35','37'),('SP036','DM002','CC008','','280000','Sản phẩm 36','57'),('SP037','DM001','CC008','','280000','Sản phẩm 37','41'),('SP038','DM003','CC008','','280000','Sản phẩm 38','64'),('SP039','DM004','CC008','','280000','Sản phẩm 39','44'),('SP040','DM005','CC008','','280000','Sản phẩm 40','55');
 /*!40000 ALTER TABLE `san_pham` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tai_khoan`
+--
+
+DROP TABLE IF EXISTS `tai_khoan`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `tai_khoan` (
+  `id_tai_khoan` varchar(5) NOT NULL,
+  `id_khach_hang` varchar(5) NOT NULL,
+  `ten_user` varchar(45) NOT NULL,
+  `password` varchar(45) NOT NULL,
+  `phan_quyen` varchar(45) NOT NULL,
+  `trang_thai` varchar(45) NOT NULL,
+  PRIMARY KEY (`id_tai_khoan`),
+  KEY `fk_tai_khoan_khach_hang` (`id_khach_hang`),
+  CONSTRAINT `fk_tai_khoan_khach_hang` FOREIGN KEY (`id_khach_hang`) REFERENCES `khach_hang` (`id_khach_hang`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tai_khoan`
+--
+
+LOCK TABLES `tai_khoan` WRITE;
+/*!40000 ALTER TABLE `tai_khoan` DISABLE KEYS */;
+INSERT INTO `tai_khoan` VALUES ('99999','99999','admin','admin','1','use'),('TK001','KH001','user001','pass001','2','use'),('TK002','KH002','user002','pass002','2','use'),('TK003','KH003','user003','pass003','2','use'),('TK004','KH004','user004','pass004','2','use'),('TK005','KH005','user005','pass005','2','use'),('TK006','KH006','user006','pass006','2','use'),('TK007','KH007','user007','pass007','2','use'),('TK008','KH008','user008','pass008','2','use'),('TK009','KH009','user009','pass009','2','use'),('TK010','KH010','user010','pass010','2','use'),('TK011','KH011','user011','pass011','2','use'),('TK012','KH012','user012','pass012','2','use'),('TK013','KH013','user013','pass013','2','use'),('TK014','KH014','user014','pass014','2','use'),('TK015','KH015','user015','pass015','2','use'),('TK016','KH016','user016','pass016','2','use'),('TK017','KH017','user017','pass017','2','use'),('TK018','KH018','user018','pass018','2','use'),('TK019','KH019','user019','pass019','2','use'),('TK020','KH020','user020','pass020','2','lock'),('TK021','KH021','user021','pass021','2','use'),('TK022','KH022','user022','pass022','2','use'),('TK023','KH023','user023','pass023','2','use'),('TK024','KH024','user024','pass024','2','use'),('TK025','KH025','user025','pass025','2','use'),('TK026','KH026','user026','pass026','2','use'),('TK027','KH027','user027','pass027','2','use'),('TK028','KH028','user028','pass028','2','use'),('TK029','KH029','user029','pass029','2','use'),('TK030','KH030','user030','pass030','2','lock'),('TK031','KH031','user031','pass031','2','use'),('TK032','KH032','user032','pass032','2','use'),('TK033','KH033','user033','pass033','2','use'),('TK034','KH034','user034','pass034','2','use'),('TK035','KH035','user035','pass035','2','use'),('TK036','KH036','user036','pass036','2','use'),('TK037','KH037','user037','pass037','2','use'),('TK038','KH038','user038','pass038','2','use'),('TK039','KH039','user039','pass039','2','use'),('TK040','KH040','user040','pass040','2','use');
+/*!40000 ALTER TABLE `tai_khoan` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -360,4 +385,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-12 22:48:49
+-- Dump completed on 2025-04-16 22:27:30

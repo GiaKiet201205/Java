@@ -327,7 +327,7 @@ public class QuanTriVienGUI extends JFrame {
     sanPhamPanel.add(topPanel, BorderLayout.NORTH);
     
     // Create table for product data
-    String[] columns = {"ID sản phẩm", "Tên sản phẩm", "Giá", "Số lượng tồn kho", "ID danh mục"};
+    String[] columns = {"ID sản phẩm", "Tên sản phẩm", "Giá", "Số lượng tồn kho", "ID danh mục","Hình ảnh"};
     sanPhamTableModel = new DefaultTableModel(columns, 0) {
         @Override
         public boolean isCellEditable(int row, int column) {
