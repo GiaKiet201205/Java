@@ -3,7 +3,6 @@ package GUI;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class TrangChuGUI extends JFrame {
     public TrangChuGUI() {
@@ -45,24 +44,19 @@ public class TrangChuGUI extends JFrame {
         authPanel.add(loginButton);
         authPanel.add(registerButton);
 
+          
         // Liên kết giao diện đăng nhập
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                DangNhapGUI dangNhap = new DangNhapGUI();
-                dangNhap.setVisible(true);
-                dispose(); // Đóng giao diện hiện tại nếu muốn
-            }
+        loginButton.addActionListener((ActionEvent e) -> {
+            setVisible(false); // Ẩn TrangChuGUI tạm thời
+            DangNhapGUI dangNhap = new DangNhapGUI();  // Sử dụng constructor mặc định
+            dangNhap.setVisible(true);
         });
-
+        
         // Liên kết giao diện đăng ký
-        registerButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                DangKiGUI dangKi = new DangKiGUI();
-                dangKi.setVisible(true);
-                dispose(); // Đóng giao diện hiện tại nếu muốn
-            }
+        registerButton.addActionListener((ActionEvent e) -> {
+            setVisible(false); // Ẩn TrangChuGUI tạm thời
+            DangKiGUI dangki = new DangKiGUI(TrangChuGUI.this); // Tạo đối tượng đăng ký
+            dangki.setVisible(true); // Hiển thị giao diện đăng ký
         });
 
         // Header Layout
@@ -121,24 +115,7 @@ public class TrangChuGUI extends JFrame {
         menuPanel.add(searchButton);
         menuPanel.add(cartButton);
 
-        add(menuPanel, BorderLayout.CENTER);
-        add(menuPanel, BorderLayout.CENTER);
-        add(menuPanel, BorderLayout.CENTER);
-        add(menuPanel, BorderLayout.CENTER);
-        add(menuPanel, BorderLayout.CENTER);
-        add(menuPanel, BorderLayout.CENTER);
-        add(menuPanel, BorderLayout.CENTER);
-        add(menuPanel, BorderLayout.CENTER);
-        add(menuPanel, BorderLayout.CENTER);
-        add(menuPanel, BorderLayout.CENTER);
-        menuPanel.add(cartButton);
-
-        add(menuPanel, BorderLayout.CENTER);
-        menuPanel.add(cartButton);
-
-        add(menuPanel, BorderLayout.CENTER);
-        menuPanel.add(cartButton);
-
+        // Add menuPanel vào center MỘT lần
         add(menuPanel, BorderLayout.CENTER);
 
         // Product Panel
