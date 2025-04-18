@@ -18,6 +18,7 @@ public class ChiTietNhapHangPanel extends JPanel {
     public ChiTietNhapHangPanel() {
         chiTietNhapHangPanel = new JPanel(new BorderLayout());
         createChiTietNhapHangPanel();
+        add(chiTietNhapHangPanel, BorderLayout.CENTER);
     }
 
     private void createChiTietNhapHangPanel() {

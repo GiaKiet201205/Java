@@ -1,7 +1,7 @@
 package GUI.panel;
 
 import javax.swing.*;
-import javax.swing.table.*;
+import javax.swing.table.*; 
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
