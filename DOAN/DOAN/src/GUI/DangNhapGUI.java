@@ -3,11 +3,9 @@ package GUI;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import GUI.TrangChuGUI;
 
 class BackgroundPanel extends JPanel {
-    private Image backgroundImage;
+    private final Image backgroundImage;
 
     public BackgroundPanel(String imagePath) {
         backgroundImage = new ImageIcon(getClass().getResource(imagePath)).getImage();
@@ -91,26 +89,40 @@ public class DangNhapGUI extends JFrame {
         forgotPasswordLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
         loginPanel.add(forgotPasswordLabel, gbc);
         
+        // Nút quay lại trang chủ
+        gbc.gridy++;
+        JButton backButton = new JButton("Quay lại Trang Chủ"); 
+        backButton.setBackground(new Color(120, 200, 120));
+        backButton.setForeground(Color.BLACK);
+        backButton.setFocusPainted(false);
+        backButton.setPreferredSize(new Dimension(160, 30));
+        backButton.setBorder(BorderFactory.createLineBorder(new Color(0, 150, 0), 2));
+        loginPanel.add(backButton, gbc);
+
+        // Xử lý sự kiện quay lại
+        backButton.addActionListener((ActionEvent e) -> {
+            TrangChuGUI trangChu = new TrangChuGUI();
+            trangChu.setVisible(true);
+            dispose();  // Đóng giao diện đăng nhập
+        });
+        
         // Xử lý sự kiện nút đăng nhập
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String username = usernameField.getText();
-                String password = new String(passwordField.getPassword());
-
-                // Giả lập kiểm tra tài khoản hợp lệ
-               if (username.equals("admin") && password.equals("123456")) {
-                  JOptionPane.showMessageDialog(null, "Đăng nhập thành công!");
-
-                   // Mở giao diện trang chủ
-                  TrangChuGUI trangChu = new TrangChuGUI();
-                  trangChu.setVisible(true);
-
-                 // Đóng giao diện đăng nhập
-                    dispose();
-                } else {
-                    JOptionPane.showMessageDialog(null, "Tên đăng nhập hoặc mật khẩu sai!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                }
+        loginButton.addActionListener((ActionEvent e) -> {
+            String username = usernameField.getText();
+            String password = new String(passwordField.getPassword());
+            
+            // Giả lập kiểm tra tài khoản hợp lệ
+            if (username.equals("admin") && password.equals("123456")) {
+                JOptionPane.showMessageDialog(null, "Đăng nhập thành công!");
+                
+                // Mở giao diện trang chủ
+                TrangChuGUI trangChu = new TrangChuGUI();
+                trangChu.setVisible(true);
+                
+                // Đóng giao diện đăng nhập
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(null, "Tên đăng nhập hoặc mật khẩu sai!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         });
 
