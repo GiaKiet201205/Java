@@ -68,7 +68,7 @@ public class QuanTriVienGUI extends JFrame {
         contentPanel.add(chiTietHoaDonPanel, "ChiTietHoaDon");
         contentPanel.add(nhapHangPanel, "NhapHang");
         contentPanel.add(chiTietNhapHangPanel, "ChiTietNhapHang");
-        contentPanel.add(nhanVienPanel, "NhanVien");
+        contentPanel.add(nhanVienPanel, "NhanVien");    
         contentPanel.add(khachHangPanel, "KhachHang");
         contentPanel.add(danhMucPanel, "DanhMuc");
         contentPanel.add(phuongThucTTPanel, "PhuongThucTT");

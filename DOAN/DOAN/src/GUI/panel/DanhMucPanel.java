@@ -12,10 +12,14 @@ public class DanhMucPanel extends JPanel {
     private JPanel danhMucPanel;
     private JTable danhMucTable;
     private DefaultTableModel danhMucTableModel;
-    private Color headerColor = new Color(200, 255, 200); // Customize as needed
+    private Color headerColor = new Color(200, 255, 200);
 
     public DanhMucPanel() {
-        createDanhMucPanel();
+        setLayout(new BorderLayout()); 
+        setPreferredSize(new Dimension(600, 400)); 
+        createDanhMucPanel(); 
+        add(danhMucPanel, BorderLayout.CENTER); 
+        add(new JLabel("Danh mục", SwingConstants.CENTER), BorderLayout.NORTH); 
     }
 
     private void createDanhMucPanel() {
@@ -127,7 +131,7 @@ public class DanhMucPanel extends JPanel {
         btnReset.addActionListener(e -> {
             txtSearchDanhMuc.setText("");
             danhMucTableModel.setRowCount(0);
-            loadDanhMucData(); // Load real data (from DB or other source)
+            loadDanhMucData();
         });
 
         btnAdd.addActionListener(e -> addDanhMuc());
@@ -147,11 +151,8 @@ public class DanhMucPanel extends JPanel {
         });
     }
 
-    // Load real data from a data source (database or file)
     private void loadDanhMucData() {
         // Example of loading data from a database or external source
-        // For demonstration, you can call a method here that fetches data
-        // from your database or service
     }
 
     private void searchDanhMuc(String searchType, String keyword) {
@@ -161,11 +162,8 @@ public class DanhMucPanel extends JPanel {
             return;
         }
 
-        // For demonstration, filtering can be done here on the existing rows.
-        // This can be replaced by querying from a data source.
         danhMucTableModel.setRowCount(0);
 
-        // Example search logic (mock data filtering)
         Object[][] allData = {
                 {"DM001", "Áo nam"},
                 {"DM002", "Áo nữ"},
@@ -190,7 +188,6 @@ public class DanhMucPanel extends JPanel {
     }
 
     private void addDanhMuc() {
-        // In a real application, this would open a form to add a new category
         JOptionPane.showMessageDialog(this, "Đang mở form thêm danh mục mới",
                 "Thêm danh mục", JOptionPane.INFORMATION_MESSAGE);
     }
@@ -210,7 +207,6 @@ public class DanhMucPanel extends JPanel {
                 "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
-            // In a real application, this would delete from the database
             danhMucTableModel.removeRow(selectedRow);
             JOptionPane.showMessageDialog(this, "Đã xóa danh mục thành công",
                     "Thông báo", JOptionPane.INFORMATION_MESSAGE);
@@ -225,8 +221,6 @@ public class DanhMucPanel extends JPanel {
         }
 
         String categoryId = danhMucTableModel.getValueAt(selectedRow, 0).toString();
-
-        // In a real application, this would open a form to edit the category
         JOptionPane.showMessageDialog(this, "Đang mở form sửa danh mục: " + categoryId,
                 "Sửa danh mục", JOptionPane.INFORMATION_MESSAGE);
     }
