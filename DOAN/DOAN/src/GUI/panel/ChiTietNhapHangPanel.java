@@ -1,182 +1,132 @@
 package GUI.panel;
 
+import DAO.ChiTietNhapHangDAO;
+import DTO.ChiTietNhapHangDTO;
+
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import javax.swing.border.EmptyBorder;
+import java.util.ArrayList;
 
 public class ChiTietNhapHangPanel extends JPanel {
-    private JPanel chiTietNhapHangPanel;
-    private JTable chiTietNhapHangTable;
-    private DefaultTableModel chiTietNhapHangTableModel;
+    private JTable table;
+    private JButton btnAdd, btnEdit, btnDelete;
+    private ChiTietNhapHangDAO chiTietNhapHangDAO;
 
     public ChiTietNhapHangPanel() {
-        chiTietNhapHangPanel = new JPanel(new BorderLayout());
-        createChiTietNhapHangPanel();
-        add(chiTietNhapHangPanel, BorderLayout.CENTER);
-    }
+        chiTietNhapHangDAO = new ChiTietNhapHangDAO();
+        setLayout(new BorderLayout());
 
-    private void createChiTietNhapHangPanel() {
-        chiTietNhapHangPanel = new JPanel(new BorderLayout());
-
-        // Create top panel for title and functions
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(new Color(200, 255, 200)); 
-        topPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-
-        // Add "Chức năng" label
-        JLabel lblChucNang = new JLabel("Chức năng");
-        topPanel.add(lblChucNang, BorderLayout.WEST);
-
-        // Add function buttons
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        buttonPanel.setOpaque(false);
-
-        // Add button
-        JButton btnAdd = new JButton();
-        btnAdd.setToolTipText("Thêm");
-        buttonPanel.add(btnAdd);
-
-        // Delete button
-        JButton btnDelete = new JButton();
-        btnDelete.setToolTipText("Xóa");
-        buttonPanel.add(btnDelete);
-
-        // Edit button
-        JButton btnEdit = new JButton();
-        btnEdit.setToolTipText("Sửa");
-        buttonPanel.add(btnEdit);
-
-        // Add labels below buttons
-        JPanel labelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        labelPanel.setOpaque(false);
-        labelPanel.add(new JLabel("Thêm"));
-        labelPanel.add(Box.createHorizontalStrut(20));
-        labelPanel.add(new JLabel("Xóa"));
-        labelPanel.add(Box.createHorizontalStrut(20));
-        labelPanel.add(new JLabel("Sửa"));
-
-        JPanel functionPanel = new JPanel(new BorderLayout());
-        functionPanel.setOpaque(false);
-        functionPanel.add(buttonPanel, BorderLayout.NORTH);
-        functionPanel.add(labelPanel, BorderLayout.SOUTH);
-
-        topPanel.add(functionPanel, BorderLayout.CENTER);
-
-        // Add search panel to top right
-        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        searchPanel.setOpaque(false);
-
-        JLabel lblTimKiem = new JLabel("Tìm kiếm");
-        searchPanel.add(lblTimKiem);
-
-        // Create combo box with search options
-        JComboBox<String> cmbSearchType = new JComboBox<>(new String[]{"ID CTNH", "ID Nhập hàng", "ID sản phẩm"});
-        cmbSearchType.setPreferredSize(new Dimension(120, 25));
-        searchPanel.add(cmbSearchType);
-
-        // Search text field
-        JTextField txtSearchCTNH = new JTextField();
-        txtSearchCTNH.setPreferredSize(new Dimension(200, 25));
-        searchPanel.add(txtSearchCTNH);
-
-        // Search button
-        JButton btnSearch = new JButton("Tìm kiếm");
-        btnSearch.setBackground(new Color(240, 240, 240));
-        searchPanel.add(btnSearch);
-
-        // Reset button
-        JButton btnReset = new JButton("Làm mới");
-        btnReset.setBackground(new Color(240, 240, 240));
-        searchPanel.add(btnReset);
-
-        topPanel.add(searchPanel, BorderLayout.EAST);
-
-        chiTietNhapHangPanel.add(topPanel, BorderLayout.NORTH);
-
-        // Create table for import detail data
-        String[] columns = {"ID CTNH", "ID Nhập hàng", "ID sản phẩm", "Số lượng nhập", "Giá nhập", "Thành tiền"};
-        chiTietNhapHangTableModel = new DefaultTableModel(columns, 0) {
+        // Bảng chi tiết nhập hàng
+        String[] columns = {"ID", "Mã Nhập Hàng", "Mã Sản Phẩm", "Số Lượng Nhập", "Giá Nhập"};
+        table = new JTable();
+        add(new JScrollPane(table), BorderLayout.CENTER);
+        
+        // Panel chứa nút
+        JPanel panelButtons = new JPanel();
+        btnAdd = new JButton("Thêm");
+        btnEdit = new JButton("Sửa");
+        btnDelete = new JButton("Xóa");
+        panelButtons.add(btnAdd);
+        panelButtons.add(btnEdit);
+        panelButtons.add(btnDelete);
+        add(panelButtons, BorderLayout.SOUTH);
+        
+        // Thêm sự kiện cho các nút
+        btnAdd.addActionListener(new ActionListener() {
             @Override
-            public boolean isCellEditable(int row, int column) {
-                return false; // Make all cells non-editable
-            }
-        };
-
-        chiTietNhapHangTable = new JTable(chiTietNhapHangTableModel);
-        chiTietNhapHangTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        chiTietNhapHangTable.setRowHeight(25);
-
-        // Center the text in cells
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-        for (int i = 0; i < chiTietNhapHangTable.getColumnCount(); i++) {
-            chiTietNhapHangTable.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
-        }
-
-        JScrollPane scrollPane = new JScrollPane(chiTietNhapHangTable);
-        chiTietNhapHangPanel.add(scrollPane, BorderLayout.CENTER);
-
-        // Add action listeners for buttons
-        btnSearch.addActionListener(e -> searchChiTietNhapHang(cmbSearchType.getSelectedItem().toString(), txtSearchCTNH.getText()));
-
-        btnReset.addActionListener(e -> {
-            txtSearchCTNH.setText("");
-            loadAllChiTietNhapHang();
-        });
-
-        btnAdd.addActionListener(e -> addChiTietNhapHang());
-        btnDelete.addActionListener(e -> deleteChiTietNhapHang(chiTietNhapHangTable.getSelectedRow()));
-        btnEdit.addActionListener(e -> editChiTietNhapHang(chiTietNhapHangTable.getSelectedRow()));
-
-        // Add listener for Enter key in search field
-        txtSearchCTNH.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    searchChiTietNhapHang(cmbSearchType.getSelectedItem().toString(), txtSearchCTNH.getText());
-                }
+            public void actionPerformed(ActionEvent e) {
+                // Xử lý thêm chi tiết nhập hàng
+                addChiTietNhapHang();
             }
         });
+        
+        btnEdit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Xử lý sửa chi tiết nhập hàng
+                editChiTietNhapHang();
+            }
+        });
+        
+        btnDelete.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Xử lý xóa chi tiết nhập hàng
+                deleteChiTietNhapHang();
+            }
+        });
+        
+        // Hiển thị dữ liệu chi tiết nhập hàng
+        loadData();
     }
 
-    private void loadAllChiTietNhapHang() {
-        chiTietNhapHangTableModel.setRowCount(0); // Xóa dữ liệu hiện tại
-        chiTietNhapHangTableModel.addRow(new Object[]{"CTNH001", "NH001", "SP001", 10, 10000, 100000});
-        chiTietNhapHangTableModel.addRow(new Object[]{"CTNH002", "NH002", "SP002", 5, 20000, 100000});
-    }
-
-    private void searchChiTietNhapHang(String searchType, String keyword) {
-        if (keyword.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập từ khóa tìm kiếm", 
-                    "Thông báo", JOptionPane.WARNING_MESSAGE);
-            return;
+    // Phương thức để tải dữ liệu vào bảng
+    private void loadData() {
+        ArrayList<ChiTietNhapHangDTO> chiTietNhapHangList = chiTietNhapHangDAO.selectAll();
+        String[][] data = new String[chiTietNhapHangList.size()][5];
+        
+        for (int i = 0; i < chiTietNhapHangList.size(); i++) {
+            ChiTietNhapHangDTO item = chiTietNhapHangList.get(i);
+            data[i][0] = item.getIdChiTietNhapHang();
+            data[i][1] = item.getIdNhapHang();
+            data[i][2] = item.getIdSanPham();
+            data[i][3] = String.valueOf(item.getSoLuongNhap());
+            data[i][4] = String.valueOf(item.getGiaNhap());
         }
-
-        JOptionPane.showMessageDialog(this, 
-                "Đang tìm kiếm chi tiết nhập hàng theo " + searchType + " với từ khóa: " + keyword,
-                "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+        
+        table.setModel(new javax.swing.table.DefaultTableModel(data, new String[]{"ID", "Mã Nhập Hàng", "Mã Sản Phẩm", "Số Lượng Nhập", "Giá Nhập"}));
     }
 
+    // Phương thức thêm chi tiết nhập hàng
     private void addChiTietNhapHang() {
-        // Code for adding ChiTietNhapHang
+        String idChiTietNhapHang = JOptionPane.showInputDialog(this, "Nhập ID chi tiết nhập hàng:");
+        String idNhapHang = JOptionPane.showInputDialog(this, "Nhập mã nhập hàng:");
+        String idSanPham = JOptionPane.showInputDialog(this, "Nhập mã sản phẩm:");
+        int soLuongNhap = Integer.parseInt(JOptionPane.showInputDialog(this, "Nhập số lượng nhập:"));
+        int giaNhap = Integer.parseInt(JOptionPane.showInputDialog(this, "Nhập giá nhập:"));
+
+        ChiTietNhapHangDTO newChiTiet = new ChiTietNhapHangDTO(idChiTietNhapHang, idNhapHang, idSanPham, soLuongNhap, giaNhap);
+        if (chiTietNhapHangDAO.insert(newChiTiet)) {
+            JOptionPane.showMessageDialog(this, "Thêm thành công!");
+            loadData(); // Tải lại dữ liệu sau khi thêm
+        } else {
+            JOptionPane.showMessageDialog(this, "Thêm thất bại!");
+        }
     }
 
-    private void editChiTietNhapHang(int selectedRow) {
-        // Code for editing ChiTietNhapHang
+    // Phương thức sửa chi tiết nhập hàng
+    private void editChiTietNhapHang() {
+        int selectedRow = table.getSelectedRow();
+        if (selectedRow >= 0) {
+            String idChiTietNhapHang = table.getValueAt(selectedRow, 0).toString();
+            String idNhapHang = table.getValueAt(selectedRow, 1).toString();
+            String idSanPham = table.getValueAt(selectedRow, 2).toString();
+            int soLuongNhap = Integer.parseInt(table.getValueAt(selectedRow, 3).toString());
+            int giaNhap = Integer.parseInt(table.getValueAt(selectedRow, 4).toString());
+
+            ChiTietNhapHangDTO chiTiet = new ChiTietNhapHangDTO(idChiTietNhapHang, idNhapHang, idSanPham, soLuongNhap, giaNhap);
+            if (chiTietNhapHangDAO.update(chiTiet)) {
+                JOptionPane.showMessageDialog(this, "Sửa thành công!");
+                loadData();
+            } else {
+                JOptionPane.showMessageDialog(this, "Sửa thất bại!");
+            }
+        }
     }
 
-    private void deleteChiTietNhapHang(int selectedRow) {
-        // Code for deleting ChiTietNhapHang
-    }
-
-    public JPanel getChiTietNhapHangPanel() {
-        return chiTietNhapHangPanel;
+    // Phương thức xóa chi tiết nhập hàng
+    private void deleteChiTietNhapHang() {
+        int selectedRow = table.getSelectedRow();
+        if (selectedRow >= 0) {
+            String idChiTietNhapHang = table.getValueAt(selectedRow, 0).toString();
+            if (chiTietNhapHangDAO.delete(idChiTietNhapHang)) {
+                JOptionPane.showMessageDialog(this, "Xóa thành công!");
+                loadData();
+            } else {
+                JOptionPane.showMessageDialog(this, "Xóa thất bại!");
+            }
+        }
     }
 }
-

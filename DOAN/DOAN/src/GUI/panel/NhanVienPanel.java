@@ -1,17 +1,23 @@
 package GUI.panel;
 
+import DAO.NhanVienDAO;
+import DTO.NhanVienDTO;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class NhanVienPanel extends JPanel {
     private JTable nhanVienTable;
     private DefaultTableModel nhanVienTableModel;
+    private NhanVienDAO nhanVienDAO;
 
     public NhanVienPanel() {
         setLayout(new BorderLayout());
+
+        nhanVienDAO = new NhanVienDAO();  // Tạo đối tượng NhanVienDAO để kết nối và lấy dữ liệu
 
         // Create the top panel
         JPanel topPanel = new JPanel(new BorderLayout());
@@ -25,7 +31,7 @@ public class NhanVienPanel extends JPanel {
         // Add function buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         buttonPanel.setOpaque(false);
-        
+
         // Add, Delete, Edit buttons
         JButton btnAdd = new JButton("Thêm");
         btnAdd.setToolTipText("Thêm");
@@ -94,6 +100,9 @@ public class NhanVienPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(nhanVienTable);
         add(scrollPane, BorderLayout.CENTER);
 
+        // Load data from the database when the panel is initialized
+        loadNhanVienData();
+
         // Add action listeners
         btnAdd.addActionListener(e -> addNhanVien());
         btnDelete.addActionListener(e -> deleteNhanVien(nhanVienTable.getSelectedRow()));
@@ -102,7 +111,24 @@ public class NhanVienPanel extends JPanel {
         btnReset.addActionListener(e -> {
             txtSearchNV.setText("");
             nhanVienTableModel.setRowCount(0);
+            loadNhanVienData(); // Reload data after reset
         });
+    }
+
+    // Method to load all employees from the database into the table
+    private void loadNhanVienData() {
+        ArrayList<NhanVienDTO> ds = nhanVienDAO.selectAll();
+        for (NhanVienDTO nv : ds) {
+            Object[] row = {
+                nv.getIdNhanVien(),
+                nv.getHoTenNV(),
+                nv.getEmail(),
+                nv.getSdt(),
+                nv.getchucVu(),
+                nv.getLuong()
+            };
+            nhanVienTableModel.addRow(row);
+        }
     }
 
     private void searchNhanVien(String searchType, String keyword) {

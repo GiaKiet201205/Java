@@ -1,11 +1,14 @@
 package GUI.panel;
 
+import DAO.NhaCungCapDAO;
+import DTO.NhaCungCapDTO;
 import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.border.EmptyBorder;
+import java.util.ArrayList;
 
 public class NhaCungCapPanel extends JPanel {
     private DefaultTableModel nhaCungCapTableModel;
@@ -13,10 +16,13 @@ public class NhaCungCapPanel extends JPanel {
     private JPanel nhaCungCapPanel;
     private Color headerColor = new Color(200, 255, 200);
     private JTextField txtSearchID, txtSearchName;
+    private NhaCungCapDAO nhaCungCapDAO;
 
     public NhaCungCapPanel() {
+        nhaCungCapDAO = new NhaCungCapDAO(); // Khởi tạo DAO để lấy dữ liệu
         setLayout(new BorderLayout());
         createNhaCungCapPanel();
+        loadDataToTable(); // Tải dữ liệu ban đầu
         add(nhaCungCapPanel, BorderLayout.CENTER);
     }
 
@@ -31,7 +37,7 @@ public class NhaCungCapPanel extends JPanel {
         // Function buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         buttonPanel.setOpaque(false);
-        JButton btnEdit = new JButton();
+        JButton btnEdit = new JButton("Sửa");
         btnEdit.setToolTipText("Sửa");
         buttonPanel.add(btnEdit);
 
@@ -129,6 +135,18 @@ public class NhaCungCapPanel extends JPanel {
         });
     }
 
+    private void loadDataToTable() {
+        ArrayList<NhaCungCapDTO> list = nhaCungCapDAO.selectAll();
+        for (NhaCungCapDTO nhaCungCap : list) {
+            nhaCungCapTableModel.addRow(new Object[]{
+                nhaCungCap.getIdNhaCungCap(),
+                nhaCungCap.getTenNhaCungCap(),
+                nhaCungCap.getDiaChi(),
+                nhaCungCap.getSdt()
+            });
+        }
+    }
+
     private void searchNhaCungCap(String idSearch, String nameSearch) {
         System.out.println("Tìm kiếm nhà cung cấp với:");
         System.out.println("ID chứa: " + idSearch);
@@ -140,7 +158,7 @@ public class NhaCungCapPanel extends JPanel {
         txtSearchID.setText("");
         txtSearchName.setText("");
         nhaCungCapTableModel.setRowCount(0); // Clear all data
-        // Tạm thời chưa load lại từ DAO ở đây
+        loadDataToTable(); // Load lại dữ liệu
         JOptionPane.showMessageDialog(this, "Đã làm mới bộ lọc tìm kiếm", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
     }
 
@@ -178,11 +196,16 @@ public class NhaCungCapPanel extends JPanel {
             nhaCungCapTableModel.setValueAt(txtAddress.getText(), selectedRow, 2);
             nhaCungCapTableModel.setValueAt(txtPhone.getText(), selectedRow, 3);
             editDialog.dispose();
+            JOptionPane.showMessageDialog(this, "Thông tin nhà cung cấp đã được cập nhật", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
         });
 
         btnCancel.addActionListener(e -> editDialog.dispose());
 
-        editDialog.add(btnSave); editDialog.add(btnCancel);
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        btnPanel.add(btnSave);
+        btnPanel.add(btnCancel);
+
+        editDialog.add(btnPanel);
         editDialog.setVisible(true);
     }
 }

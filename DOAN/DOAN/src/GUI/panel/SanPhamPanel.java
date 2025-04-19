@@ -1,11 +1,14 @@
 package GUI.panel;
 
+import DAO.SanPhamDAO;
+import DTO.SanPhamDTO;
+
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import javax.swing.border.EmptyBorder;
+import java.awt.event.*;
+import java.util.ArrayList;
 
 public class SanPhamPanel extends JPanel {
     private DefaultTableModel sanPhamTableModel;
@@ -17,6 +20,7 @@ public class SanPhamPanel extends JPanel {
         setLayout(new BorderLayout());
         createSanPhamPanel();
         add(sanPhamPanel, BorderLayout.CENTER);
+        loadDataFromDatabase();
     }
 
     private void createSanPhamPanel() {
@@ -107,7 +111,7 @@ public class SanPhamPanel extends JPanel {
 
         btnReset.addActionListener(e -> {
             txtSearchProduct.setText("");
-            sanPhamTableModel.setRowCount(0);
+            loadDataFromDatabase();
         });
 
         btnAdd.addActionListener(e -> addSanPham());
@@ -124,12 +128,29 @@ public class SanPhamPanel extends JPanel {
         });
     }
 
+    private void loadDataFromDatabase() {
+        sanPhamTableModel.setRowCount(0);
+        SanPhamDAO dao = new SanPhamDAO();
+        ArrayList<SanPhamDTO> list = dao.selectAll();
+        for (SanPhamDTO sp : list) {
+            sanPhamTableModel.addRow(new Object[]{
+                    sp.getIdSanPham(),
+                    sp.getTenSanPham(),
+                    sp.getGia(),
+                    sp.getSoLuongTonKho(),
+                    sp.getIdDanhMuc(),
+                    sp.getHinhAnh()
+            });
+        }
+    }
+
     private void addSanPham() {
         JTextField txtID = new JTextField();
         JTextField txtTen = new JTextField();
         JTextField txtGia = new JTextField();
         JTextField txtSoLuong = new JTextField();
         JTextField txtDanhMuc = new JTextField();
+        JTextField txtHinhAnh = new JTextField();
 
         JPanel panel = new JPanel(new GridLayout(0, 2));
         panel.add(new JLabel("ID sản phẩm:"));
@@ -142,44 +163,52 @@ public class SanPhamPanel extends JPanel {
         panel.add(txtSoLuong);
         panel.add(new JLabel("ID danh mục:"));
         panel.add(txtDanhMuc);
+        panel.add(new JLabel("Hình ảnh:"));
+        panel.add(txtHinhAnh);
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Thêm sản phẩm mới",
                 JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
         if (result == JOptionPane.OK_OPTION) {
-            Object[] newRow = {
-                txtID.getText(), txtTen.getText(), txtGia.getText(),
-                txtSoLuong.getText(), txtDanhMuc.getText(), ""
-            };
-            sanPhamTableModel.addRow(newRow);
+            SanPhamDTO sp = new SanPhamDTO();
+            sp.setIdSanPham(txtID.getText());
+            sp.setTenSanPham(txtTen.getText());
+            sp.setGia(Integer.parseInt(txtGia.getText()));
+            sp.setSoLuongTonKho(Integer.parseInt(txtSoLuong.getText()));
+            sp.setIdDanhMuc(txtDanhMuc.getText());
+            sp.setHinhAnh(txtHinhAnh.getText());
+            sp.setIdNhaCungCap("");
+
+            if (new SanPhamDAO().insert(sp)) {
+                JOptionPane.showMessageDialog(this, "Thêm sản phẩm thành công!");
+                loadDataFromDatabase();
+            } else {
+                JOptionPane.showMessageDialog(this, "Thêm sản phẩm thất bại!");
+            }
         }
     }
 
     private void deleteSanPham(int selectedRow) {
         if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn một sản phẩm để xóa",
-                    "Thông báo", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một sản phẩm để xóa", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         String productId = sanPhamTableModel.getValueAt(selectedRow, 0).toString();
-        String productName = sanPhamTableModel.getValueAt(selectedRow, 1).toString();
-
-        int confirm = JOptionPane.showConfirmDialog(this,
-                "Bạn có chắc chắn muốn xóa sản phẩm: " + productName + " (" + productId + ")?",
-                "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
-
+        int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn xóa sản phẩm này?", "Xác nhận", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
-            sanPhamTableModel.removeRow(selectedRow);
-            JOptionPane.showMessageDialog(this, "Đã xóa sản phẩm thành công",
-                    "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            if (new SanPhamDAO().delete(productId)) {
+                JOptionPane.showMessageDialog(this, "Xóa thành công!");
+                loadDataFromDatabase();
+            } else {
+                JOptionPane.showMessageDialog(this, "Xóa thất bại!");
+            }
         }
     }
 
     private void editSanPham(int selectedRow) {
         if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn một sản phẩm để sửa",
-                    "Thông báo", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một sản phẩm để sửa", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -188,6 +217,7 @@ public class SanPhamPanel extends JPanel {
         JTextField txtGia = new JTextField(sanPhamTableModel.getValueAt(selectedRow, 2).toString());
         JTextField txtSoLuong = new JTextField(sanPhamTableModel.getValueAt(selectedRow, 3).toString());
         JTextField txtDanhMuc = new JTextField(sanPhamTableModel.getValueAt(selectedRow, 4).toString());
+        JTextField txtHinhAnh = new JTextField(sanPhamTableModel.getValueAt(selectedRow, 5).toString());
 
         JPanel panel = new JPanel(new GridLayout(0, 2));
         panel.add(new JLabel("ID sản phẩm:"));
@@ -200,23 +230,32 @@ public class SanPhamPanel extends JPanel {
         panel.add(txtSoLuong);
         panel.add(new JLabel("ID danh mục:"));
         panel.add(txtDanhMuc);
+        panel.add(new JLabel("Hình ảnh:"));
+        panel.add(txtHinhAnh);
 
-        int result = JOptionPane.showConfirmDialog(this, panel, "Sửa sản phẩm",
-                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-
+        int result = JOptionPane.showConfirmDialog(this, panel, "Sửa sản phẩm", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
-            sanPhamTableModel.setValueAt(txtID.getText(), selectedRow, 0);
-            sanPhamTableModel.setValueAt(txtTen.getText(), selectedRow, 1);
-            sanPhamTableModel.setValueAt(txtGia.getText(), selectedRow, 2);
-            sanPhamTableModel.setValueAt(txtSoLuong.getText(), selectedRow, 3);
-            sanPhamTableModel.setValueAt(txtDanhMuc.getText(), selectedRow, 4);
+            SanPhamDTO sp = new SanPhamDTO();
+            sp.setIdSanPham(txtID.getText());
+            sp.setTenSanPham(txtTen.getText());
+            sp.setGia(Integer.parseInt(txtGia.getText()));
+            sp.setSoLuongTonKho(Integer.parseInt(txtSoLuong.getText()));
+            sp.setIdDanhMuc(txtDanhMuc.getText());
+            sp.setHinhAnh(txtHinhAnh.getText());
+            sp.setIdNhaCungCap("");
+
+            if (new SanPhamDAO().update(sp)) {
+                JOptionPane.showMessageDialog(this, "Cập nhật thành công!");
+                loadDataFromDatabase();
+            } else {
+                JOptionPane.showMessageDialog(this, "Cập nhật thất bại!");
+            }
         }
     }
 
     private void searchSanPham(String searchType, String keyword) {
         if (keyword.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập từ khóa tìm kiếm",
-                    "Thông báo", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập từ khóa tìm kiếm", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
 

@@ -1,5 +1,8 @@
 package GUI.panel;
 
+import DAO.PhuongThucThanhToanDAO;
+import DTO.PhuongThucThanhToanDTO;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -7,14 +10,17 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 public class PhuongThucTTPanel extends JPanel {
     private JPanel phuongThucPanel;
     private JTable phuongThucTable;
     private DefaultTableModel phuongThucTableModel;
     private Color headerColor = new Color(200, 255, 200);
+    private PhuongThucThanhToanDAO phuongThucThanhToanDAO;
 
     public PhuongThucTTPanel() {
+        phuongThucThanhToanDAO = new PhuongThucThanhToanDAO();
         createPhuongThucTTPanel();
     }
 
@@ -76,7 +82,7 @@ public class PhuongThucTTPanel extends JPanel {
         phuongThucPanel.add(topPanel, BorderLayout.NORTH);
 
         // Table
-        String[] columns = {"Mã thanh toán", "Tên thanh toán"};
+        String[] columns = {"Mã thanh toán", "Tên thanh toán", "Loại thanh toán", "Trạng thái thanh toán"};
         phuongThucTableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -128,23 +134,62 @@ public class PhuongThucTTPanel extends JPanel {
         // Add panel to main view
         this.setLayout(new BorderLayout());
         this.add(phuongThucPanel, BorderLayout.CENTER);
+
+        // Initial load of data
+        loadPhuongThucData();
     }
 
     private void loadPhuongThucData() {
-        // Load real data from database or file
+        ArrayList<PhuongThucThanhToanDTO> list = phuongThucThanhToanDAO.selectAll();
+        for (PhuongThucThanhToanDTO pttt : list) {
+            phuongThucTableModel.addRow(new Object[]{
+                    pttt.getIdPttt(),
+                    pttt.getIdDonHang(),
+                    pttt.getLoaiThanhToan(),
+                    pttt.getTrangThaiThanhToan()
+            });
+        }
     }
 
     private void searchPhuongThuc(String searchType, String keyword) {
-        if (keyword.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập từ khóa tìm kiếm",
-                    "Thông báo", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        phuongThucTableModel.setRowCount(0);
-
-        // Thực hiện tìm kiếm từ CSDL hoặc danh sách dữ liệu thực tế
+    if (keyword.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Vui lòng nhập từ khóa tìm kiếm",
+                "Thông báo", JOptionPane.WARNING_MESSAGE);
+        return;
     }
+
+    phuongThucTableModel.setRowCount(0);  // Xóa tất cả dữ liệu trong bảng
+
+    // Lấy tất cả dữ liệu từ DAO
+    ArrayList<PhuongThucThanhToanDTO> list = phuongThucThanhToanDAO.selectAll();
+
+    // Lọc kết quả dựa trên loại tìm kiếm
+    ArrayList<PhuongThucThanhToanDTO> results = new ArrayList<>();
+    if (searchType.equals("Mã thanh toán")) {
+        for (PhuongThucThanhToanDTO pttt : list) {
+            if (pttt.getIdPttt().contains(keyword)) {
+                results.add(pttt);
+            }
+        }
+    } else if (searchType.equals("Tên thanh toán")) {
+        for (PhuongThucThanhToanDTO pttt : list) {
+            if (pttt.getLoaiThanhToan().contains(keyword)) {
+                results.add(pttt);
+            }
+        }
+    }
+
+    // Thêm kết quả vào bảng
+    for (PhuongThucThanhToanDTO pttt : results) {
+        phuongThucTableModel.addRow(new Object[]{
+                pttt.getIdPttt(),
+                pttt.getIdDonHang(),
+                pttt.getLoaiThanhToan(),
+                pttt.getTrangThaiThanhToan()
+        });
+    }
+}
+
 
     private void addPhuongThuc() {
         JOptionPane.showMessageDialog(this, "Đang mở form thêm phương thức thanh toán mới",
