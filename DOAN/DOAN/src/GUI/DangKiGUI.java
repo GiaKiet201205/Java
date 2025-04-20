@@ -2,7 +2,6 @@ package GUI;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.net.URL;
@@ -98,17 +97,7 @@ public class DangKiGUI extends JFrame {
         registerButton.setBorder(BorderFactory.createLineBorder(new Color(0, 150, 0), 2));
         registerButton.setPreferredSize(new Dimension(109, 30));
         rightPanel.add(registerButton, gbc);
-
-        // Nút quay lại Trang chủ
-        gbc.gridy++;
-        JButton backButton = new JButton("Quay lại Trang Chủ");
-        backButton.setBackground(new Color(120, 200, 120));
-        backButton.setForeground(Color.BLACK);
-        backButton.setFocusPainted(false);
-        backButton.setPreferredSize(new Dimension(160, 30));
-        backButton.setBorder(BorderFactory.createLineBorder(new Color(0, 150, 0), 2));
-        rightPanel.add(backButton, gbc); // Thêm backButton vào panel
-
+        
         // Xử lý nút Đăng ký
         registerButton.addActionListener((var e) -> {
             String fullName = fullNameField.getText();
@@ -128,27 +117,14 @@ public class DangKiGUI extends JFrame {
             dispose();
         });
 
-        // Xử lý nút Quay lại Trang chủ
-        backButton.addActionListener((ActionEvent e) -> {
-            TrangChuGUI trangChu1 = new TrangChuGUI();
-            trangChu1.setVisible(true);
-            dispose();  // Đóng giao diện 
-        });
-
         backgroundPanel.add(leftPanel, BorderLayout.WEST);
         backgroundPanel.add(rightPanel, BorderLayout.CENTER);
         add(backgroundPanel);
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            TrangChuGUI trangChu = new TrangChuGUI();
-            trangChu.setVisible(true);
-            new DangKiGUI(trangChu).setVisible(true);
-        });
-    }
-
-    DangKiGUI() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-        }
-    }
+    SwingUtilities.invokeLater(() -> {
+        new DangKiGUI(null).setVisible(true);
+    });
+}
+}

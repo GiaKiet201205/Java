@@ -2,47 +2,51 @@ package GUI;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GiayDepGUI extends JPanel {
     private List<String> danhSachSanPham;
     private JPanel gridPanel;
-    private JButton Prev, Next;
+    private JButton Prev, Next, btnGioHang;
     private JLabel lblPage;
     private int currentPage = 1;
-    private final int itemsPerPage = 9; // 3x3 sản phẩm mỗi trang
+    private final int itemsPerPage = 9;
+    private List<String> cart = new ArrayList<>();
+    private int totalPrice = 0;
+    private JFrame parentFrame;
 
-    public GiayDepGUI() {
+    public GiayDepGUI(JFrame parentFrame) {
+        super();
+        this.parentFrame = parentFrame;
         setLayout(new BorderLayout());
-        danhSachSanPham = getSanPhamMau(); // Danh sách sản phẩm giả lập
-        
-        // **Header (Thanh tiêu đề)**
+        danhSachSanPham = getDanhSachGiayDep();
+
+        // Header
         JPanel headerPanel = new JPanel();
-        headerPanel.setBackground(new Color(100, 200, 100)); // Màu xanh lá nhạt
+        headerPanel.setBackground(new Color(100, 200, 100));
         JLabel titleLabel = new JLabel("GIÀY DÉP", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         titleLabel.setForeground(Color.WHITE);
         headerPanel.add(titleLabel);
         add(headerPanel, BorderLayout.NORTH);
 
+        // Grid Panel
         gridPanel = new JPanel(new GridLayout(3, 3, 10, 10));
         gridPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(gridPanel, BorderLayout.CENTER);
 
-        // Thanh điều hướng trang
+        // Navigation
         JPanel navigationPanel = new JPanel();
         Prev = new JButton("<< Trang trước");
         Next = new JButton("Trang sau >>");
         lblPage = new JLabel("Trang: " + currentPage);
-        
-        // Chỉnh màu nút điều hướng
+
         Prev.setBackground(new Color(100, 200, 100));
         Prev.setForeground(Color.WHITE);
         Next.setBackground(new Color(100, 200, 100));
         Next.setForeground(Color.WHITE);
-        
+
         Prev.addActionListener(e -> {
             if (currentPage > 1) {
                 currentPage--;
@@ -57,16 +61,27 @@ public class GiayDepGUI extends JPanel {
             }
         });
 
+        // Nút Giỏ Hàng
+        btnGioHang = new JButton("🛒");
+        btnGioHang.setBackground(new Color(100, 200, 100));
+        btnGioHang.setForeground(Color.WHITE);
+        btnGioHang.addActionListener(e -> {
+            new GioHangGUI(cart, totalPrice).setVisible(true);
+        });
+
         navigationPanel.add(Prev);
         navigationPanel.add(lblPage);
         navigationPanel.add(Next);
+        navigationPanel.add(btnGioHang);
         add(navigationPanel, BorderLayout.SOUTH);
 
-        // Load trang đầu tiên
         loadSanPham();
     }
 
-    // Hiển thị sản phẩm lên giao diện
+    public GiayDepGUI() {
+        this(new JFrame()); // Nếu chưa có frame thì tạo tạm
+    }
+
     private void loadSanPham() {
         gridPanel.removeAll();
 
@@ -75,8 +90,33 @@ public class GiayDepGUI extends JPanel {
 
         for (int i = start; i < end; i++) {
             String tenSanPham = danhSachSanPham.get(i);
-            JPanel itemPanel = taoKhungSanPham(tenSanPham);
-            gridPanel.add(itemPanel);
+
+            JPanel panel = new JPanel();
+            panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+            panel.setLayout(new BorderLayout());
+
+            JLabel lblTen = new JLabel(tenSanPham, SwingConstants.CENTER);
+            JLabel lblHinh = new JLabel("[Hình ảnh]", SwingConstants.CENTER);
+            lblHinh.setPreferredSize(new Dimension(100, 100));
+
+            JButton btnThemGio = new JButton("Thêm vào giỏ hàng");
+            btnThemGio.setBackground(Color.WHITE);
+            btnThemGio.setForeground(Color.BLACK);
+
+            btnThemGio.addActionListener(e -> {
+                cart.add(tenSanPham);
+                totalPrice += layGiaSanPham(tenSanPham);
+                JOptionPane.showMessageDialog(this, "Đã thêm sản phẩm vào giỏ hàng!");
+            });
+
+            JPanel bottomPanel = new JPanel(new BorderLayout());
+            bottomPanel.add(lblTen, BorderLayout.CENTER);
+            bottomPanel.add(btnThemGio, BorderLayout.SOUTH);
+
+            panel.add(lblHinh, BorderLayout.CENTER);
+            panel.add(bottomPanel, BorderLayout.SOUTH);
+
+            gridPanel.add(panel);
         }
 
         lblPage.setText("Trang: " + currentPage);
@@ -84,34 +124,26 @@ public class GiayDepGUI extends JPanel {
         gridPanel.repaint();
     }
 
-    // Tạo khung sản phẩm đơn giản
-    private JPanel taoKhungSanPham(String tenSanPham) {
-        JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createLineBorder(Color.WHITE));
-        panel.setBackground(Color.WHITE);
-        panel.setLayout(new BorderLayout());
-
-        JLabel lblTen = new JLabel(tenSanPham, SwingConstants.CENTER);
-        JLabel lblHinh = new JLabel("[Hình ảnh]", SwingConstants.CENTER);
-        lblHinh.setPreferredSize(new Dimension(100, 100));
-
-        panel.add(lblHinh, BorderLayout.CENTER);
-        panel.add(lblTen, BorderLayout.SOUTH);
-        return panel;
-    }
-
-    // Tính số trang
     private int getTotalPage() {
         return (int) Math.ceil((double) danhSachSanPham.size() / itemsPerPage);
     }
 
-    // Tạo danh sách sản phẩm (chỉ có tên sản phẩm)
-    private List<String> getSanPhamMau() {
+    private List<String> getDanhSachGiayDep() {
         List<String> list = new ArrayList<>();
         for (int i = 1; i <= 20; i++) {
-            list.add("Giày Số " + i);
+            list.add("Giày " + i + " - 300000");
+            list.add("Dép " + i + " - 200000");
         }
         return list;
+    }
+
+    private int layGiaSanPham(String tenSanPham) {
+        try {
+            String[] parts = tenSanPham.split("-");
+            return Integer.parseInt(parts[1].trim());
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     public static void main(String[] args) {
@@ -121,7 +153,7 @@ public class GiayDepGUI extends JPanel {
             frame.setSize(600, 500);
             frame.setLocationRelativeTo(null);
 
-            frame.add(new GiayDepGUI());
+            frame.add(new GiayDepGUI(frame));
             frame.setVisible(true);
         });
     }

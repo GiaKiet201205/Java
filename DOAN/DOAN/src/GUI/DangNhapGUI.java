@@ -1,5 +1,8 @@
 package GUI;
 
+import DAO.TaiKhoanDAO;
+import DTO.TaiKhoanDTO;
+import GUI.QuanTriVienGUI;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -89,42 +92,31 @@ public class DangNhapGUI extends JFrame {
         forgotPasswordLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
         loginPanel.add(forgotPasswordLabel, gbc);
         
-        // Nút quay lại trang chủ
-        gbc.gridy++;
-        JButton backButton = new JButton("Quay lại Trang Chủ"); 
-        backButton.setBackground(new Color(120, 200, 120));
-        backButton.setForeground(Color.BLACK);
-        backButton.setFocusPainted(false);
-        backButton.setPreferredSize(new Dimension(160, 30));
-        backButton.setBorder(BorderFactory.createLineBorder(new Color(0, 150, 0), 2));
-        loginPanel.add(backButton, gbc);
-
-        // Xử lý sự kiện quay lại
-        backButton.addActionListener((ActionEvent e) -> {
-            TrangChuGUI trangChu = new TrangChuGUI();
-            trangChu.setVisible(true);
-            dispose();  // Đóng giao diện đăng nhập
-        });
-        
         // Xử lý sự kiện nút đăng nhập
         loginButton.addActionListener((ActionEvent e) -> {
-            String username = usernameField.getText();
-            String password = new String(passwordField.getPassword());
-            
-            // Giả lập kiểm tra tài khoản hợp lệ
-            if (username.equals("admin") && password.equals("123456")) {
-                JOptionPane.showMessageDialog(null, "Đăng nhập thành công!");
-                
-                // Mở giao diện trang chủ
-                TrangChuGUI trangChu = new TrangChuGUI();
-                trangChu.setVisible(true);
-                
-                // Đóng giao diện đăng nhập
-                dispose();
-            } else {
-                JOptionPane.showMessageDialog(null, "Tên đăng nhập hoặc mật khẩu sai!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-            }
-        });
+    String username = usernameField.getText();
+    String password = new String(passwordField.getPassword());
+
+    TaiKhoanDAO taiKhoanDAO = new TaiKhoanDAO();
+    TaiKhoanDTO tk = taiKhoanDAO.login(username, password);
+
+    if (tk != null) {
+        String quyen = tk.getPhanQuyen();
+        if (quyen.equals("1")) {
+            JOptionPane.showMessageDialog(null, "Đăng nhập thành công! (Admin)");
+            new QuanTriVienGUI().setVisible(true);
+        } else if (quyen.equals("2")) {
+            JOptionPane.showMessageDialog(null, "Đăng nhập thành công!");
+            new TrangChuGUI().setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(null, "Không xác định được quyền đăng nhập!");
+        }
+        dispose();
+    } else {
+        JOptionPane.showMessageDialog(null, "Tên đăng nhập hoặc mật khẩu sai!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+    }
+});
+
 
         // Thêm panel vào backgroundPanel
         backgroundPanel.add(loginPanel, BorderLayout.CENTER);

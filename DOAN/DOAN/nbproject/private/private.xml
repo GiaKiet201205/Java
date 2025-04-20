@@ -3,20 +3,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Clothes_store/Java/DOAN/DOAN/src/DAO/KhachHangDAO.java</file>
-            <file>file:/D:/Clothes_store/Java/DOAN/DOAN/src/DAO/ChiTietNhapHangDAO.java</file>
-            <file>file:/D:/Clothes_store/Java/DOAN/DOAN/src/DAO/NhanVienDAO.java</file>
-            <file>file:/D:/Clothes_store/Java/DOAN/DOAN/src/DTO/DonHangDTO.java</file>
-            <file>file:/D:/Clothes_store/Java/DOAN/DOAN/src/DAO/NhaCungCapDAO.java</file>
-            <file>file:/D:/Clothes_store/Java/DOAN/DOAN/src/DTO/ChiTietDonHangDTO.java</file>
-            <file>file:/D:/Clothes_store/Java/DOAN/DOAN/src/DTO/NhaCungCapDTO.java</file>
-            <file>file:/D:/Clothes_store/Java/DOAN/DOAN/src/DTO/ChiTietNhapHangDTO.java</file>
-            <file>file:/D:/Clothes_store/Java/DOAN/DOAN/src/DTO/NhanVienDTO.java</file>
-            <file>file:/D:/Clothes_store/Java/DOAN/DOAN/src/DAO/DonHangDAO.java</file>
-            <file>file:/D:/Clothes_store/Java/DOAN/DOAN/src/DTO/DanhMucDTO.java</file>
-            <file>file:/D:/Clothes_store/Java/DOAN/DOAN/src/DAO/DanhMucDAO.java</file>
-            <file>file:/D:/Clothes_store/Java/DOAN/DOAN/src/DAO/ChiTietDonHangDAO.java</file>
-            <file>file:/D:/Clothes_store/Java/DOAN/DOAN/src/DTO/KhachHangDTO.java</file>
+            <file>file:/C:/Users/Nguyen%20Xuan%20Thuan/OneDrive%20-%20Saigon%20University/Desktop/Java/DOAN/DOAN/src/DTO/SanPhamDTO.java</file>
+            <file>file:/C:/Users/Nguyen%20Xuan%20Thuan/OneDrive%20-%20Saigon%20University/Desktop/Java/DOAN/DOAN/src/GUI/PhuKienGUI.java</file>
+            <file>file:/C:/Users/Nguyen%20Xuan%20Thuan/OneDrive%20-%20Saigon%20University/Desktop/Java/DOAN/DOAN/src/GUI/GiayDepGUI.java</file>
+            <file>file:/C:/Users/Nguyen%20Xuan%20Thuan/OneDrive%20-%20Saigon%20University/Desktop/Java/DOAN/DOAN/src/GUI/TrangChuGUI.java</file>
+            <file>file:/C:/Users/Nguyen%20Xuan%20Thuan/OneDrive%20-%20Saigon%20University/Desktop/Java/DOAN/DOAN/src/DAO/SanPhamDAO.java</file>
+            <file>file:/C:/Users/Nguyen%20Xuan%20Thuan/OneDrive%20-%20Saigon%20University/Desktop/Java/DOAN/DOAN/src/GUI/GioHangGUI.java</file>
+            <file>file:/C:/Users/Nguyen%20Xuan%20Thuan/OneDrive%20-%20Saigon%20University/Desktop/Java/DOAN/DOAN/src/GUI/QuanAoGUI.java</file>
         </group>
     </open-files>
 </project-private>

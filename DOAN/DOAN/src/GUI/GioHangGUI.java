@@ -1,6 +1,7 @@
+package GUI;
+
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class GioHangGUI extends JFrame {
@@ -8,7 +9,7 @@ public class GioHangGUI extends JFrame {
     public GioHangGUI(List<String> productList, int totalPrice) {
         setTitle("Giỏ Hàng");
         setSize(700, 500);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);  // Thay vì EXIT_ON_CLOSE, dùng DISPOSE_ON_CLOSE để chỉ đóng cửa sổ này
         setLocationRelativeTo(null);
 
         Font smallFont = new Font("Arial", Font.PLAIN, 13);
@@ -35,7 +36,7 @@ public class GioHangGUI extends JFrame {
 
         JPanel formPanel = new JPanel();
         formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
-        formPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // padding tổng thể
+        formPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         String[] labels = {"Tên người nhận:", "Email:", "Số điện thoại:", "Địa chỉ:"};
         JTextField[] textFields = new JTextField[labels.length];
@@ -59,7 +60,7 @@ public class GioHangGUI extends JFrame {
             row.add(tf, BorderLayout.CENTER);
 
             formPanel.add(row);
-            formPanel.add(Box.createVerticalStrut(10)); // khoảng cách đều giữa các dòng
+            formPanel.add(Box.createVerticalStrut(10));
         }
 
         // Dòng chọn hình thức thanh toán
@@ -132,4 +133,3 @@ public class GioHangGUI extends JFrame {
         new GioHangGUI(products, 1200000);
     }
 }
-

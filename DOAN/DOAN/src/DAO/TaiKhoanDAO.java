@@ -118,4 +118,25 @@ public class TaiKhoanDAO {
         }
         return tk;
     }
+
+    public boolean isUsernameExists(String username) {
+    String sql = "SELECT COUNT(*) FROM tai_khoan WHERE ten_user = ?";
+    
+    try (Connection con = JDBC.getConnection();
+         PreparedStatement pst = con.prepareStatement(sql)) {
+        
+        pst.setString(1, username); // Gán giá trị của tên người dùng vào câu truy vấn
+        
+        try (ResultSet rs = pst.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1) > 0; // Nếu có ít nhất một bản ghi, trả về true
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    
+    return false; // Trả về false nếu không có tên người dùng trong cơ sở dữ liệu
+}
+
 }
