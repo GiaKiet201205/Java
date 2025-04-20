@@ -35,30 +35,6 @@ public class DonHangDAO {
         return ds;
     }
 
-    // Thêm đơn hàng mới
-    public boolean insert(DonHangDTO donHang) {
-        String sql = "INSERT INTO don_hang (id_don_hang, id_khach_hang, id_nhan_vien, tong_tien, ngay_dat_hang, trang_thai, hinh_thuc_mua_hang, dia_diem_giao) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-
-        try (Connection con = JDBC.getConnection();
-             PreparedStatement pst = con.prepareStatement(sql)) {
-
-            pst.setString(1, donHang.getIdDonHang());
-            pst.setString(2, donHang.getIdKhachHang());
-            pst.setString(3, donHang.getIdNhanVien());
-            pst.setInt(4, donHang.getTongTien());
-            pst.setDate(5, new java.sql.Date(donHang.getNgayDatHang().getTime()));
-            pst.setString(6, donHang.getTrangThai());
-            pst.setString(7, donHang.getHinhThucMuaHang());
-            pst.setString(8, donHang.getDiaDiemGiao());
-
-            return pst.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     // Cập nhật thông tin đơn hàng
     public boolean update(DonHangDTO donHang) {
         String sql = "UPDATE don_hang SET id_khach_hang=?, id_nhan_vien=?, tong_tien=?, ngay_dat_hang=?, trang_thai=?, hinh_thuc_mua_hang=?, dia_diem_giao=? WHERE id_don_hang=?";

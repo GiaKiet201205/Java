@@ -9,12 +9,15 @@ import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SanPhamPanel extends JPanel {
     private DefaultTableModel sanPhamTableModel;
     private JTable sanPhamTable;
     private JPanel sanPhamPanel;
     private Color headerColor = new Color(200, 255, 200);
+    private Set<String> outOfStockProducts = new HashSet<>(); // Lưu idSanPham của sản phẩm hết hàng
 
     public SanPhamPanel() {
         setLayout(new BorderLayout());
@@ -29,7 +32,7 @@ public class SanPhamPanel extends JPanel {
         // ===== TOP PANEL =====
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(headerColor);
-        topPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        topPanel.setPreferredSize(new Dimension(800, 80));
 
         JLabel lblChucNang = new JLabel("Chức năng");
         topPanel.add(lblChucNang, BorderLayout.WEST);
@@ -38,20 +41,20 @@ public class SanPhamPanel extends JPanel {
         buttonPanel.setOpaque(false);
 
         JButton btnAdd = new JButton("Thêm");
-        JButton btnDelete = new JButton("Xóa");
         JButton btnEdit = new JButton("Sửa");
+        JButton btnOutOfStock = new JButton("Hết hàng");
 
         buttonPanel.add(btnAdd);
-        buttonPanel.add(btnDelete);
         buttonPanel.add(btnEdit);
+        buttonPanel.add(btnOutOfStock);
 
         JPanel labelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         labelPanel.setOpaque(false);
         labelPanel.add(new JLabel("Thêm"));
         labelPanel.add(Box.createHorizontalStrut(20));
-        labelPanel.add(new JLabel("Xóa"));
-        labelPanel.add(Box.createHorizontalStrut(20));
         labelPanel.add(new JLabel("Sửa"));
+        labelPanel.add(Box.createHorizontalStrut(20));
+        labelPanel.add(new JLabel("Hết hàng"));
 
         JPanel functionPanel = new JPanel(new BorderLayout());
         functionPanel.setOpaque(false);
@@ -97,6 +100,21 @@ public class SanPhamPanel extends JPanel {
         sanPhamTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         sanPhamTable.setRowHeight(25);
 
+        // Áp dụng renderer để tô màu dựa trên outOfStockProducts
+        sanPhamTable.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                String idSanPham = table.getModel().getValueAt(row, 0).toString();
+                if (outOfStockProducts.contains(idSanPham)) {
+                    c.setBackground(Color.RED);
+                } else {
+                    c.setBackground(isSelected ? table.getSelectionBackground() : Color.WHITE);
+                }
+                return c;
+            }
+        });
+
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
         for (int i = 0; i < sanPhamTable.getColumnCount(); i++) {
@@ -115,8 +133,8 @@ public class SanPhamPanel extends JPanel {
         });
 
         btnAdd.addActionListener(e -> addSanPham());
-        btnDelete.addActionListener(e -> deleteSanPham(sanPhamTable.getSelectedRow()));
         btnEdit.addActionListener(e -> editSanPham(sanPhamTable.getSelectedRow()));
+        btnOutOfStock.addActionListener(e -> markProductOutOfStock(sanPhamTable.getSelectedRow()));
 
         txtSearchProduct.addKeyListener(new KeyAdapter() {
             @Override
@@ -188,24 +206,6 @@ public class SanPhamPanel extends JPanel {
         }
     }
 
-    private void deleteSanPham(int selectedRow) {
-        if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this, "Vui lòng chọn một sản phẩm để xóa", "Thông báo", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        String productId = sanPhamTableModel.getValueAt(selectedRow, 0).toString();
-        int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn xóa sản phẩm này?", "Xác nhận", JOptionPane.YES_NO_OPTION);
-        if (confirm == JOptionPane.YES_OPTION) {
-            if (new SanPhamDAO().delete(productId)) {
-                JOptionPane.showMessageDialog(this, "Xóa thành công!");
-                loadDataFromDatabase();
-            } else {
-                JOptionPane.showMessageDialog(this, "Xóa thất bại!");
-            }
-        }
-    }
-
     private void editSanPham(int selectedRow) {
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn một sản phẩm để sửa", "Thông báo", JOptionPane.WARNING_MESSAGE);
@@ -263,7 +263,33 @@ public class SanPhamPanel extends JPanel {
         sanPhamTable.setRowSorter(sorter);
 
         int columnIndex = searchType.equals("Tên sản phẩm") ? 1 : 0;
-        RowFilter<TableModel, Object> rf = RowFilter.regexFilter("(?i)" + keyword, columnIndex);
+        RowFilter<TableModel, Object> rf = RowFilter.regexFilter("(? Rewards) " + keyword, columnIndex);
         sorter.setRowFilter(rf);
     }
+
+    private void markProductOutOfStock(int selectedRow) {
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một sản phẩm", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Lấy ID sản phẩm đã chọn
+        String idSanPham = sanPhamTableModel.getValueAt(selectedRow, 0).toString();
+        SanPhamDAO dao = new SanPhamDAO();
+
+        // Đánh dấu sản phẩm là hết hàng
+        boolean success = dao.markOutOfStock(idSanPham);
+        if (success) {
+            // Thêm sản phẩm vào danh sách hết hàng
+            outOfStockProducts.add(idSanPham);
+            JOptionPane.showMessageDialog(this, "Sản phẩm đã được đánh dấu hết hàng");
+
+            // Làm mới dữ liệu và giao diện
+            loadDataFromDatabase();
+            sanPhamTable.repaint(); // Repaint bảng để cập nhật màu
+        } else {
+            JOptionPane.showMessageDialog(this, "Không thể đánh dấu hết hàng", "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
 }

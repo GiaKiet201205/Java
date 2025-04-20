@@ -25,22 +25,13 @@ public class ChiTietNhapHangPanel extends JPanel {
         
         // Panel chứa nút
         JPanel panelButtons = new JPanel();
-        btnAdd = new JButton("Thêm");
         btnEdit = new JButton("Sửa");
         btnDelete = new JButton("Xóa");
-        panelButtons.add(btnAdd);
         panelButtons.add(btnEdit);
         panelButtons.add(btnDelete);
         add(panelButtons, BorderLayout.SOUTH);
         
         // Thêm sự kiện cho các nút
-        btnAdd.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Xử lý thêm chi tiết nhập hàng
-                addChiTietNhapHang();
-            }
-        });
         
         btnEdit.addActionListener(new ActionListener() {
             @Override
@@ -77,23 +68,6 @@ public class ChiTietNhapHangPanel extends JPanel {
         }
         
         table.setModel(new javax.swing.table.DefaultTableModel(data, new String[]{"ID", "Mã Nhập Hàng", "Mã Sản Phẩm", "Số Lượng Nhập", "Giá Nhập"}));
-    }
-
-    // Phương thức thêm chi tiết nhập hàng
-    private void addChiTietNhapHang() {
-        String idChiTietNhapHang = JOptionPane.showInputDialog(this, "Nhập ID chi tiết nhập hàng:");
-        String idNhapHang = JOptionPane.showInputDialog(this, "Nhập mã nhập hàng:");
-        String idSanPham = JOptionPane.showInputDialog(this, "Nhập mã sản phẩm:");
-        int soLuongNhap = Integer.parseInt(JOptionPane.showInputDialog(this, "Nhập số lượng nhập:"));
-        int giaNhap = Integer.parseInt(JOptionPane.showInputDialog(this, "Nhập giá nhập:"));
-
-        ChiTietNhapHangDTO newChiTiet = new ChiTietNhapHangDTO(idChiTietNhapHang, idNhapHang, idSanPham, soLuongNhap, giaNhap);
-        if (chiTietNhapHangDAO.insert(newChiTiet)) {
-            JOptionPane.showMessageDialog(this, "Thêm thành công!");
-            loadData(); // Tải lại dữ liệu sau khi thêm
-        } else {
-            JOptionPane.showMessageDialog(this, "Thêm thất bại!");
-        }
     }
 
     // Phương thức sửa chi tiết nhập hàng

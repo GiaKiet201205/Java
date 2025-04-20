@@ -30,22 +30,20 @@ public class HoaDonPanel extends JPanel {
 
     private void createHoaDonPanel() {
         hoaDonPanel = new JPanel(new BorderLayout());
-
-        // === Top Panel code giữ nguyên như cũ ===
-        
-        // Thêm ô tìm kiếm và các nút
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        
+        topPanel.setBackground(new Color(200, 255, 200)); // Giống NhapHangPanel
+        topPanel.setBorder(new EmptyBorder(10, 10, 10, 10)); // Padding giống bên NhapHang
+
         JLabel lblSearchID = new JLabel("Tìm theo ID:");
         txtSearchID = new JTextField(10);
-        
+
         JLabel lblDateFrom = new JLabel("Từ ngày:");
         dateFrom = new JTextField(10);
-        
+
         JLabel lblDateTo = new JLabel("Đến ngày:");
         dateTo = new JTextField(10);
-        
+
         JButton btnSearch = new JButton("Tìm kiếm");
         JButton btnReset = new JButton("Làm mới");
         JButton btnEdit = new JButton("Sửa");

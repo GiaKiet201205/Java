@@ -32,26 +32,6 @@ public class ChiTietNhapHangDAO {
         return chiTietNhapHangList;
     }
 
-    // Phương thức insert: Thêm một chi tiết nhập hàng mới
-    public boolean insert(ChiTietNhapHangDTO chiTietNhapHang) {
-        String sql = "INSERT INTO chi_tiet_nhap_hang (id_chi_tiet_nhap_hang, id_nhap_hang, id_san_pham, so_luong_nhap, gia_nhap) VALUES (?, ?, ?, ?, ?)";
-
-        try (Connection con = JDBC.getConnection();
-             PreparedStatement pst = con.prepareStatement(sql)) {
-
-            pst.setString(1, chiTietNhapHang.getIdChiTietNhapHang());
-            pst.setString(2, chiTietNhapHang.getIdNhapHang());
-            pst.setString(3, chiTietNhapHang.getIdSanPham());
-            pst.setInt(4, chiTietNhapHang.getSoLuongNhap());
-            pst.setInt(5, chiTietNhapHang.getGiaNhap());
-
-            return pst.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     // Phương thức update: Cập nhật chi tiết nhập hàng
     public boolean update(ChiTietNhapHangDTO chiTietNhapHang) {
         String sql = "UPDATE chi_tiet_nhap_hang SET id_nhap_hang=?, id_san_pham=?, so_luong_nhap=?, gia_nhap=? WHERE id_chi_tiet_nhap_hang=?";

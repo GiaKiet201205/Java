@@ -74,20 +74,6 @@ public class SanPhamDAO {
         }
     }
 
-    public boolean delete(String idSanPham) {
-        String sql = "DELETE FROM san_pham WHERE id_san_pham=?";
-
-        try (Connection con = JDBC.getConnection();
-             PreparedStatement pst = con.prepareStatement(sql)) {
-
-            pst.setString(1, idSanPham);
-            return pst.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     public ArrayList<SanPhamDTO> searchByName(String keyword) {
         ArrayList<SanPhamDTO> ds = new ArrayList<>();
         String sql = "SELECT * FROM san_pham WHERE ten_san_pham LIKE ?";
@@ -114,5 +100,20 @@ public class SanPhamDAO {
         }
         return ds;
     }
-}
 
+    // Method to mark a product as out of stock by setting its stock quantity to 0
+    public boolean markOutOfStock(String idSanPham) {
+        String sql = "UPDATE san_pham SET so_luong_ton_kho = 0 WHERE id_san_pham = ?";
+
+        try (Connection con = JDBC.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+
+            pst.setString(1, idSanPham);
+            int rowsUpdated = pst.executeUpdate();
+            return rowsUpdated > 0;  // If the product was updated, return true
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;  // If there's an error, return false
+        }
+    }
+}
