@@ -28,38 +28,6 @@ public class ChiTietNhapHangPanel extends JPanel {
         add(new JLabel("Chi Tiết Nhập Hàng", SwingConstants.CENTER), BorderLayout.NORTH);
     }
 
-        // Bảng chi tiết nhập hàng
-        String[] columns = {"ID", "Mã Nhập Hàng", "Mã Sản Phẩm", "Số Lượng Nhập", "Giá Nhập"};
-        table = new JTable();
-        add(new JScrollPane(table), BorderLayout.CENTER);
-        
-        // Panel chứa nút
-        JPanel panelButtons = new JPanel();
-        btnEdit = new JButton("Sửa");
-        btnDelete = new JButton("Xóa");
-        panelButtons.add(btnEdit);
-        panelButtons.add(btnDelete);
-        add(panelButtons, BorderLayout.SOUTH);
-        
-        // Thêm sự kiện cho các nút
-        
-        btnEdit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Xử lý sửa chi tiết nhập hàng
-                editChiTietNhapHang();
-            }
-        });
-        
-        btnDelete.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // Xử lý xóa chi tiết nhập hàng
-                deleteChiTietNhapHang();
-            }
-        });
-        
-        // Hiển thị dữ liệu chi tiết nhập hàng
     private void createMainPanel() {
         mainPanel = new JPanel(new BorderLayout());
 
@@ -180,17 +148,6 @@ public class ChiTietNhapHangPanel extends JPanel {
         ArrayList<ChiTietNhapHangDTO> chiTietNhapHangList = chiTietNhapHangDAO.selectAll();
         tableModel.setRowCount(0); // Clear existing rows
 
-
-    // Phương thức sửa chi tiết nhập hàng
-    private void editChiTietNhapHang() {
-        int selectedRow = table.getSelectedRow();
-        if (selectedRow >= 0) {
-            String idChiTietNhapHang = table.getValueAt(selectedRow, 0).toString();
-            String idNhapHang = table.getValueAt(selectedRow, 1).toString();
-            String idSanPham = table.getValueAt(selectedRow, 2).toString();
-            int soLuongNhap = Integer.parseInt(table.getValueAt(selectedRow, 3).toString());
-            int giaNhap = Integer.parseInt(table.getValueAt(selectedRow, 4).toString());
-
         for (ChiTietNhapHangDTO item : chiTietNhapHangList) {
             tableModel.addRow(new Object[]{
                     item.getIdChiTietNhapHang(),
@@ -208,7 +165,6 @@ public class ChiTietNhapHangPanel extends JPanel {
                     "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
 
         tableModel.setRowCount(0);
 

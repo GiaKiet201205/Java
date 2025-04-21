@@ -172,7 +172,7 @@ public class ThongKePanel extends JPanel {
                 String secondaryFilter = (String) cmbSecondaryFilter.getSelectedItem();
                 if (secondaryFilter != null) {
                     if (filterType.equals("Tháng/Quý/Năm")) {
-                        updateTimeTable(timeModelpari, secondaryFilter, sortOption);
+                        updateTimeTable(timeModel, secondaryFilter, sortOption);
                         table.setModel(timeModel);
                     } else if (filterType.equals("Hình thức")) {
                         updateMethodTable(methodModel, secondaryFilter, sortOption);

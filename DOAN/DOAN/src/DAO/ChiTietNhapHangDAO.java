@@ -32,10 +32,6 @@ public class ChiTietNhapHangDAO {
         return chiTietNhapHangList;
     }
 
-
-    // Phương thức update: Cập nhật chi tiết nhập hàng
-    public boolean update(ChiTietNhapHangDTO chiTietNhapHang) {
-
     public ChiTietNhapHangDTO getByIdNhapHang(String idNhapHang) {
         String sql = "SELECT * FROM chi_tiet_nhap_hang WHERE id_nhap_hang = ?";
         try (Connection con = JDBC.getConnection();
@@ -84,7 +80,6 @@ public class ChiTietNhapHangDAO {
     }
 
     public void update(ChiTietNhapHangDTO chiTietNhapHang) throws SQLException {
-
         String sql = "UPDATE chi_tiet_nhap_hang SET id_nhap_hang=?, id_san_pham=?, so_luong_nhap=?, gia_nhap=? WHERE id_chi_tiet_nhap_hang=?";
         System.out.println("Thực hiện update chi tiết nhập hàng: " + chiTietNhapHang.getIdChiTietNhapHang());
 
