@@ -31,14 +31,35 @@ public class KhachHangDAO {
         return ds;
     }
 
-    // Thêm khách hàng mới
+    // Tạo mã khách hàng mới tự động
+    public String generateNextId() {
+        String sql = "SELECT MAX(id_khach_hang) AS max_id FROM khach_hang";
+        try (Connection conn = JDBC.getConnection(); 
+             PreparedStatement stmt = conn.prepareStatement(sql); 
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                String maxId = rs.getString("max_id");
+                if (maxId != null) {
+                    int number = Integer.parseInt(maxId.substring(2)); // Bỏ "KH"
+                    return String.format("KH%03d", number + 1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "KH001"; // Trường hợp chưa có khách hàng nào
+    }
+
+    // Thêm khách hàng mới với mã khách hàng tự động
     public boolean insert(KhachHangDTO khachHang) {
         String sql = "INSERT INTO khach_hang (id_khach_hang, ho_ten, email, sdt) VALUES (?, ?, ?, ?)";
 
         try (Connection con = JDBC.getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
 
-            pst.setString(1, khachHang.getIdKhachHang());
+            // Sinh mã khách hàng mới
+            String newId = generateNextId();
+            pst.setString(1, newId); // Sử dụng mã khách hàng mới
             pst.setString(2, khachHang.getHoTen());
             pst.setString(3, khachHang.getEmail());
             pst.setString(4, khachHang.getSdt());
