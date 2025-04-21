@@ -1,5 +1,8 @@
 package GUI.panel;
 
+import DAO.DanhMucDAO;
+import DTO.DanhMucDTO;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -7,16 +10,19 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.border.EmptyBorder;
+import java.util.ArrayList;
 
 public class DanhMucPanel extends JPanel {
     private JPanel danhMucPanel;
     private JTable danhMucTable;
     private DefaultTableModel danhMucTableModel;
     private Color headerColor = new Color(200, 255, 200);
+    private DanhMucDAO danhMucDAO;
 
     public DanhMucPanel() {
         setLayout(new BorderLayout()); 
         setPreferredSize(new Dimension(600, 400)); 
+        danhMucDAO = new DanhMucDAO(); // Khởi tạo đối tượng DAO
         createDanhMucPanel(); 
         add(danhMucPanel, BorderLayout.CENTER); 
         add(new JLabel("Danh mục", SwingConstants.CENTER), BorderLayout.NORTH); 
@@ -131,7 +137,7 @@ public class DanhMucPanel extends JPanel {
         btnReset.addActionListener(e -> {
             txtSearchDanhMuc.setText("");
             danhMucTableModel.setRowCount(0);
-            loadDanhMucData();
+            loadDanhMucData(); // Reload all data after reset
         });
 
         btnAdd.addActionListener(e -> addDanhMuc());
@@ -149,10 +155,18 @@ public class DanhMucPanel extends JPanel {
                 }
             }
         });
+
+        // Load data initially
+        loadDanhMucData();
     }
 
     private void loadDanhMucData() {
-        // Example of loading data from a database or external source
+        ArrayList<DanhMucDTO> danhMucList = danhMucDAO.selectAll();
+        danhMucTableModel.setRowCount(0); // Clear existing rows
+
+        for (DanhMucDTO danhMuc : danhMucList) {
+            danhMucTableModel.addRow(new Object[]{danhMuc.getIdDanhMuc(), danhMuc.getTenDanhMuc()});
+        }
     }
 
     private void searchDanhMuc(String searchType, String keyword) {
@@ -164,20 +178,14 @@ public class DanhMucPanel extends JPanel {
 
         danhMucTableModel.setRowCount(0);
 
-        Object[][] allData = {
-                {"DM001", "Áo nam"},
-                {"DM002", "Áo nữ"},
-                {"DM003", "Quần nam"},
-                {"DM004", "Quần nữ"},
-                {"DM005", "Phụ kiện nam"},
-                {"DM006", "Phụ kiện nữ"}
-        };
+        ArrayList<DanhMucDTO> allData = danhMucDAO.selectAll(); // Get all data from DAO
 
         int columnIndex = searchType.equals("Tên danh mục") ? 1 : 0;
 
-        for (Object[] row : allData) {
-            if (row[columnIndex].toString().toLowerCase().contains(keyword.toLowerCase())) {
-                danhMucTableModel.addRow(row);
+        for (DanhMucDTO row : allData) {
+            if (row.getIdDanhMuc().toLowerCase().contains(keyword.toLowerCase()) ||
+                row.getTenDanhMuc().toLowerCase().contains(keyword.toLowerCase())) {
+                danhMucTableModel.addRow(new Object[]{row.getIdDanhMuc(), row.getTenDanhMuc()});
             }
         }
 
@@ -207,6 +215,7 @@ public class DanhMucPanel extends JPanel {
                 "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
+            danhMucDAO.delete(categoryId); // Delete from database
             danhMucTableModel.removeRow(selectedRow);
             JOptionPane.showMessageDialog(this, "Đã xóa danh mục thành công",
                     "Thông báo", JOptionPane.INFORMATION_MESSAGE);

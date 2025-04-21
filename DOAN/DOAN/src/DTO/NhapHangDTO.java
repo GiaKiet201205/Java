@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package DTO;
 
 import java.util.Date;
@@ -11,12 +7,12 @@ public class NhapHangDTO {
     private String idNhaCungCap;
     private String idNhanVien;
     private Date ngayNhap;
-    private int tongGiaTriNhap;
+    private double tongGiaTriNhap; // Thay từ int thành double
 
     public NhapHangDTO() {
     }
 
-    public NhapHangDTO(String idNhapHang, String idNhaCungCap, String idNhanVien, Date ngayNhap, int tongGiaTriNhap) {
+    public NhapHangDTO(String idNhapHang, String idNhaCungCap, String idNhanVien, Date ngayNhap, double tongGiaTriNhap) {
         this.idNhapHang = idNhapHang;
         this.idNhaCungCap = idNhaCungCap;
         this.idNhanVien = idNhanVien;
@@ -56,12 +52,11 @@ public class NhapHangDTO {
         this.ngayNhap = ngayNhap;
     }
 
-    public int getTongGiaTriNhap() {
+    public double getTongGiaTriNhap() {
         return tongGiaTriNhap;
     }
 
-    public void setTongGiaTriNhap(int tongGiaTriNhap) {
+    public void setTongGiaTriNhap(double tongGiaTriNhap) {
         this.tongGiaTriNhap = tongGiaTriNhap;
     }
-
 }
