@@ -21,18 +21,43 @@ public class NhapHangDAO {
                     rs.getString("id_nha_cung_cap"),
                     rs.getString("id_nhan_vien"),
                     rs.getDate("ngay_nhap"),
-                    rs.getInt("tong_gia_tri_nhap")
+                    rs.getDouble("tong_gia_tri_nhap")
                 );
                 ds.add(nh);
             }
         } catch (SQLException e) {
+            System.err.println("Lỗi SQL khi lấy tất cả nhập hàng: " + e.getMessage());
             e.printStackTrace();
         }
         return ds;
     }
 
-    public boolean insert(NhapHangDTO nh) {
+    public NhapHangDTO getById(String idNhapHang) {
+        String sql = "SELECT * FROM nhap_hang WHERE id_nhap_hang = ?";
+        try (Connection con = JDBC.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setString(1, idNhapHang);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    return new NhapHangDTO(
+                        rs.getString("id_nhap_hang"),
+                        rs.getString("id_nha_cung_cap"),
+                        rs.getString("id_nhan_vien"),
+                        rs.getDate("ngay_nhap"),
+                        rs.getDouble("tong_gia_tri_nhap")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Lỗi SQL khi lấy nhập hàng theo id_nhap_hang: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void insert(NhapHangDTO nh) throws SQLException {
         String sql = "INSERT INTO nhap_hang VALUES (?, ?, ?, ?, ?)";
+        System.out.println("Thực hiện insert nhập hàng: " + nh.getIdNhapHang());
 
         try (Connection con = JDBC.getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
@@ -40,18 +65,23 @@ public class NhapHangDAO {
             pst.setString(1, nh.getIdNhapHang());
             pst.setString(2, nh.getIdNhaCungCap());
             pst.setString(3, nh.getIdNhanVien());
-            pst.setDate(4, new java.sql.Date(nh.getNgayNhap().getTime())); // ép kiểu Date
-            pst.setInt(5, nh.getTongGiaTriNhap());
+            pst.setDate(4, new java.sql.Date(nh.getNgayNhap().getTime()));
+            pst.setDouble(5, nh.getTongGiaTriNhap());
 
-            return pst.executeUpdate() > 0;
+            int rowsAffected = pst.executeUpdate();
+            System.out.println("Số dòng ảnh hưởng khi insert nhập hàng: " + rowsAffected);
+            if (rowsAffected == 0) {
+                throw new SQLException("Không thể thêm nhập hàng: " + nh.getIdNhapHang());
+            }
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            System.err.println("Lỗi SQL khi insert nhập hàng: " + e.getMessage());
+            throw e;
         }
     }
 
-    public boolean update(NhapHangDTO nh) {
+    public void update(NhapHangDTO nh) throws SQLException {
         String sql = "UPDATE nhap_hang SET id_nha_cung_cap=?, id_nhan_vien=?, ngay_nhap=?, tong_gia_tri_nhap=? WHERE id_nhap_hang=?";
+        System.out.println("Thực hiện update nhập hàng: " + nh.getIdNhapHang());
 
         try (Connection con = JDBC.getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
@@ -59,52 +89,36 @@ public class NhapHangDAO {
             pst.setString(1, nh.getIdNhaCungCap());
             pst.setString(2, nh.getIdNhanVien());
             pst.setDate(3, new java.sql.Date(nh.getNgayNhap().getTime()));
-            pst.setInt(4, nh.getTongGiaTriNhap());
+            pst.setDouble(4, nh.getTongGiaTriNhap());
             pst.setString(5, nh.getIdNhapHang());
 
-            return pst.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public boolean delete(String idNhapHang) {
-        String sql = "DELETE FROM nhap_hang WHERE id_nhap_hang=?";
-
-        try (Connection con = JDBC.getConnection();
-             PreparedStatement pst = con.prepareStatement(sql)) {
-
-            pst.setString(1, idNhapHang);
-            return pst.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public NhapHangDTO selectById(String idNhapHang) {
-        String sql = "SELECT * FROM nhap_hang WHERE id_nhap_hang=?";
-        NhapHangDTO nh = null;
-
-        try (Connection con = JDBC.getConnection();
-             PreparedStatement pst = con.prepareStatement(sql)) {
-
-            pst.setString(1, idNhapHang);
-            ResultSet rs = pst.executeQuery();
-
-            if (rs.next()) {
-                nh = new NhapHangDTO(
-                    rs.getString("id_nhap_hang"),
-                    rs.getString("id_nha_cung_cap"),
-                    rs.getString("id_nhan_vien"),
-                    rs.getDate("ngay_nhap"),
-                    rs.getInt("tong_gia_tri_nhap")
-                );
+            int rowsAffected = pst.executeUpdate();
+            System.out.println("Số dòng ảnh hưởng khi update nhập hàng: " + rowsAffected);
+            if (rowsAffected == 0) {
+                throw new SQLException("Không thể cập nhật nhập hàng: " + nh.getIdNhapHang());
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Lỗi SQL khi update nhập hàng: " + e.getMessage());
+            throw e;
         }
-        return nh;
+    }
+
+    public void delete(String idNhapHang) throws SQLException {
+        String sql = "DELETE FROM nhap_hang WHERE id_nhap_hang=?";
+        System.out.println("Thực hiện delete nhập hàng: " + idNhapHang);
+
+        try (Connection con = JDBC.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+
+            pst.setString(1, idNhapHang);
+            int rowsAffected = pst.executeUpdate();
+            System.out.println("Số dòng ảnh hưởng khi delete nhập hàng: " + rowsAffected);
+            if (rowsAffected == 0) {
+                throw new SQLException("Không thể xóa nhập hàng: " + idNhapHang);
+            }
+        } catch (SQLException e) {
+            System.err.println("Lỗi SQL khi delete nhập hàng: " + e.getMessage());
+            throw e;
+        }
     }
 }
