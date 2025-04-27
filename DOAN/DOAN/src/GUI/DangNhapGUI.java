@@ -1,5 +1,6 @@
 package GUI;
 
+import BLL.Session;
 import DAO.TaiKhoanDAO;
 import DTO.TaiKhoanDTO;
 import GUI.QuanTriVienGUI;
@@ -92,31 +93,32 @@ public class DangNhapGUI extends JFrame {
         forgotPasswordLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
         loginPanel.add(forgotPasswordLabel, gbc);
         
-        // Xử lý sự kiện nút đăng nhập
+        // Xử lý sự kiện nút đăng nhậpa
         loginButton.addActionListener((ActionEvent e) -> {
-    String username = usernameField.getText();
-    String password = new String(passwordField.getPassword());
+        String username = usernameField.getText();
+        String password = new String(passwordField.getPassword());
 
-    TaiKhoanDAO taiKhoanDAO = new TaiKhoanDAO();
-    TaiKhoanDTO tk = taiKhoanDAO.login(username, password);
+        TaiKhoanDAO taiKhoanDAO = new TaiKhoanDAO();
+        TaiKhoanDTO tk = taiKhoanDAO.login(username, password);
 
-    if (tk != null) {
-        String quyen = tk.getPhanQuyen();
-        if (quyen.equals("1")) {
-            JOptionPane.showMessageDialog(null, "Đăng nhập thành công! (Admin)");
-            new QuanTriVienGUI().setVisible(true);
-        } else if (quyen.equals("2")) {
-            JOptionPane.showMessageDialog(null, "Đăng nhập thành công!");
-            new TrangChuGUI().setVisible(true);
+        if (tk != null) {
+            Session.setCurrentTaiKhoan(tk);
+
+            String quyen = tk.getPhanQuyen();
+            if (quyen.equals("1")) {
+                JOptionPane.showMessageDialog(null, "Đăng nhập thành công! (Admin)");
+                new QuanTriVienGUI().setVisible(true);
+            } else if (quyen.equals("2")) {
+                JOptionPane.showMessageDialog(null, "Đăng nhập thành công!");
+                new TrangChuGUI().setVisible(true);
+            } else {
+                JOptionPane.showMessageDialog(null, "Không xác định được quyền đăng nhập!");
+            }
+            dispose();
         } else {
-            JOptionPane.showMessageDialog(null, "Không xác định được quyền đăng nhập!");
+            JOptionPane.showMessageDialog(null, "Tên đăng nhập hoặc mật khẩu sai!", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
-        dispose();
-    } else {
-        JOptionPane.showMessageDialog(null, "Tên đăng nhập hoặc mật khẩu sai!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-    }
-});
-
+    });
 
         // Thêm panel vào backgroundPanel
         backgroundPanel.add(loginPanel, BorderLayout.CENTER);

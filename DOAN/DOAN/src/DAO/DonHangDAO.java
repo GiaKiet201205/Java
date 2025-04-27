@@ -1,6 +1,7 @@
 package DAO;
 
 import DTO.DonHangDTO;
+import BLL.Session;
 import config.JDBC;
 import java.sql.*;
 import java.util.ArrayList;
@@ -39,6 +40,13 @@ public class DonHangDAO {
         String sql = "INSERT INTO don_hang (id_don_hang, id_khach_hang, id_nhan_vien, tong_tien, ngay_dat_hang, trang_thai, hinh_thuc_mua_hang, dia_diem_giao) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
+        // Lấy id_khach_hang từ session
+        String idKhachHang = Session.getIdKhachHang();
+        if (idKhachHang == null) {
+            System.out.println("Khách hàng chưa đăng nhập.");
+            return null; 
+        }
+    
         try (Connection con = JDBC.getConnection();
              PreparedStatement pst = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 

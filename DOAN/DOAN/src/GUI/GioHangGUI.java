@@ -1,14 +1,13 @@
 package GUI;
 
+import BLL.Session; 
 import DAO.DonHangDAO;
-import DAO.KhachHangDAO;  // Import KhachHangDAO
 import DAO.NhanVienDAO;
 import DTO.DonHangDTO;
 import javax.swing.*;
 import java.awt.*;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.UUID;
 
 public class GioHangGUI extends JFrame {
 
@@ -121,23 +120,23 @@ public class GioHangGUI extends JFrame {
             String diaChi = textFields[3].getText().trim();
             String hinhThucThanhToan = (String) paymentBox.getSelectedItem();
 
+            // Kiểm tra thông tin đầu vào
             if (hoTen.isEmpty() || email.isEmpty() || sdt.isEmpty() || diaChi.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Vui lòng điền đầy đủ thông tin!", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             try {
-                
-                KhachHangDAO khachHangDAO = new KhachHangDAO();
-                String idKhachHang = khachHangDAO.generateNextId(); // Tạo mã khách hàng mới
+                String idKhachHang = Session.getIdKhachHang();
 
+                // Lấy ID nhân viên admin
                 NhanVienDAO nhanVienDAO = new NhanVienDAO();
-                String idNhanVien = nhanVienDAO.generateNextId(); // Tạo mã nhân viên mới
+                String idNhanVien = "admin";  // chỉ có admin duyệt hóa đơn
 
                 // Tạo đơn hàng
                 DonHangDTO donHang = new DonHangDTO();
-                donHang.setIdKhachHang(idKhachHang);  // Đặt mã khách hàng
-                donHang.setIdNhanVien(idNhanVien);  // Đặt mã nhân viên từ NhanVienDAO
+                donHang.setIdKhachHang(idKhachHang);
+                donHang.setIdNhanVien(idNhanVien);
                 donHang.setTongTien(totalPrice);
                 donHang.setNgayDatHang(new Timestamp(System.currentTimeMillis()));
                 donHang.setTrangThai("Đã thanh toán");
@@ -145,19 +144,12 @@ public class GioHangGUI extends JFrame {
                 donHang.setDiaDiemGiao(diaChi);
 
                 DonHangDAO donHangDAO = new DonHangDAO();
-                String idDonHang = donHangDAO.generateNextId(); // Tạo mã đơn hàng mới
+                String idDonHang = donHangDAO.generateNextId();
                 donHang.setIdDonHang(idDonHang);
-                String idInserted = donHangDAO.insert(donHang);
+                donHangDAO.insert(donHang);
 
-                if (idDonHang == null) {
-                    JOptionPane.showMessageDialog(this, "Không thể lưu hóa đơn!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                // Hiển thị hóa đơn đơn giản
                 JOptionPane.showMessageDialog(this, "Thanh toán thành công! Hóa đơn đã được lưu.", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-                dispose();
-
+                dispose();  // Đóng cửa sổ giỏ hàng sau khi hoàn thành
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Lỗi khi thanh toán: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();

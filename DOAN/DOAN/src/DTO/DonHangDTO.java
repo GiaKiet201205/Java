@@ -12,10 +12,7 @@ public class DonHangDTO {
     private String hinhThucMuaHang;
     private String diaDiemGiao;
 
-    // Constructor rỗng
     public DonHangDTO() {}
-
-    // Constructor đầy đủ
     public DonHangDTO(String idDonHang, String idKhachHang, String idNhanVien, int tongTien, Date ngayDatHang,
                       String trangThai, String hinhThucMuaHang, String diaDiemGiao) {
         this.idDonHang = idDonHang;

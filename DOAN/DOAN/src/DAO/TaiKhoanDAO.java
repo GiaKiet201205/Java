@@ -93,7 +93,6 @@ public class TaiKhoanDAO {
 
     public TaiKhoanDTO login(String tenUser, String password) {
         String sql = "SELECT * FROM tai_khoan WHERE ten_user=? AND password=?";
-        TaiKhoanDTO tk = null;
 
         try (Connection con = JDBC.getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
@@ -103,7 +102,7 @@ public class TaiKhoanDAO {
 
             try (ResultSet rs = pst.executeQuery()) {
                 if (rs.next()) {
-                    tk = new TaiKhoanDTO(
+                    TaiKhoanDTO tk = new TaiKhoanDTO(
                         rs.getString("id_tai_khoan"),
                         rs.getString("id_khach_hang"),
                         rs.getString("ten_user"),
@@ -111,12 +110,13 @@ public class TaiKhoanDAO {
                         rs.getString("phan_quyen"),
                         rs.getString("trang_thai")
                     );
+                    return tk;
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return tk;
+        return null;
     }
 
     public boolean isUsernameExists(String username) {

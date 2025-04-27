@@ -129,4 +129,19 @@ public class KhachHangDAO {
         }
         return khachHang;
     }
+    
+    // Kiểm tra xem id_khach_hang có tồn tại trong bảng khach_hang không
+    public boolean isCustomerExist(String idKhachHang) {
+        String sql = "SELECT 1 FROM khach_hang WHERE id_khach_hang = ?";
+        try (Connection con = JDBC.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setString(1, idKhachHang);
+            ResultSet rs = pst.executeQuery();
+            return rs.next(); // Nếu có dòng dữ liệu, nghĩa là tồn tại
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }
