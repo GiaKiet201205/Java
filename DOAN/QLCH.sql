@@ -31,7 +31,6 @@ CREATE TABLE `chi_tiet_don_hang` (
   `so_luong` int NOT NULL,
   `gia_ban` int NOT NULL,
   PRIMARY KEY (`id_chi_tiet_don_hang`),
-  UNIQUE KEY `id chi tiet don hang_UNIQUE` (`id_chi_tiet_don_hang`),
   KEY `fk_ctdh_donhang` (`id_don_hang`),
   KEY `fk_ctdh_sanpham` (`id_san_pham`),
   CONSTRAINT `fk_ctdh_donhang` FOREIGN KEY (`id_don_hang`) REFERENCES `don_hang` (`id_don_hang`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -76,7 +75,7 @@ CREATE TABLE `chi_tiet_nhap_hang` (
 
 LOCK TABLES `chi_tiet_nhap_hang` WRITE;
 /*!40000 ALTER TABLE `chi_tiet_nhap_hang` DISABLE KEYS */;
-INSERT INTO `chi_tiet_nhap_hang` VALUES ('CN001','NH001','SP005',10,60000),('CN002','NH002','SP018',20,55000),('CN003','NH003','SP002',30,65000),('CN004','NH004','SP025',15,70000),('CN005','NH005','SP011',25,100000),('CN006','NH006','SP030',50,50000),('CN007','NH007','SP008',12,62000),('CN008','NH008','SP029',8,58000),('CN009','NH009','SP020',40,68000),('CN010','NH010','SP033',18,72000),('CN011','NH011','SP001',22,105000),('CN012','NH012','SP022',5,52000),('CN013','NH013','SP015',15,100000),('CN014','NH014','SP038',35,60000),('CN015','NH015','SP007',7,110000),('CN016','NH016','SP028',10,55000),('CN017','NH017','SP019',60,65000),('CN018','NH018','SP031',20,70000),('CN019','NH019','SP003',18,115000),('CN020','NH020','SP026',28,52000),('CN021','NH021','SP009',30,100000),('CN022','NH022','SP035',45,60000),('CN023','NH023','SP017',11,62000),('CN024','NH024','SP039',55,58000),('CN025','NH025','SP004',25,68000),('CN026','NH026','SP027',16,72000),('CN027','NH027','SP012',9,108000),('CN028','NH028','SP032',14,52000),('CN029','NH029','SP021',32,102000),('CN030','NH030','SP040',22,60000),('CN031','NH031','SP006',17,62000),('CN032','NH032','SP023',48,58000),('CN033','NH033','SP016',21,68000),('CN034','NH034','SP037',60,72000),('CN035','NH035','SP010',6,118000),('CN036','NH036','SP033',19,52000),('CN037','NH037','SP014',13,102000),('CN038','NH038','SP036',11,60000),('CN039','NH039','SP024',27,62000),('CN040','NH040','SP028',38,58000);
+INSERT INTO `chi_tiet_nhap_hang` VALUES ('CN001','NH001','SP005',10,60000),('CN002','NH002','SP018',20,55000),('CN003','NH003','SP002',30,65000),('CN004','NH004','SP025',15,70000),('CN005','NH005','SP011',25,100000),('CN006','NH006','SP030',50,50000),('CN007','NH007','SP008',12,62000),('CN008','NH008','SP029',8,58000),('CN009','NH009','SP020',40,68000),('CN010','NH010','SP033',18,72000),('CN011','NH011','SP001',22,105000),('CN012','NH012','SP022',5,52000),('CN013','NH013','SP015',15,100000),('CN014','NH014','SP038',35,60000),('CN015','NH015','SP007',7,110000),('CN017','NH017','SP019',60,65000),('CN018','NH018','SP031',20,70000),('CN019','NH019','SP003',18,115000),('CN020','NH020','SP026',28,52000),('CN021','NH021','SP009',30,100000),('CN022','NH022','SP035',45,60000),('CN023','NH023','SP017',11,62000),('CN024','NH024','SP039',55,58000),('CN025','NH025','SP004',25,68000),('CN026','NH026','SP027',16,72000),('CN027','NH027','SP012',9,108000),('CN028','NH028','SP032',14,52000),('CN029','NH029','SP021',32,102000),('CN030','NH030','SP040',22,60000),('CN031','NH031','SP006',17,62000),('CN032','NH032','SP023',48,58000),('CN033','NH033','SP016',21,68000),('CN034','NH034','SP037',60,72000),('CN035','NH035','SP010',6,118000),('CN036','NH036','SP033',19,52000),('CN037','NH037','SP014',13,102000),('CN038','NH038','SP036',11,60000);
 /*!40000 ALTER TABLE `chi_tiet_nhap_hang` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -90,9 +89,7 @@ DROP TABLE IF EXISTS `danh_muc`;
 CREATE TABLE `danh_muc` (
   `id_danh_muc` varchar(5) NOT NULL,
   `ten_danh_muc` varchar(45) NOT NULL,
-  PRIMARY KEY (`id_danh_muc`),
-  UNIQUE KEY `id danh muc_UNIQUE` (`id_danh_muc`),
-  UNIQUE KEY `ten danh muc_UNIQUE` (`ten_danh_muc`)
+  PRIMARY KEY (`id_danh_muc`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -102,7 +99,7 @@ CREATE TABLE `danh_muc` (
 
 LOCK TABLES `danh_muc` WRITE;
 /*!40000 ALTER TABLE `danh_muc` DISABLE KEYS */;
-INSERT INTO `danh_muc` VALUES ('DM005','Áo hoodie'),('DM004','Áo khoác'),('DM003','Áo thun'),('DM001','Quần jean'),('DM002','Quần short');
+INSERT INTO `danh_muc` VALUES ('DM001','Quần jean'),('DM002','Quần short'),('DM003','Áo thun'),('DM004','Áo khoác'),('DM005','Áo hoodie');
 /*!40000 ALTER TABLE `danh_muc` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -123,11 +120,10 @@ CREATE TABLE `don_hang` (
   `hinh_thuc_mua_hang` varchar(45) NOT NULL,
   `dia_diem_giao` varchar(45) NOT NULL,
   PRIMARY KEY (`id_don_hang`),
-  UNIQUE KEY `id don hang_UNIQUE` (`id_don_hang`),
-  UNIQUE KEY `id khach hang_UNIQUE` (`id_khach_hang`),
-  UNIQUE KEY `id nhan vien_UNIQUE` (`id_nhan_vien`),
-  CONSTRAINT `fk_donhang_khachhang` FOREIGN KEY (`id_khach_hang`) REFERENCES `khach_hang` (`id_khach_hang`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_donhang_nhanvien` FOREIGN KEY (`id_nhan_vien`) REFERENCES `nhan_vien` (`id_nhan_vien`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `fk_donhang_id_khach_hang` (`id_khach_hang`),
+  KEY `fk_donhang_id_nhan_vien` (`id_nhan_vien`),
+  CONSTRAINT `fk_donhang_id_khach_hang` FOREIGN KEY (`id_khach_hang`) REFERENCES `khach_hang` (`id_khach_hang`),
+  CONSTRAINT `fk_donhang_id_nhan_vien` FOREIGN KEY (`id_nhan_vien`) REFERENCES `nhan_vien` (`id_nhan_vien`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -153,10 +149,7 @@ CREATE TABLE `khach_hang` (
   `ho_ten` varchar(45) NOT NULL,
   `email` varchar(45) NOT NULL,
   `sdt` varchar(10) NOT NULL,
-  PRIMARY KEY (`id_khach_hang`),
-  UNIQUE KEY `id khach hang_UNIQUE` (`id_khach_hang`),
-  UNIQUE KEY `email_UNIQUE` (`email`),
-  UNIQUE KEY `sđt_UNIQUE` (`sdt`)
+  PRIMARY KEY (`id_khach_hang`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -166,7 +159,7 @@ CREATE TABLE `khach_hang` (
 
 LOCK TABLES `khach_hang` WRITE;
 /*!40000 ALTER TABLE `khach_hang` DISABLE KEYS */;
-INSERT INTO `khach_hang` VALUES ('99999','Admin','admin@gmail.com','0999999999'),('KH001','Nguyen Van A1','a1@gmail.com','0900000001'),('KH002','Nguyen Van A2','a2@gmail.com','0900000002'),('KH003','Nguyen Van A3','a3@gmail.com','0900000003'),('KH004','Nguyen Van A4','a4@gmail.com','0900000004'),('KH005','Nguyen Van A5','a5@gmail.com','0900000005'),('KH006','Nguyen Van A6','a6@gmail.com','0900000006'),('KH007','Nguyen Van A7','a7@gmail.com','0900000007'),('KH008','Nguyen Van A8','a8@gmail.com','0900000008'),('KH009','Nguyen Van A9','a9@gmail.com','0900000009'),('KH010','Nguyen Van A10','a10@gmail.com','0900000010'),('KH011','Nguyen Van A11','a11@gmail.com','0900000011'),('KH012','Nguyen Van A12','a12@gmail.com','0900000012'),('KH013','Nguyen Van A13','a13@gmail.com','0900000013'),('KH014','Nguyen Van A14','a14@gmail.com','0900000014'),('KH015','Nguyen Van A15','a15@gmail.com','0900000015'),('KH016','Nguyen Van A16','a16@gmail.com','0900000016'),('KH017','Nguyen Van A17','a17@gmail.com','0900000017'),('KH018','Nguyen Van A18','a18@gmail.com','0900000018'),('KH019','Nguyen Van A19','a19@gmail.com','0900000019'),('KH020','Nguyen Van A20','a20@gmail.com','0900000020'),('KH021','Nguyen Van A21','a21@gmail.com','0900000021'),('KH022','Nguyen Van A22','a22@gmail.com','0900000022'),('KH023','Nguyen Van A23','a23@gmail.com','0900000023'),('KH024','Nguyen Van A24','a24@gmail.com','0900000024'),('KH025','Nguyen Van A25','a25@gmail.com','0900000025'),('KH026','Nguyen Van A26','a26@gmail.com','0900000026'),('KH027','Nguyen Van A27','a27@gmail.com','0900000027'),('KH028','Nguyen Van A28','a28@gmail.com','0900000028'),('KH029','Nguyen Van A29','a29@gmail.com','0900000029'),('KH030','Nguyen Van A30','a30@gmail.com','0900000030'),('KH031','Nguyen Van A31','a31@gmail.com','0900000031'),('KH032','Nguyen Van A32','a32@gmail.com','0900000032'),('KH033','Nguyen Van A33','a33@gmail.com','0900000033'),('KH034','Nguyen Van A34','a34@gmail.com','0900000034'),('KH035','Nguyen Van A35','a35@gmail.com','0900000035'),('KH036','Nguyen Van A36','a36@gmail.com','0900000036'),('KH037','Nguyen Van A37','a37@gmail.com','0900000037'),('KH038','Nguyen Van A38','a38@gmail.com','0900000038'),('KH039','Nguyen Van A39','a39@gmail.com','0900000039'),('KH040','Nguyen Van A40','a40@gmail.com','0900000040');
+INSERT INTO `khach_hang` VALUES ('99999','Admin','admin@gmail.com','0999999999'),('KH001','Nguyen Van A1','a1@gmail.com','0900000001'),('KH002','Nguyen Van A2','a2@gmail.com','0900000002'),('KH003','Nguyen Van A3','a3@gmail.com','0900000003'),('KH004','Nguyen Van A4','a4@gmail.com','0900000004'),('KH005','Nguyen Van A5','a5@gmail.com','0900000005'),('KH006','Nguyen Van A6','a6@gmail.com','0900000006'),('KH007','Nguyen Van A7','a7@gmail.com','0900000007'),('KH008','Nguyen Van A8','a8@gmail.com','0900000008'),('KH009','Nguyen Van A9','a9@gmail.com','0900000009'),('KH010','Nguyen Van A10','a10@gmail.com','0900000010'),('KH011','Nguyen Van A11','a11@gmail.com','0900000011'),('KH012','Nguyen Van A12','a12@gmail.com','0900000012'),('KH013','Nguyen Van A13','a13@gmail.com','0900000013'),('KH014','Nguyen Van A14','a14@gmail.com','0900000014'),('KH015','Nguyen Van A15','a15@gmail.com','0900000015'),('KH016','Nguyen Van A16','a16@gmail.com','0900000016'),('KH017','Nguyen Van A17','a17@gmail.com','0900000017'),('KH018','Nguyen Van A18','a18@gmail.com','0900000018'),('KH019','Nguyen Van A19','a19@gmail.com','0900000019'),('KH020','Nguyen Van A20','a20@gmail.com','0900000020'),('KH021','Nguyen Van A21','a21@gmail.com','0900000021'),('KH022','Nguyen Van A22','a22@gmail.com','0900000022'),('KH023','Nguyen Van A23','a23@gmail.com','0900000023'),('KH024','Nguyen Van A24','a24@gmail.com','0900000024'),('KH025','Nguyen Van A25','a25@gmail.com','0900000025'),('KH026','Nguyen Van A26','a26@gmail.com','0900000026'),('KH027','Nguyen Van A27','a27@gmail.com','0900000027'),('KH028','Nguyen Van A28','a28@gmail.com','0900000028'),('KH029','Nguyen Van A29','a29@gmail.com','0900000029'),('KH030','Nguyen Van A30','a30@gmail.com','0900000030'),('KH031','Nguyen Van A31','a31@gmail.com','0900000031'),('KH032','Nguyen Van A32','a32@gmail.com','0900000032'),('KH033','Nguyen Van A33','a33@gmail.com','0900000033'),('KH034','Nguyen Van A34','a34@gmail.com','0900000034'),('KH035','Nguyen Van A35','a35@gmail.com','0900000035'),('KH036','Nguyen Van A36','a36@gmail.com','0900000036'),('KH037','Nguyen Van A37','a37@gmail.com','0900000037'),('KH038','Nguyen Van A38','a38@gmail.com','0900000038'),('KH039','Nguyen Van A39','a39@gmail.com','0900000039'),('KH040','Nguyen Van A40','a40@gmail.com','0900000040'),('KH041','','','');
 /*!40000 ALTER TABLE `khach_hang` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -182,8 +175,7 @@ CREATE TABLE `nha_cung_cap` (
   `ten_nha_cung_cap` varchar(45) NOT NULL,
   `dia_chi` varchar(45) NOT NULL,
   `sdt` varchar(10) NOT NULL,
-  PRIMARY KEY (`id_nha_cung_cap`),
-  UNIQUE KEY `id nha cung cap_UNIQUE` (`id_nha_cung_cap`)
+  PRIMARY KEY (`id_nha_cung_cap`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -211,10 +203,7 @@ CREATE TABLE `nhan_vien` (
   `sdt` varchar(10) NOT NULL,
   `chuc_vu` varchar(25) NOT NULL,
   `luong` int NOT NULL,
-  PRIMARY KEY (`id_nhan_vien`),
-  UNIQUE KEY `email_UNIQUE` (`email`),
-  UNIQUE KEY `id nhan vien_UNIQUE` (`id_nhan_vien`),
-  UNIQUE KEY `sđt_UNIQUE` (`sdt`)
+  PRIMARY KEY (`id_nhan_vien`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -240,9 +229,8 @@ CREATE TABLE `nhap_hang` (
   `id_nha_cung_cap` varchar(5) NOT NULL,
   `id_nhan_vien` varchar(5) NOT NULL,
   `ngay_nhap` datetime NOT NULL,
-  `tong_gia_tri_nhap` int NOT NULL,
+  `tong_gia_tri_nhap` double NOT NULL,
   PRIMARY KEY (`id_nhap_hang`),
-  UNIQUE KEY `id nhap hang_UNIQUE` (`id_nhap_hang`),
   KEY `fk_nhaphang_ncc` (`id_nha_cung_cap`),
   KEY `fk_nhaphang_nv` (`id_nhan_vien`),
   CONSTRAINT `fk_nhaphang_ncc` FOREIGN KEY (`id_nha_cung_cap`) REFERENCES `nha_cung_cap` (`id_nha_cung_cap`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -256,7 +244,7 @@ CREATE TABLE `nhap_hang` (
 
 LOCK TABLES `nhap_hang` WRITE;
 /*!40000 ALTER TABLE `nhap_hang` DISABLE KEYS */;
-INSERT INTO `nhap_hang` VALUES ('NH001','CC005','NV012','2025-01-05 00:00:00',600000),('NH002','CC018','NV025','2025-01-12 00:00:00',1100000),('NH003','CC031','NV003','2025-01-20 00:00:00',1950000),('NH004','CC002','NV038','2025-01-28 00:00:00',1050000),('NH005','CC022','NV019','2025-02-03 00:00:00',2500000),('NH006','CC011','NV033','2025-02-10 00:00:00',2500000),('NH007','CC035','NV008','2025-02-17 00:00:00',744000),('NH008','CC009','NV029','2025-02-24 00:00:00',464000),('NH009','CC027','NV015','2025-03-03 00:00:00',2720000),('NH010','CC001','NV039','2025-03-10 00:00:00',1296000),('NH011','CC015','NV021','2025-03-17 00:00:00',2310000),('NH012','CC038','NV005','2025-03-24 00:00:00',260000),('NH013','CC007','NV031','2025-03-31 00:00:00',1500000),('NH014','CC025','NV010','2025-04-07 00:00:00',2100000),('NH015','CC019','NV027','2025-04-14 00:00:00',770000),('NH016','CC033','NV002','2025-04-21 00:00:00',550000),('NH017','CC004','NV036','2025-04-28 00:00:00',3900000),('NH018','CC021','NV017','2025-05-05 00:00:00',1400000),('NH019','CC039','NV009','2025-05-12 00:00:00',2070000),('NH020','CC012','NV023','2025-05-19 00:00:00',1456000),('NH021','CC008','NV034','2025-05-26 00:00:00',3000000),('NH022','CC029','NV007','2025-06-02 00:00:00',2700000),('NH023','CC016','NV028','2025-06-09 00:00:00',682000),('NH024','CC037','NV013','2025-06-16 00:00:00',3190000),('NH025','CC003','NV032','2025-06-23 00:00:00',1700000),('NH026','CC023','NV001','2025-06-30 00:00:00',1152000),('NH027','CC010','NV020','2025-07-07 00:00:00',972000),('NH028','CC036','NV011','2025-07-14 00:00:00',728000),('NH029','CC017','NV037','2025-07-21 00:00:00',3264000),('NH030','CC006','NV026','2025-07-28 00:00:00',1320000),('NH031','CC026','NV004','2025-08-04 00:00:00',1054000),('NH032','CC013','NV030','2025-08-11 00:00:00',2784000),('NH033','CC032','NV016','2025-08-18 00:00:00',1428000),('NH034','CC008','NV022','2025-08-25 00:00:00',4320000),('NH035','CC020','NV006','2025-09-01 00:00:00',708000),('NH036','CC034','NV024','2025-09-08 00:00:00',988000),('NH037','CC014','NV040','2025-09-15 00:00:00',1326000),('NH038','CC028','NV018','2025-09-22 00:00:00',660000),('NH039','CC040','NV035','2025-09-29 00:00:00',1674000),('NH040','CC024','NV014','2025-10-06 00:00:00',2204000);
+INSERT INTO `nhap_hang` VALUES ('NH001','CC005','NV012','2025-01-05 00:00:00',600000),('NH002','CC018','NV025','2025-01-12 00:00:00',1100000),('NH003','CC031','NV003','2025-01-20 00:00:00',1950000),('NH004','CC002','NV038','2025-01-28 00:00:00',1050000),('NH005','CC022','NV019','2025-02-03 00:00:00',2500000),('NH006','CC011','NV033','2025-02-10 00:00:00',2500000),('NH007','CC035','NV008','2025-02-17 00:00:00',744000),('NH008','CC009','NV029','2025-02-24 00:00:00',464000),('NH009','CC027','NV015','2025-03-03 00:00:00',2720000),('NH010','CC001','NV039','2025-03-10 00:00:00',1296000),('NH011','CC015','NV021','2025-03-17 00:00:00',2310000),('NH012','CC038','NV005','2025-03-24 00:00:00',260000),('NH013','CC007','NV031','2025-03-31 00:00:00',1500000),('NH014','CC025','NV010','2025-04-07 00:00:00',2100000),('NH015','CC019','NV027','2025-04-14 00:00:00',770000),('NH016','CC033','NV002','2025-04-21 00:00:00',550000),('NH017','CC004','NV036','2025-04-28 00:00:00',3900000),('NH018','CC021','NV017','2025-05-05 00:00:00',1400000),('NH019','CC039','NV009','2025-05-12 00:00:00',2070000),('NH020','CC012','NV023','2025-05-19 00:00:00',1456000),('NH021','CC008','NV034','2025-05-26 00:00:00',3000000),('NH022','CC029','NV007','2025-06-02 00:00:00',2700000),('NH023','CC016','NV028','2025-06-09 00:00:00',682000),('NH024','CC037','NV013','2025-06-16 00:00:00',3190000),('NH025','CC003','NV032','2025-06-23 00:00:00',1700000),('NH026','CC023','NV001','2025-06-30 00:00:00',1152000),('NH027','CC010','NV020','2025-07-07 00:00:00',972000),('NH028','CC036','NV011','2025-07-14 00:00:00',728000),('NH029','CC017','NV037','2025-07-21 00:00:00',3264000),('NH030','CC006','NV026','2025-07-28 00:00:00',1320000),('NH031','CC026','NV004','2025-08-04 00:00:00',1054000),('NH032','CC013','NV030','2025-08-11 00:00:00',2784000),('NH033','CC032','NV016','2025-08-18 00:00:00',1428000),('NH034','CC008','NV022','2025-08-25 00:00:00',4320000),('NH035','CC020','NV006','2025-09-01 00:00:00',708000),('NH036','CC034','NV024','2025-09-08 00:00:00',988000),('NH037','CC014','NV040','2025-09-15 00:00:00',1326000),('NH038','CC028','NV018','2025-09-22 00:00:00',660000);
 /*!40000 ALTER TABLE `nhap_hang` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -328,7 +316,6 @@ CREATE TABLE `san_pham` (
   `ten_san_pham` varchar(45) NOT NULL,
   `so_luong_ton_kho` varchar(45) NOT NULL,
   PRIMARY KEY (`id_san_pham`),
-  UNIQUE KEY `id san pham_UNIQUE` (`id_san_pham`),
   KEY `fk_sanpham_danhmuc` (`id_danh_muc`),
   KEY `fk_sanpham_ncc` (`id_nha_cung_cap`),
   CONSTRAINT `fk_sanpham_danhmuc` FOREIGN KEY (`id_danh_muc`) REFERENCES `danh_muc` (`id_danh_muc`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -385,4 +372,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-16 22:27:30
+-- Dump completed on 2025-04-27 20:48:09
