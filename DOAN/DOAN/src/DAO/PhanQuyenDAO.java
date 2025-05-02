@@ -95,4 +95,27 @@ public class PhanQuyenDAO {
         }
         return pq;
     }
+    
+    public PhanQuyenDTO getPhanQuyenByTaiKhoan(String idTaiKhoan) {
+        String sql = "SELECT pq.ten_quyen FROM tai_khoan tk " +
+                     "JOIN phan_quyen pq ON tk.id_phan_quyen = pq.id_phan_quyen " +
+                     "WHERE tk.id_tai_khoan = ?";
+        PhanQuyenDTO phanQuyen = null;
+
+        try (Connection con = JDBC.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+            pst.setString(1, idTaiKhoan);
+
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    phanQuyen = new PhanQuyenDTO();
+                    phanQuyen.setTenQuyen(rs.getString("ten_quyen"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return phanQuyen;
+    }
 }

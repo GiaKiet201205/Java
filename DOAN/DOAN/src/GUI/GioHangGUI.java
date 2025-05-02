@@ -1,18 +1,26 @@
 package GUI;
 
+import BLL.Session;
+import BLL.TaiKhoanBLL;
 import DAO.DonHangDAO;
-import DAO.KhachHangDAO;  // Import KhachHangDAO
 import DAO.NhanVienDAO;
 import DTO.DonHangDTO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.UUID;
 
 public class GioHangGUI extends JFrame {
 
+    private List<String> productList;
+    private int totalPrice;
+    private JTextField[] textFields;
+    private JComboBox<String> paymentBox;
+
     public GioHangGUI(List<String> productList, int totalPrice) {
+        this.productList = productList;
+        this.totalPrice = totalPrice;
         setTitle("Giỏ Hàng");
         setSize(700, 500);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -43,7 +51,7 @@ public class GioHangGUI extends JFrame {
         formPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         String[] labels = {"Tên người nhận:", "Email:", "Số điện thoại:", "Địa chỉ:"};
-        JTextField[] textFields = new JTextField[labels.length];
+        textFields = new JTextField[labels.length];
 
         for (int i = 0; i < labels.length; i++) {
             JPanel row = new JPanel(new BorderLayout(5, 5));
@@ -72,7 +80,7 @@ public class GioHangGUI extends JFrame {
         lblPayment.setFont(smallFont);
         lblPayment.setPreferredSize(new Dimension(120, 25));
 
-        JComboBox<String> paymentBox = new JComboBox<>(new String[]{"Tiền mặt", "Thẻ tín dụng", "Chuyển khoản", "Ví điện tử"});
+        paymentBox = new JComboBox<>(new String[]{"Tiền mặt", "Chuyển khoản"});
         paymentBox.setFont(smallFont);
         paymentBox.setBackground(Color.WHITE);
 
@@ -114,30 +122,39 @@ public class GioHangGUI extends JFrame {
         add(buttonPanel, BorderLayout.SOUTH);
 
         // ===== SỰ KIỆN XÁC NHẬN =====
+        TaiKhoanBLL taiKhoanBLL = new TaiKhoanBLL();
         btnConfirm.addActionListener(e -> {
+            if (!taiKhoanBLL.isUserLoggedIn()) {
+                JOptionPane.showMessageDialog(this, "Bạn chưa đăng nhập!", 
+                    "Thông báo", JOptionPane.WARNING_MESSAGE);
+                taiKhoanBLL.showLoginForm(this);
+                return;
+            }
+
             String hoTen = textFields[0].getText().trim();
             String email = textFields[1].getText().trim();
             String sdt = textFields[2].getText().trim();
             String diaChi = textFields[3].getText().trim();
             String hinhThucThanhToan = (String) paymentBox.getSelectedItem();
 
+            // Kiểm tra thông tin đầu vào
             if (hoTen.isEmpty() || email.isEmpty() || sdt.isEmpty() || diaChi.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng điền đầy đủ thông tin!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Vui lòng điền đầy đủ thông tin!", 
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
             try {
-                
-                KhachHangDAO khachHangDAO = new KhachHangDAO();
-                String idKhachHang = khachHangDAO.generateNextId(); // Tạo mã khách hàng mới
+                String idKhachHang = Session.getIdKhachHang();
 
+                // Lấy ID nhân viên admin
                 NhanVienDAO nhanVienDAO = new NhanVienDAO();
-                String idNhanVien = nhanVienDAO.generateNextId(); // Tạo mã nhân viên mới
+                String idNhanVien = "admin"; // chỉ có admin duyệt hóa đơn
 
                 // Tạo đơn hàng
                 DonHangDTO donHang = new DonHangDTO();
-                donHang.setIdKhachHang(idKhachHang);  // Đặt mã khách hàng
-                donHang.setIdNhanVien(idNhanVien);  // Đặt mã nhân viên từ NhanVienDAO
+                donHang.setIdKhachHang(idKhachHang);
+                donHang.setIdNhanVien(idNhanVien);
                 donHang.setTongTien(totalPrice);
                 donHang.setNgayDatHang(new Timestamp(System.currentTimeMillis()));
                 donHang.setTrangThai("Đã thanh toán");
@@ -145,21 +162,16 @@ public class GioHangGUI extends JFrame {
                 donHang.setDiaDiemGiao(diaChi);
 
                 DonHangDAO donHangDAO = new DonHangDAO();
-                String idDonHang = donHangDAO.generateNextId(); // Tạo mã đơn hàng mới
+                String idDonHang = donHangDAO.generateNextId();
                 donHang.setIdDonHang(idDonHang);
-                String idInserted = donHangDAO.insert(donHang);
+                donHangDAO.insert(donHang);
 
-                if (idDonHang == null) {
-                    JOptionPane.showMessageDialog(this, "Không thể lưu hóa đơn!", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                // Hiển thị hóa đơn đơn giản
-                JOptionPane.showMessageDialog(this, "Thanh toán thành công! Hóa đơn đã được lưu.", "Thành công", JOptionPane.INFORMATION_MESSAGE);
-                dispose();
-
+                JOptionPane.showMessageDialog(this, "Thanh toán thành công! Hóa đơn đã được lưu.", 
+                    "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                dispose(); // Đóng cửa sổ giỏ hàng sau khi hoàn thành
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Lỗi khi thanh toán: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Lỗi khi thanh toán: " + ex.getMessage(), 
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
             }
         });

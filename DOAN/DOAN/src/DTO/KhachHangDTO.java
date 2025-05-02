@@ -7,10 +7,7 @@ public class KhachHangDTO {
     private String email;
     private String sdt;
 
-    // Constructor rỗng
     public KhachHangDTO() {}
-
-    // Constructor đầy đủ
     public KhachHangDTO(String idKhachHang, String hoTen, String email, String sdt) {
         this.idKhachHang = idKhachHang;
 

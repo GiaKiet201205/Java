@@ -1,8 +1,10 @@
 package GUI;
 
+import BLL.TaiKhoanBLL;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.Arrays;
 
 public class TrangChuGUI extends JFrame {
     public TrangChuGUI() {
@@ -44,14 +46,12 @@ public class TrangChuGUI extends JFrame {
         authPanel.add(loginButton);
         authPanel.add(registerButton);
 
-          
         // Liên kết giao diện đăng nhập
+        TaiKhoanBLL taiKhoanBLL = new TaiKhoanBLL();
         loginButton.addActionListener((ActionEvent e) -> {
-            setVisible(false); // Ẩn TrangChuGUI tạm thời
-            DangNhapGUI dangNhap = new DangNhapGUI();  // Sử dụng constructor mặc định
-            dangNhap.setVisible(true);
+            taiKhoanBLL.showLoginForm(this);
         });
-        
+
         // Liên kết giao diện đăng ký
         registerButton.addActionListener((ActionEvent e) -> {
             setVisible(false); // Ẩn TrangChuGUI tạm thời
@@ -114,6 +114,14 @@ public class TrangChuGUI extends JFrame {
         menuPanel.add(searchField);
         menuPanel.add(searchButton);
         menuPanel.add(cartButton);
+
+        // Xử lý sự kiện nút giỏ hàng
+        cartButton.addActionListener((ActionEvent e) -> {
+            // Sample products for demonstration
+            java.util.List<String> products = Arrays.asList("Áo Polo Nam - 150000đ", "Quần Jean - 300000đ");
+            int totalPrice = 450000;
+            new GioHangGUI(products, totalPrice).setVisible(true);
+        });
 
         // Add menuPanel vào center MỘT lần
         add(menuPanel, BorderLayout.CENTER);

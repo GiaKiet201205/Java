@@ -5,6 +5,8 @@ import DTO.ChiTietNhapHangDTO;
 import DTO.NhapHangDTO;
 import config.JDBC;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +37,7 @@ public class NhapHangBLL {
         return newId;
     }
 
-    public void addNhapHang(NhapHangDTO nhapHang, ChiTietNhapHangDTO chiTiet) throws Exception {
+    public void addNhapHang(NhapHangDTO nhapHang, List<ChiTietNhapHangDTO> chiTietList) throws Exception {
         System.out.println("Bắt đầu thêm nhập hàng: " + nhapHang.getIdNhapHang());
         if (nhapHang.getIdNhaCungCap() == null || nhapHang.getIdNhaCungCap().isEmpty()) {
             throw new Exception("ID Nhà Cung Cấp không được để trống");
@@ -46,23 +48,59 @@ public class NhapHangBLL {
         if (nhapHang.getTongGiaTriNhap() <= 0) {
             throw new Exception("Tổng giá trị nhập phải lớn hơn 0");
         }
+        if (chiTietList == null || chiTietList.isEmpty()) {
+            throw new Exception("Phải có ít nhất một sản phẩm trong phiếu nhập");
+        }
 
-        nhapHang.setIdNhapHang(generateNewNhapHangId());
-        chiTiet.setIdNhapHang(nhapHang.getIdNhapHang());
-
-        Connection con = null;
+        // Kiểm tra tồn tại id_nha_cung_cap, id_nhan_vien, id_san_pham
+        Connection con = JDBC.getConnection();
+        if (con == null) {
+            throw new Exception("Không thể kết nối đến cơ sở dữ liệu");
+        }
         try {
-            con = JDBC.getConnection();
-            if (con == null) {
-                throw new Exception("Không thể kết nối đến cơ sở dữ liệu");
+            // Kiểm tra id_nha_cung_cap
+            PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) FROM nha_cung_cap WHERE id_nha_cung_cap = ?");
+            ps.setString(1, nhapHang.getIdNhaCungCap());
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            if (rs.getInt(1) == 0) {
+                throw new Exception("ID Nhà Cung Cấp không tồn tại");
             }
+
+            // Kiểm tra id_nhan_vien
+            ps = con.prepareStatement("SELECT COUNT(*) FROM nhan_vien WHERE id_nhan_vien = ?");
+            ps.setString(1, nhapHang.getIdNhanVien());
+            rs = ps.executeQuery();
+            rs.next();
+            if (rs.getInt(1) == 0) {
+                throw new Exception("ID Nhân Viên không tồn tại");
+            }
+
+            // Kiểm tra id_san_pham
+            for (ChiTietNhapHangDTO chiTiet : chiTietList) {
+                ps = con.prepareStatement("SELECT COUNT(*) FROM san_pham WHERE id_san_pham = ?");
+                ps.setString(1, chiTiet.getIdSanPham());
+                rs = ps.executeQuery();
+                rs.next();
+                if (rs.getInt(1) == 0) {
+                    throw new Exception("ID Sản Phẩm " + chiTiet.getIdSanPham() + " không tồn tại");
+                }
+            }
+
+            nhapHang.setIdNhapHang(generateNewNhapHangId());
+            for (ChiTietNhapHangDTO chiTiet : chiTietList) {
+                chiTiet.setIdNhapHang(nhapHang.getIdNhapHang());
+            }
+
             con.setAutoCommit(false);
 
             System.out.println("Thêm vào bảng nhap_hang: " + nhapHang.getIdNhapHang());
             nhapHangDAO.insert(nhapHang);
 
-            System.out.println("Thêm chi tiết nhập hàng cho ID nhập hàng: " + chiTiet.getIdNhapHang());
-            chiTietNhapHangBLL.addChiTietNhapHang(chiTiet);
+            for (ChiTietNhapHangDTO chiTiet : chiTietList) {
+                System.out.println("Thêm chi tiết nhập hàng cho ID nhập hàng: " + chiTiet.getIdNhapHang());
+                chiTietNhapHangBLL.addChiTietNhapHang(chiTiet);
+            }
 
             con.commit();
             System.out.println("Thêm nhập hàng thành công: " + nhapHang.getIdNhapHang());
@@ -76,16 +114,6 @@ public class NhapHangBLL {
                 }
             }
             throw new Exception("Lỗi SQL: " + e.getMessage());
-        } catch (Exception e) {
-            if (con != null) {
-                try {
-                    System.out.println("Rollback giao dịch do lỗi: " + e.getMessage());
-                    con.rollback();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            }
-            throw e;
         } finally {
             if (con != null) {
                 try {

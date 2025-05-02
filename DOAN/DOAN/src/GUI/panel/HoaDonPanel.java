@@ -9,6 +9,12 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.List;
 import javax.swing.border.EmptyBorder;
+import java.awt.Color;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class HoaDonPanel extends JPanel {
     private DefaultTableModel hoaDonTableModel;
@@ -41,6 +47,7 @@ public class HoaDonPanel extends JPanel {
         JButton btnSearch = new JButton("Tìm kiếm");
         JButton btnReset = new JButton("Làm mới");
         JButton btnEdit = new JButton("Sửa");
+        JButton btnExportExcel = new JButton("Xuất Excel");
 
         topPanel.add(lblSearchID);
         topPanel.add(txtSearchID);
@@ -51,7 +58,8 @@ public class HoaDonPanel extends JPanel {
         topPanel.add(btnSearch);
         topPanel.add(btnReset);
         topPanel.add(btnEdit);
-
+        topPanel.add(btnExportExcel);
+        
         hoaDonPanel.add(topPanel, BorderLayout.NORTH);
 
         String[] columns = {
@@ -81,6 +89,8 @@ public class HoaDonPanel extends JPanel {
         btnSearch.addActionListener(e -> searchHoaDon(txtSearchID.getText(), dateFrom.getText(), dateTo.getText()));
         btnReset.addActionListener(e -> resetHoaDonSearch());
         btnEdit.addActionListener(e -> editHoaDon(hoaDonTable.getSelectedRow()));
+        btnExportExcel.addActionListener(e -> exportHoaDonToExcel());
+
 
         txtSearchID.addKeyListener(new KeyAdapter() {
             @Override
@@ -194,4 +204,53 @@ public class HoaDonPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn một đơn hàng để sửa.", "Thông báo", JOptionPane.WARNING_MESSAGE);
         }
     }
+    
+    private void exportHoaDonToExcel() {
+    JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Chọn nơi lưu file Excel");
+    fileChooser.setFileFilter(new FileNameExtensionFilter("Excel Files", "xlsx"));
+
+    int userSelection = fileChooser.showSaveDialog(this);
+
+    if (userSelection == JFileChooser.APPROVE_OPTION) {
+        String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+        if (!filePath.endsWith(".xlsx")) {
+            filePath += ".xlsx"; // đảm bảo có đuôi .xlsx
+        }
+
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("HoaDon");
+
+            // Tạo dòng header
+            Row headerRow = sheet.createRow(0);
+            for (int col = 0; col < hoaDonTable.getColumnCount(); col++) {
+                Cell cell = headerRow.createCell(col);
+                cell.setCellValue(hoaDonTable.getColumnName(col));
+            }
+
+            // Ghi dữ liệu các dòng
+            for (int row = 0; row < hoaDonTable.getRowCount(); row++) {
+                Row excelRow = sheet.createRow(row + 1); // +1 vì dòng 0 đã là header
+                for (int col = 0; col < hoaDonTable.getColumnCount(); col++) {
+                    Cell cell = excelRow.createCell(col);
+                    Object value = hoaDonTable.getValueAt(row, col);
+                    if (value != null) {
+                        cell.setCellValue(value.toString());
+                    }
+                }
+            }
+
+            // Ghi file ra đĩa
+            try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
+                workbook.write(fileOut);
+            }
+
+            JOptionPane.showMessageDialog(this, "Xuất file Excel thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Xuất file thất bại: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}
 }

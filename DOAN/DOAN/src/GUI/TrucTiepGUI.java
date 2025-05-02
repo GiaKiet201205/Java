@@ -1,11 +1,13 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package GUI;
 
+import BLL.NhanVienBLL;
+import BLL.SanPhamBLL;
+import DTO.NhanVienDTO;
+import DTO.SanPhamDTO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,6 +24,10 @@ public class TrucTiepGUI extends JFrame {
     private Font textFieldFont = new Font("Arial", Font.PLAIN, 14);
     private Font buttonFont = new Font("Arial", Font.BOLD, 16);
     private Font comboBoxFont = new Font("Arial", Font.PLAIN, 14);
+
+    // Khởi tạo BLL
+    private SanPhamBLL sanPhamBLL = new SanPhamBLL();
+    private NhanVienBLL nhanVienBLL = new NhanVienBLL();
 
     public TrucTiepGUI() {
         setTitle("QUẢN LÝ BÁN HÀNG");
@@ -79,6 +85,7 @@ public class TrucTiepGUI extends JFrame {
         txtProductName = new JTextField(15);
         txtProductName.setFont(textFieldFont);
         txtProductName.setBackground(new Color(240, 240, 240));
+        txtProductName.setEditable(false); // Không cho chỉnh sửa
         productPanel.add(txtProductName, gbc);
         
         // Price
@@ -92,6 +99,7 @@ public class TrucTiepGUI extends JFrame {
         txtPrice = new JTextField(15);
         txtPrice.setFont(textFieldFont);
         txtPrice.setBackground(new Color(240, 240, 240));
+        txtPrice.setEditable(false); // Không cho chỉnh sửa
         productPanel.add(txtPrice, gbc);
         
         // Quantity
@@ -117,6 +125,7 @@ public class TrucTiepGUI extends JFrame {
         txtTotal = new JTextField(15);
         txtTotal.setFont(textFieldFont);
         txtTotal.setBackground(new Color(240, 240, 240));
+        txtTotal.setEditable(false); // Không cho chỉnh sửa
         totalPanel.add(txtTotal);
         contentPanel.add(totalPanel);
         
@@ -152,6 +161,7 @@ public class TrucTiepGUI extends JFrame {
         txtEmployeeName = new JTextField(15);
         txtEmployeeName.setFont(textFieldFont);
         txtEmployeeName.setBackground(new Color(240, 240, 240));
+        txtEmployeeName.setEditable(false); // Không cho chỉnh sửa
         employeePanel.add(txtEmployeeName, gbc);
         
         // Payment Method - thay thế bằng ComboBox
@@ -162,7 +172,7 @@ public class TrucTiepGUI extends JFrame {
         employeePanel.add(lblPaymentMethod, gbc);
         
         gbc.gridx = 1;
-        String[] paymentMethods = {"ATM", "Tiền mặt", "Chuyển khoản"};
+        String[] paymentMethods = {"Tiền mặt", "Chuyển khoản"};
         cmbPaymentMethod = new JComboBox<>(paymentMethods);
         cmbPaymentMethod.setFont(comboBoxFont);
         cmbPaymentMethod.setBackground(new Color(240, 240, 240));
@@ -176,7 +186,7 @@ public class TrucTiepGUI extends JFrame {
         employeePanel.add(lblStatus, gbc);
         
         gbc.gridx = 3;
-        String[] statuses = {"Đã thanh toán", "Chưa thanh toán"};
+        String[] statuses = {"Đã thanh toán"};
         cmbStatus = new JComboBox<>(statuses);
         cmbStatus.setFont(comboBoxFont);
         cmbStatus.setBackground(new Color(240, 240, 240));
@@ -201,11 +211,151 @@ public class TrucTiepGUI extends JFrame {
         
         contentPanel.add(buttonPanel);
         
+        // Thêm DocumentListener để tự động điền thông tin sản phẩm (không báo lỗi ngay)
+        txtProductID.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateProductInfo();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateProductInfo();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateProductInfo();
+            }
+
+            private void updateProductInfo() {
+                String idSanPham = txtProductID.getText().trim();
+                if (!idSanPham.isEmpty()) {
+                    SanPhamDTO sp = sanPhamBLL.getSanPhamById(idSanPham);
+                    if (sp != null) {
+                        txtProductName.setText(sp.getTenSanPham());
+                        txtPrice.setText(String.valueOf(sp.getGia()));
+                        updateTotal();
+                    } else {
+                        txtProductName.setText("");
+                        txtPrice.setText("");
+                        txtTotal.setText("");
+                    }
+                } else {
+                    txtProductName.setText("");
+                    txtPrice.setText("");
+                    txtTotal.setText("");
+                }
+            }
+        });
+
+        // Thêm DocumentListener để tự động điền thông tin nhân viên (không báo lỗi ngay)
+        txtEmployeeID.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateEmployeeInfo();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateEmployeeInfo();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateEmployeeInfo();
+            }
+
+            private void updateEmployeeInfo() {
+                String idNhanVien = txtEmployeeID.getText().trim();
+                if (!idNhanVien.isEmpty()) {
+                    NhanVienDTO nv = nhanVienBLL.getNhanVienById(idNhanVien);
+                    if (nv != null) {
+                        txtEmployeeName.setText(nv.getHoTenNV());
+                    } else {
+                        txtEmployeeName.setText("");
+                    }
+                } else {
+                    txtEmployeeName.setText("");
+                }
+            }
+        });
+
+        // Thêm DocumentListener để tự động tính tổng tiền
+        txtQuantity.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateTotal();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateTotal();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateTotal();
+            }
+        });
+
         // Add action listener for the button
         btnAddOrder.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Add your order processing logic here
+                // Kiểm tra tính hợp lệ của dữ liệu trước khi thêm đơn hàng
+                String idSanPham = txtProductID.getText().trim();
+                String idNhanVien = txtEmployeeID.getText().trim();
+                String quantityStr = txtQuantity.getText().trim();
+
+                // Kiểm tra các trường bắt buộc
+                if (idSanPham.isEmpty() || idNhanVien.isEmpty() || quantityStr.isEmpty()) {
+                    JOptionPane.showMessageDialog(TrucTiepGUI.this, 
+                        "Vui lòng nhập đầy đủ thông tin!", 
+                        "Lỗi", 
+                        JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // Kiểm tra ID sản phẩm
+                SanPhamDTO sp = sanPhamBLL.getSanPhamById(idSanPham);
+                if (sp == null) {
+                    JOptionPane.showMessageDialog(TrucTiepGUI.this, 
+                        "ID sản phẩm không hợp lệ!", 
+                        "Lỗi", 
+                        JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // Kiểm tra ID nhân viên
+                NhanVienDTO nv = nhanVienBLL.getNhanVienById(idNhanVien);
+                if (nv == null) {
+                    JOptionPane.showMessageDialog(TrucTiepGUI.this, 
+                        "ID nhân viên không hợp lệ!", 
+                        "Lỗi", 
+                        JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // Kiểm tra số lượng
+                try {
+                    int quantity = Integer.parseInt(quantityStr);
+                    if (quantity <= 0) {
+                        JOptionPane.showMessageDialog(TrucTiepGUI.this, 
+                            "Số lượng phải lớn hơn 0!", 
+                            "Lỗi", 
+                            JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(TrucTiepGUI.this, 
+                        "Số lượng phải là số nguyên!", 
+                        "Lỗi", 
+                        JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // Thêm đơn hàng
                 String paymentMethod = (String) cmbPaymentMethod.getSelectedItem();
                 String status = (String) cmbStatus.getSelectedItem();
                 
@@ -236,6 +386,27 @@ public class TrucTiepGUI extends JFrame {
         txtEmployeeName.setText("");
         cmbPaymentMethod.setSelectedIndex(0);
         cmbStatus.setSelectedIndex(0);
+    }
+
+    private void updateTotal() {
+        try {
+            String priceStr = txtPrice.getText().trim();
+            String quantityStr = txtQuantity.getText().trim();
+            if (!priceStr.isEmpty() && !quantityStr.isEmpty()) {
+                int price = Integer.parseInt(priceStr);
+                int quantity = Integer.parseInt(quantityStr);
+                if (quantity > 0) {
+                    int total = price * quantity;
+                    txtTotal.setText(String.valueOf(total));
+                } else {
+                    txtTotal.setText("");
+                }
+            } else {
+                txtTotal.setText("");
+            }
+        } catch (NumberFormatException e) {
+            txtTotal.setText("");
+        }
     }
     
     public static void main(String[] args) {

@@ -12,7 +12,9 @@ import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -22,8 +24,12 @@ public class NhapHangPanel extends JPanel {
     private JPanel nhapHangPanel;
     private Color headerColor = new Color(200, 255, 200);
     private NhapHangBLL nhapHangBLL;
+    private DecimalFormat decimalFormat;
 
     public NhapHangPanel() {
+        // Định dạng số không có phần thập phân
+        decimalFormat = new DecimalFormat("#,###"); // Không hiển thị phần thập phân
+
         nhapHangBLL = new NhapHangBLL();
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(600, 400));
@@ -164,7 +170,7 @@ public class NhapHangPanel extends JPanel {
                     nhapHang.getIdNhaCungCap(),
                     nhapHang.getIdNhanVien(),
                     sdf.format(nhapHang.getNgayNhap()),
-                    nhapHang.getTongGiaTriNhap()
+                    decimalFormat.format(nhapHang.getTongGiaTriNhap())
             });
         }
     }
@@ -205,7 +211,7 @@ public class NhapHangPanel extends JPanel {
                         nhapHang.getIdNhaCungCap(),
                         nhapHang.getIdNhanVien(),
                         sdf.format(nhapHang.getNgayNhap()),
-                        nhapHang.getTongGiaTriNhap()
+                        decimalFormat.format(nhapHang.getTongGiaTriNhap())
                 });
             }
         }
@@ -218,7 +224,7 @@ public class NhapHangPanel extends JPanel {
 
     private void addNhapHang() {
         JDialog addDialog = new JDialog(SwingUtilities.getWindowAncestor(this), "Thêm Nhập Hàng", Dialog.ModalityType.APPLICATION_MODAL);
-        addDialog.setSize(450, 500);
+        addDialog.setSize(600, 600);
         addDialog.setLocationRelativeTo(this);
         addDialog.setLayout(new BorderLayout());
         addDialog.getContentPane().setBackground(new Color(240, 248, 255));
@@ -234,6 +240,7 @@ public class NhapHangPanel extends JPanel {
         Font labelFont = new Font("Arial", Font.BOLD, 14);
         Font fieldFont = new Font("Arial", Font.PLAIN, 14);
 
+        // Thông tin phiếu nhập
         JLabel lblIdNhaCungCap = new JLabel("ID Nhà Cung Cấp:");
         lblIdNhaCungCap.setFont(labelFont);
         JTextField txtIdNhaCungCap = new JTextField(20);
@@ -246,29 +253,11 @@ public class NhapHangPanel extends JPanel {
         txtIdNhanVien.setFont(fieldFont);
         txtIdNhanVien.setBorder(BorderFactory.createLineBorder(new Color(100, 149, 237), 1));
 
-        JLabel lblIdSanPham = new JLabel("ID Sản Phẩm:");
-        lblIdSanPham.setFont(labelFont);
-        JTextField txtIdSanPham = new JTextField(20);
-        txtIdSanPham.setFont(fieldFont);
-        txtIdSanPham.setBorder(BorderFactory.createLineBorder(new Color(100, 149, 237), 1));
-
         JLabel lblNgayNhap = new JLabel("Ngày Nhập (dd/MM/yyyy):");
         lblNgayNhap.setFont(labelFont);
         JTextField txtNgayNhap = new JTextField(new SimpleDateFormat("dd/MM/yyyy").format(new Date()), 20);
         txtNgayNhap.setFont(fieldFont);
         txtNgayNhap.setBorder(BorderFactory.createLineBorder(new Color(100, 149, 237), 1));
-
-        JLabel lblSoLuongNhap = new JLabel("Số Lượng Nhập:");
-        lblSoLuongNhap.setFont(labelFont);
-        JTextField txtSoLuongNhap = new JTextField(20);
-        txtSoLuongNhap.setFont(fieldFont);
-        txtSoLuongNhap.setBorder(BorderFactory.createLineBorder(new Color(100, 149, 237), 1));
-
-        JLabel lblGiaNhap = new JLabel("Giá Nhập:");
-        lblGiaNhap.setFont(labelFont);
-        JTextField txtGiaNhap = new JTextField(20);
-        txtGiaNhap.setFont(fieldFont);
-        txtGiaNhap.setBorder(BorderFactory.createLineBorder(new Color(100, 149, 237), 1));
 
         JLabel lblTongGiaTriNhap = new JLabel("Tổng Giá Trị Nhập:");
         lblTongGiaTriNhap.setFont(labelFont);
@@ -278,54 +267,31 @@ public class NhapHangPanel extends JPanel {
         txtTongGiaTriNhap.setEditable(false);
         txtTongGiaTriNhap.setBackground(new Color(220, 220, 220));
 
-        txtSoLuongNhap.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
-            public void changedUpdate(javax.swing.event.DocumentEvent e) { updateTongGiaTri(); }
-            public void removeUpdate(javax.swing.event.DocumentEvent e) { updateTongGiaTri(); }
-            public void insertUpdate(javax.swing.event.DocumentEvent e) { updateTongGiaTri(); }
+        // Bảng chi tiết sản phẩm
+        String[] columns = {"ID Sản Phẩm", "Số Lượng Nhập", "Giá Nhập"};
+        DefaultTableModel productTableModel = new DefaultTableModel(columns, 0);
+        JTable productTable = new JTable(productTableModel);
+        productTable.setRowHeight(25);
+        JScrollPane productScrollPane = new JScrollPane(productTable);
+        productScrollPane.setPreferredSize(new Dimension(500, 200));
 
-            private void updateTongGiaTri() {
-                try {
-                    int soLuong = Integer.parseInt(txtSoLuongNhap.getText().trim());
-                    double giaNhap = Double.parseDouble(txtGiaNhap.getText().trim());
-                    double tongGiaTri = soLuong * giaNhap;
-                    txtTongGiaTriNhap.setText(String.format("%.2f", tongGiaTri));
-                } catch (NumberFormatException ex) {
-                    txtTongGiaTriNhap.setText("");
-                }
-            }
-        });
+        JPanel productButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JButton btnAddProduct = new JButton("Thêm Sản Phẩm");
+        JButton btnRemoveProduct = new JButton("Xóa Sản Phẩm");
+        productButtonPanel.add(btnAddProduct);
+        productButtonPanel.add(btnRemoveProduct);
 
-        txtGiaNhap.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
-            public void changedUpdate(javax.swing.event.DocumentEvent e) { updateTongGiaTri(); }
-            public void removeUpdate(javax.swing.event.DocumentEvent e) { updateTongGiaTri(); }
-            public void insertUpdate(javax.swing.event.DocumentEvent e) { updateTongGiaTri(); }
-
-            private void updateTongGiaTri() {
-                try {
-                    int soLuong = Integer.parseInt(txtSoLuongNhap.getText().trim());
-                    double giaNhap = Double.parseDouble(txtGiaNhap.getText().trim());
-                    double tongGiaTri = soLuong * giaNhap;
-                    txtTongGiaTriNhap.setText(String.format("%.2f", tongGiaTri));
-                } catch (NumberFormatException ex) {
-                    txtTongGiaTriNhap.setText("");
-                }
-            }
-        });
-
+        // Thêm các thành phần vào form
         gbc.gridx = 0; gbc.gridy = 0; formPanel.add(lblIdNhaCungCap, gbc);
         gbc.gridx = 1; formPanel.add(txtIdNhaCungCap, gbc);
         gbc.gridx = 0; gbc.gridy = 1; formPanel.add(lblIdNhanVien, gbc);
         gbc.gridx = 1; formPanel.add(txtIdNhanVien, gbc);
-        gbc.gridx = 0; gbc.gridy = 2; formPanel.add(lblIdSanPham, gbc);
-        gbc.gridx = 1; formPanel.add(txtIdSanPham, gbc);
-        gbc.gridx = 0; gbc.gridy = 3; formPanel.add(lblNgayNhap, gbc);
+        gbc.gridx = 0; gbc.gridy = 2; formPanel.add(lblNgayNhap, gbc);
         gbc.gridx = 1; formPanel.add(txtNgayNhap, gbc);
-        gbc.gridx = 0; gbc.gridy = 4; formPanel.add(lblSoLuongNhap, gbc);
-        gbc.gridx = 1; formPanel.add(txtSoLuongNhap, gbc);
-        gbc.gridx = 0; gbc.gridy = 5; formPanel.add(lblGiaNhap, gbc);
-        gbc.gridx = 1; formPanel.add(txtGiaNhap, gbc);
-        gbc.gridx = 0; gbc.gridy = 6; formPanel.add(lblTongGiaTriNhap, gbc);
+        gbc.gridx = 0; gbc.gridy = 3; formPanel.add(lblTongGiaTriNhap, gbc);
         gbc.gridx = 1; formPanel.add(txtTongGiaTriNhap, gbc);
+        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2; formPanel.add(productButtonPanel, gbc);
+        gbc.gridy = 5; formPanel.add(productScrollPane, gbc);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBackground(new Color(240, 248, 255));
@@ -346,13 +312,109 @@ public class NhapHangPanel extends JPanel {
         addDialog.add(formPanel, BorderLayout.CENTER);
         addDialog.add(buttonPanel, BorderLayout.SOUTH);
 
+        // Sự kiện thêm sản phẩm
+        btnAddProduct.addActionListener(e -> {
+            JDialog productDialog = new JDialog(addDialog, "Thêm Sản Phẩm", Dialog.ModalityType.APPLICATION_MODAL);
+            productDialog.setSize(400, 250);
+            productDialog.setLocationRelativeTo(addDialog);
+            productDialog.setLayout(new GridBagLayout());
+            GridBagConstraints gbcProduct = new GridBagConstraints();
+            gbcProduct.insets = new Insets(10, 10, 10, 10);
+            gbcProduct.fill = GridBagConstraints.HORIZONTAL;
+            gbcProduct.weightx = 1.0;
+
+            JLabel lblIdSanPham = new JLabel("ID Sản Phẩm:");
+            lblIdSanPham.setFont(labelFont);
+            JTextField txtIdSanPham = new JTextField(20);
+            txtIdSanPham.setFont(fieldFont);
+
+            JLabel lblSoLuongNhap = new JLabel("Số Lượng Nhập:");
+            lblSoLuongNhap.setFont(labelFont);
+            JTextField txtSoLuongNhap = new JTextField(20);
+            txtSoLuongNhap.setFont(fieldFont);
+
+            JLabel lblGiaNhap = new JLabel("Giá Nhập:");
+            lblGiaNhap.setFont(labelFont);
+            JTextField txtGiaNhap = new JTextField(20);
+            txtGiaNhap.setFont(fieldFont);
+
+            gbcProduct.gridx = 0; gbcProduct.gridy = 0; productDialog.add(lblIdSanPham, gbcProduct);
+            gbcProduct.gridx = 1; productDialog.add(txtIdSanPham, gbcProduct);
+            gbcProduct.gridx = 0; gbcProduct.gridy = 1; productDialog.add(lblSoLuongNhap, gbcProduct);
+            gbcProduct.gridx = 1; productDialog.add(txtSoLuongNhap, gbcProduct);
+            gbcProduct.gridx = 0; gbcProduct.gridy = 2; productDialog.add(lblGiaNhap, gbcProduct);
+            gbcProduct.gridx = 1; productDialog.add(txtGiaNhap, gbcProduct);
+
+            JPanel productBtnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+            JButton btnSaveProduct = new JButton("Lưu");
+            JButton btnCancelProduct = new JButton("Hủy");
+            productBtnPanel.add(btnSaveProduct);
+            productBtnPanel.add(btnCancelProduct);
+
+            gbcProduct.gridx = 0; gbcProduct.gridy = 3; gbcProduct.gridwidth = 2;
+            productDialog.add(productBtnPanel, gbcProduct);
+
+            btnSaveProduct.addActionListener(ev -> {
+                try {
+                    String idSanPham = txtIdSanPham.getText().trim();
+                    String soLuongStr = txtSoLuongNhap.getText().trim();
+                    String giaNhapStr = txtGiaNhap.getText().trim();
+
+                    if (idSanPham.isEmpty()) {
+                        JOptionPane.showMessageDialog(productDialog, "ID Sản Phẩm không được để trống", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    if (soLuongStr.isEmpty() || !soLuongStr.matches("\\d+")) {
+                        JOptionPane.showMessageDialog(productDialog, "Số lượng nhập phải là số nguyên dương", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    if (giaNhapStr.isEmpty() || !giaNhapStr.matches("\\d+")) {
+                        JOptionPane.showMessageDialog(productDialog, "Giá nhập phải là số nguyên dương", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    int soLuong = Integer.parseInt(soLuongStr);
+                    int giaNhap = Integer.parseInt(giaNhapStr);
+
+                    if (soLuong <= 0) {
+                        JOptionPane.showMessageDialog(productDialog, "Số lượng nhập phải lớn hơn 0", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    if (giaNhap <= 0) {
+                        JOptionPane.showMessageDialog(productDialog, "Giá nhập phải lớn hơn 0", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    productTableModel.addRow(new Object[]{idSanPham, soLuong, giaNhap});
+                    updateTongGiaTriNhap(productTableModel, txtTongGiaTriNhap);
+                    productDialog.dispose();
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(productDialog, "Số lượng và giá nhập phải là số nguyên hợp lệ", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            });
+
+            btnCancelProduct.addActionListener(ev -> productDialog.dispose());
+            productDialog.setVisible(true);
+        });
+
+        // Sự kiện xóa sản phẩm
+        btnRemoveProduct.addActionListener(e -> {
+            int selectedRow = productTable.getSelectedRow();
+            if (selectedRow >= 0) {
+                productTableModel.removeRow(selectedRow);
+                updateTongGiaTriNhap(productTableModel, txtTongGiaTriNhap);
+            } else {
+                JOptionPane.showMessageDialog(addDialog, "Vui lòng chọn một sản phẩm để xóa", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            }
+        });
+
+        // Sự kiện thêm phiếu nhập
         btnAdd.addActionListener(e -> {
             try {
                 // Validate input
                 if (txtIdNhaCungCap.getText().trim().isEmpty() || txtIdNhanVien.getText().trim().isEmpty() ||
-                    txtIdSanPham.getText().trim().isEmpty() || txtNgayNhap.getText().trim().isEmpty() ||
-                    txtSoLuongNhap.getText().trim().isEmpty() || txtGiaNhap.getText().trim().isEmpty()) {
-                    JOptionPane.showMessageDialog(addDialog, "Vui lòng điền đầy đủ thông tin",
+                    txtNgayNhap.getText().trim().isEmpty() || productTableModel.getRowCount() == 0) {
+                    JOptionPane.showMessageDialog(addDialog, "Vui lòng điền đầy đủ thông tin và thêm ít nhất một sản phẩm",
                             "Lỗi", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
@@ -363,16 +425,22 @@ public class NhapHangPanel extends JPanel {
                 nhapHang.setIdNhanVien(txtIdNhanVien.getText().trim());
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
                 nhapHang.setNgayNhap(sdf.parse(txtNgayNhap.getText().trim()));
-                nhapHang.setTongGiaTriNhap(Double.parseDouble(txtTongGiaTriNhap.getText().trim()));
+                String tongGiaTriStr = txtTongGiaTriNhap.getText().replace(",", "");
+                nhapHang.setTongGiaTriNhap(Double.parseDouble(tongGiaTriStr));
 
-                // Tạo ChiTietNhapHangDTO
-                ChiTietNhapHangDTO chiTiet = new ChiTietNhapHangDTO();
-                chiTiet.setIdSanPham(txtIdSanPham.getText().trim());
-                chiTiet.setSoLuongNhap(Integer.parseInt(txtSoLuongNhap.getText().trim()));
-                chiTiet.setGiaNhap(Integer.parseInt(txtGiaNhap.getText().trim()));
+                // Tạo danh sách ChiTietNhapHangDTO
+                List<ChiTietNhapHangDTO> chiTietList = new ArrayList<>();
+                for (int i = 0; i < productTableModel.getRowCount(); i++) {
+                    ChiTietNhapHangDTO chiTiet = new ChiTietNhapHangDTO();
+                    chiTiet.setIdSanPham(productTableModel.getValueAt(i, 0).toString());
+                    chiTiet.setSoLuongNhap(Integer.parseInt(productTableModel.getValueAt(i, 1).toString()));
+                    String giaNhapStr = productTableModel.getValueAt(i, 2).toString().replace(",", "");
+                    chiTiet.setGiaNhap(Integer.parseInt(giaNhapStr));
+                    chiTietList.add(chiTiet);
+                }
 
                 // Thêm qua BLL
-                nhapHangBLL.addNhapHang(nhapHang, chiTiet);
+                nhapHangBLL.addNhapHang(nhapHang, chiTietList);
                 JOptionPane.showMessageDialog(addDialog, "Thêm nhập hàng thành công",
                         "Thông báo", JOptionPane.INFORMATION_MESSAGE);
                 loadDataFromDatabase();
@@ -386,6 +454,22 @@ public class NhapHangPanel extends JPanel {
         btnCancel.addActionListener(e -> addDialog.dispose());
 
         addDialog.setVisible(true);
+    }
+
+    private void updateTongGiaTriNhap(DefaultTableModel productTableModel, JTextField txtTongGiaTriNhap) {
+        double tongGiaTri = 0;
+        for (int i = 0; i < productTableModel.getRowCount(); i++) {
+            try {
+                int soLuong = Integer.parseInt(productTableModel.getValueAt(i, 1).toString());
+                String giaNhapStr = productTableModel.getValueAt(i, 2).toString().replace(",", "");
+                int giaNhap = Integer.parseInt(giaNhapStr);
+                tongGiaTri += soLuong * giaNhap;
+            } catch (NumberFormatException ex) {
+                // Bỏ qua dòng lỗi
+                continue;
+            }
+        }
+        txtTongGiaTriNhap.setText(decimalFormat.format(tongGiaTri));
     }
 
     private void deleteNhapHang(int selectedRow) {
@@ -494,7 +578,7 @@ public class NhapHangPanel extends JPanel {
 
         JLabel lblTongGiaTriNhap = new JLabel("Tổng Giá Trị Nhập:");
         lblTongGiaTriNhap.setFont(labelFont);
-        JTextField txtTongGiaTriNhap = new JTextField(String.valueOf(nhapHang.getTongGiaTriNhap()), 20);
+        JTextField txtTongGiaTriNhap = new JTextField(decimalFormat.format(nhapHang.getTongGiaTriNhap()), 20);
         txtTongGiaTriNhap.setFont(fieldFont);
         txtTongGiaTriNhap.setBorder(BorderFactory.createLineBorder(new Color(100, 149, 237), 1));
         txtTongGiaTriNhap.setEditable(false);
@@ -508,9 +592,9 @@ public class NhapHangPanel extends JPanel {
             private void updateTongGiaTri() {
                 try {
                     int soLuong = Integer.parseInt(txtSoLuongNhap.getText().trim());
-                    double giaNhap = Double.parseDouble(txtGiaNhap.getText().trim());
+                    int giaNhap = Integer.parseInt(txtGiaNhap.getText().trim());
                     double tongGiaTri = soLuong * giaNhap;
-                    txtTongGiaTriNhap.setText(String.format("%.2f", tongGiaTri));
+                    txtTongGiaTriNhap.setText(decimalFormat.format(tongGiaTri));
                 } catch (NumberFormatException ex) {
                     txtTongGiaTriNhap.setText("");
                 }
@@ -525,9 +609,9 @@ public class NhapHangPanel extends JPanel {
             private void updateTongGiaTri() {
                 try {
                     int soLuong = Integer.parseInt(txtSoLuongNhap.getText().trim());
-                    double giaNhap = Double.parseDouble(txtGiaNhap.getText().trim());
+                    int giaNhap = Integer.parseInt(txtGiaNhap.getText().trim());
                     double tongGiaTri = soLuong * giaNhap;
-                    txtTongGiaTriNhap.setText(String.format("%.2f", tongGiaTri));
+                    txtTongGiaTriNhap.setText(decimalFormat.format(tongGiaTri));
                 } catch (NumberFormatException ex) {
                     txtTongGiaTriNhap.setText("");
                 }
@@ -585,7 +669,8 @@ public class NhapHangPanel extends JPanel {
                 nhapHang.setIdNhaCungCap(txtIdNhaCungCap.getText().trim());
                 nhapHang.setIdNhanVien(txtIdNhanVien.getText().trim());
                 nhapHang.setNgayNhap(sdf.parse(txtNgayNhap.getText().trim()));
-                nhapHang.setTongGiaTriNhap(Double.parseDouble(txtTongGiaTriNhap.getText().trim()));
+                String tongGiaTriStr = txtTongGiaTriNhap.getText().trim().replace(",", "");
+                nhapHang.setTongGiaTriNhap(Double.parseDouble(tongGiaTriStr));
 
                 // Cập nhật ChiTietNhapHangDTO
                 chiTiet.setIdSanPham(txtIdSanPham.getText().trim());
