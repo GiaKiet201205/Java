@@ -91,7 +91,6 @@ public class HoaDonPanel extends JPanel {
         btnEdit.addActionListener(e -> editHoaDon(hoaDonTable.getSelectedRow()));
         btnExportExcel.addActionListener(e -> exportHoaDonToExcel());
 
-
         txtSearchID.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -149,7 +148,9 @@ public class HoaDonPanel extends JPanel {
                 JTextField txtTongTien = new JTextField(String.valueOf(donHang.getTongTien()));
                 JTextField txtNgayDatHang = new JTextField(donHang.getNgayDatHang().toString());
                 txtNgayDatHang.setEditable(false);
-                JTextField txtTrangThai = new JTextField(donHang.getTrangThai());
+                String[] trangThaiOptions = {"Đang xử lý", "Đã giao", "Đã hủy"};
+                JComboBox<String> cbTrangThai = new JComboBox<>(trangThaiOptions);
+                cbTrangThai.setSelectedItem(donHang.getTrangThai());
                 JTextField txtHinhThucMuaHang = new JTextField(donHang.getHinhThucMuaHang());
                 JTextField txtDiaDiemGiao = new JTextField(donHang.getDiaDiemGiao());
 
@@ -164,7 +165,7 @@ public class HoaDonPanel extends JPanel {
                 editDialog.add(new JLabel("Ngày Đặt Hàng:"));
                 editDialog.add(txtNgayDatHang);
                 editDialog.add(new JLabel("Trạng Thái:"));
-                editDialog.add(txtTrangThai);
+                editDialog.add(cbTrangThai);
                 editDialog.add(new JLabel("Hình Thức Mua Hàng:"));
                 editDialog.add(txtHinhThucMuaHang);
                 editDialog.add(new JLabel("Địa Điểm Giao Hàng:"));
@@ -176,7 +177,7 @@ public class HoaDonPanel extends JPanel {
                 btnLuu.addActionListener(e -> {
                     try {
                         donHang.setTongTien(Integer.parseInt(txtTongTien.getText()));
-                        donHang.setTrangThai(txtTrangThai.getText());
+                        donHang.setTrangThai((String) cbTrangThai.getSelectedItem());
                         donHang.setHinhThucMuaHang(txtHinhThucMuaHang.getText());
                         donHang.setDiaDiemGiao(txtDiaDiemGiao.getText());
                         donHang.setIdKhachHang(txtIdKhachHang.getText());
@@ -206,51 +207,48 @@ public class HoaDonPanel extends JPanel {
     }
     
     private void exportHoaDonToExcel() {
-    JFileChooser fileChooser = new JFileChooser();
-    fileChooser.setDialogTitle("Chọn nơi lưu file Excel");
-    fileChooser.setFileFilter(new FileNameExtensionFilter("Excel Files", "xlsx"));
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Chọn nơi lưu file Excel");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Excel Files", "xlsx"));
 
-    int userSelection = fileChooser.showSaveDialog(this);
+        int userSelection = fileChooser.showSaveDialog(this);
 
-    if (userSelection == JFileChooser.APPROVE_OPTION) {
-        String filePath = fileChooser.getSelectedFile().getAbsolutePath();
-        if (!filePath.endsWith(".xlsx")) {
-            filePath += ".xlsx"; // đảm bảo có đuôi .xlsx
-        }
-
-        try (Workbook workbook = new XSSFWorkbook()) {
-            Sheet sheet = workbook.createSheet("HoaDon");
-
-            // Tạo dòng header
-            Row headerRow = sheet.createRow(0);
-            for (int col = 0; col < hoaDonTable.getColumnCount(); col++) {
-                Cell cell = headerRow.createCell(col);
-                cell.setCellValue(hoaDonTable.getColumnName(col));
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+            if (!filePath.endsWith(".xlsx")) {
+                filePath += ".xlsx";
             }
 
-            // Ghi dữ liệu các dòng
-            for (int row = 0; row < hoaDonTable.getRowCount(); row++) {
-                Row excelRow = sheet.createRow(row + 1); // +1 vì dòng 0 đã là header
+            try (Workbook workbook = new XSSFWorkbook()) {
+                Sheet sheet = workbook.createSheet("HoaDon");
+
+                Row headerRow = sheet.createRow(0);
                 for (int col = 0; col < hoaDonTable.getColumnCount(); col++) {
-                    Cell cell = excelRow.createCell(col);
-                    Object value = hoaDonTable.getValueAt(row, col);
-                    if (value != null) {
-                        cell.setCellValue(value.toString());
+                    Cell cell = headerRow.createCell(col);
+                    cell.setCellValue(hoaDonTable.getColumnName(col));
+                }
+
+                for (int row = 0; row < hoaDonTable.getRowCount(); row++) {
+                    Row excelRow = sheet.createRow(row + 1);
+                    for (int col = 0; col < hoaDonTable.getColumnCount(); col++) {
+                        Cell cell = excelRow.createCell(col);
+                        Object value = hoaDonTable.getValueAt(row, col);
+                        if (value != null) {
+                            cell.setCellValue(value.toString());
+                        }
                     }
                 }
+
+                try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
+                    workbook.write(fileOut);
+                }
+
+                JOptionPane.showMessageDialog(this, "Xuất file Excel thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Xuất file thất bại: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
-
-            // Ghi file ra đĩa
-            try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
-                workbook.write(fileOut);
-            }
-
-            JOptionPane.showMessageDialog(this, "Xuất file Excel thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Xuất file thất bại: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
-}
 }
