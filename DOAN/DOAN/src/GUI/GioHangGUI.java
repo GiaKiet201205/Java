@@ -149,7 +149,7 @@ public class GioHangGUI extends JFrame {
 
                 // Lấy ID nhân viên admin
                 NhanVienDAO nhanVienDAO = new NhanVienDAO();
-                String idNhanVien = "admin"; // chỉ có admin duyệt hóa đơn
+                String idNhanVien = "NV001"; // chỉ có admin duyệt hóa đơn
 
                 // Tạo đơn hàng
                 DonHangDTO donHang = new DonHangDTO();

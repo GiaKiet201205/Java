@@ -61,7 +61,7 @@ public class DonHangDAO {
 
             int affectedRows = pst.executeUpdate();
             if (affectedRows > 0) {
-                return donHang.getIdDonHang(); // Trả lại ID do bạn đã tạo
+                return donHang.getIdDonHang(); // Trả lại ID đã tạo
             }
         } catch (SQLException e) {
             e.printStackTrace();

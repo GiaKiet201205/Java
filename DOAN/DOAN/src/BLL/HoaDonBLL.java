@@ -19,7 +19,7 @@ public class HoaDonBLL {
         // Cập nhật các thông tin đơn hàng
         donHang.setIdDonHang(idDonHang);
         donHang.setIdKhachHang(idKhachHang); // Lấy id khách hàng từ session
-        donHang.setIdNhanVien("admin");
+        donHang.setIdNhanVien(idNhanVien);
         donHang.setTongTien(tongTien);
         donHang.setNgayDatHang(ngayDatHang);
         donHang.setTrangThai(trangThai);
