@@ -5,7 +5,6 @@ import DTO.TaiKhoanDTO;
 import GUI.DangNhapGUI;
 import GUI.NguoiDungGUI;
 import javax.swing.*;
-import java.util.Random;
 
 public class TaiKhoanBLL {
     private TaiKhoanDAO taiKhoanDAO;
@@ -84,45 +83,13 @@ public class TaiKhoanBLL {
         tk.setPassword(password);
         tk.setPhanQuyen("2");
         tk.setTrangThai("1");
-        String id = generateUniqueId();
-        tk.setIdTaiKhoan(id);
+        tk.setIdTaiKhoan(generateUniqueId());
         tk.setIdKhachHang(null);
 
-        System.out.println("ID tài khoản trước khi chèn: " + id); // Debug
-
-        return taiKhoanDAO.insert(tk);
+        return taiKhoanDAO.insert(tk); // Thay addTaiKhoan thành insert
     }
 
     private String generateUniqueId() {
-        Random random = new Random();
-        String id;
-        boolean isUnique;
-        do {
-            int randomNum = 100 + random.nextInt(900); // Số ngẫu nhiên 3 chữ số (100-999)
-            id = "TK" + randomNum; // Ví dụ: TK123
-            System.out.println("ID được tạo: " + id + " (độ dài: " + id.length() + ")"); // Debug
-            if (id.length() > 5) {
-                System.err.println("Cảnh báo: ID vượt quá 5 ký tự!");
-                id = id.substring(0, 5); // Cắt bớt nếu cần
-            }
-            isUnique = !isIdExists(id);
-        } while (!isUnique);
-        return id;
-    }
-
-    private boolean isIdExists(String id) {
-        String sql = "SELECT COUNT(*) FROM tai_khoan WHERE id_tai_khoan = ?";
-        try (java.sql.Connection con = config.JDBC.getConnection();
-             java.sql.PreparedStatement pst = con.prepareStatement(sql)) {
-            pst.setString(1, id);
-            try (java.sql.ResultSet rs = pst.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
-            }
-        } catch (java.sql.SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
+        return "TK" + System.currentTimeMillis();
     }
 }
