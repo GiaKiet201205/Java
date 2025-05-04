@@ -1,7 +1,11 @@
 package GUI;
 
+import BLL.HoaDonBLL;
 import BLL.NhanVienBLL;
 import BLL.SanPhamBLL;
+import DAO.ChiTietDonHangDAO;
+import DTO.ChiTietDonHangDTO;
+import DTO.DonHangDTO;
 import DTO.NhanVienDTO;
 import DTO.SanPhamDTO;
 import javax.swing.*;
@@ -25,9 +29,11 @@ public class TrucTiepGUI extends JFrame {
     private Font buttonFont = new Font("Arial", Font.BOLD, 16);
     private Font comboBoxFont = new Font("Arial", Font.PLAIN, 14);
 
-    // Khởi tạo BLL
+    // Khởi tạo BLL và DAO
     private SanPhamBLL sanPhamBLL = new SanPhamBLL();
     private NhanVienBLL nhanVienBLL = new NhanVienBLL();
+    private HoaDonBLL hoaDonBLL = new HoaDonBLL();
+    private ChiTietDonHangDAO chiTietDonHangDAO = new ChiTietDonHangDAO();
 
     public TrucTiepGUI() {
         setTitle("QUẢN LÝ BÁN HÀNG");
@@ -211,7 +217,7 @@ public class TrucTiepGUI extends JFrame {
         
         contentPanel.add(buttonPanel);
         
-        // Thêm DocumentListener để tự động điền thông tin sản phẩm (không báo lỗi ngay)
+        // Thêm DocumentListener để tự động điền thông tin sản phẩm
         txtProductID.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -249,7 +255,7 @@ public class TrucTiepGUI extends JFrame {
             }
         });
 
-        // Thêm DocumentListener để tự động điền thông tin nhân viên (không báo lỗi ngay)
+        // Thêm DocumentListener để tự động điền thông tin nhân viên
         txtEmployeeID.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -307,9 +313,10 @@ public class TrucTiepGUI extends JFrame {
                 String idSanPham = txtProductID.getText().trim();
                 String idNhanVien = txtEmployeeID.getText().trim();
                 String quantityStr = txtQuantity.getText().trim();
+                String totalStr = txtTotal.getText().trim();
 
                 // Kiểm tra các trường bắt buộc
-                if (idSanPham.isEmpty() || idNhanVien.isEmpty() || quantityStr.isEmpty()) {
+                if (idSanPham.isEmpty() || idNhanVien.isEmpty() || quantityStr.isEmpty() || totalStr.isEmpty()) {
                     JOptionPane.showMessageDialog(TrucTiepGUI.this, 
                         "Vui lòng nhập đầy đủ thông tin!", 
                         "Lỗi", 
@@ -338,8 +345,9 @@ public class TrucTiepGUI extends JFrame {
                 }
 
                 // Kiểm tra số lượng
+                int quantity;
                 try {
-                    int quantity = Integer.parseInt(quantityStr);
+                    quantity = Integer.parseInt(quantityStr);
                     if (quantity <= 0) {
                         JOptionPane.showMessageDialog(TrucTiepGUI.this, 
                             "Số lượng phải lớn hơn 0!", 
@@ -355,17 +363,63 @@ public class TrucTiepGUI extends JFrame {
                     return;
                 }
 
-                // Thêm đơn hàng
-                String paymentMethod = (String) cmbPaymentMethod.getSelectedItem();
-                String status = (String) cmbStatus.getSelectedItem();
-                
+                // Kiểm tra tổng tiền
+                int tongTien;
+                try {
+                    tongTien = Integer.parseInt(totalStr);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(TrucTiepGUI.this, 
+                        "Tổng tiền không hợp lệ!", 
+                        "Lỗi", 
+                        JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                // Tạo đối tượng DonHangDTO
+                DonHangDTO donHang = new DonHangDTO();
+
+                // Lấy thông tin từ giao diện
+                String trangThai = (String) cmbStatus.getSelectedItem();
+                String hinhThucMuaHang = "Trực tiếp";
+                String diaDiemGiao = "Tại cửa hàng";
+
+                // Gọi createDonHang với idKhachHang là null
+                String idDonHang = hoaDonBLL.createDonHang(donHang, "KH001", idNhanVien, tongTien, 
+                                                          trangThai, hinhThucMuaHang, diaDiemGiao);
+
+                if (idDonHang != null) {
+            // Tạo đối tượng ChiTietDonHangDTO
+            ChiTietDonHangDTO chiTiet = new ChiTietDonHangDTO();
+            chiTiet.setIdDonHang(idDonHang);
+            chiTiet.setIdSanPham(idSanPham);
+            chiTiet.setSoLuong(quantity);
+            chiTiet.setGiaBan(sp.getGia());
+
+            // Lưu chi tiết đơn hàng
+            boolean chiTietSuccess = chiTietDonHangDAO.insert(chiTiet);
+            if (chiTietSuccess) {
                 JOptionPane.showMessageDialog(TrucTiepGUI.this, 
                     "Đơn hàng đã được thêm thành công!\n" +
-                    "Phương thức: " + paymentMethod + "\n" +
-                    "Trạng thái: " + status,
+                    "ID đơn hàng: " + idDonHang + "\n" +
+                    "Hình thức: " + hinhThucMuaHang + "\n" +
+                    "Trạng thái: " + trangThai,
                     "Thông báo", 
                     JOptionPane.INFORMATION_MESSAGE);
                 clearFields();
+                    } else {
+                        // Xóa đơn hàng nếu lưu chi tiết thất bại
+                        hoaDonBLL.deleteDonHang(idDonHang);
+                        JOptionPane.showMessageDialog(TrucTiepGUI.this, 
+                            "Lỗi khi lưu chi tiết đơn hàng!", 
+                            "Lỗi", 
+                            JOptionPane.ERROR_MESSAGE);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(TrucTiepGUI.this, 
+                        "Lỗi khi thêm đơn hàng vào cơ sở dữ liệu!", 
+                        "Lỗi", 
+                        JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
         

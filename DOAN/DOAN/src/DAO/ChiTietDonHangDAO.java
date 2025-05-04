@@ -38,7 +38,12 @@ public class ChiTietDonHangDAO {
         try (Connection con = JDBC.getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
 
-            pst.setString(1, chiTietDonHang.getIdChiTietDonHang());
+            String idChiTiet = chiTietDonHang.getIdChiTietDonHang();
+            if (idChiTiet == null) {
+                idChiTiet = generateNextId(); // Tạo ID mới nếu null
+            }
+
+            pst.setString(1, idChiTiet);
             pst.setString(2, chiTietDonHang.getIdDonHang());
             pst.setString(3, chiTietDonHang.getIdSanPham());
             pst.setInt(4, chiTietDonHang.getSoLuong());
@@ -110,5 +115,23 @@ public class ChiTietDonHangDAO {
             e.printStackTrace();
         }
         return chiTietDonHang;
+    }
+    
+    public String generateNextId() {
+        String sql = "SELECT MAX(id_chi_tiet_don_hang) AS max_id FROM chi_tiet_don_hang";
+        try (Connection conn = JDBC.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                String maxId = rs.getString("max_id");
+                if (maxId != null) {
+                    int number = Integer.parseInt(maxId.substring(2)); // Lấy phần số sau "CT"
+                    return String.format("CT%03d", number + 1); // Tạo ID tiếp theo
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "CT001"; // Trường hợp bảng rỗng
     }
 }
