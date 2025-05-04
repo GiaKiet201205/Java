@@ -82,7 +82,7 @@ public class PhuongThucTTPanel extends JPanel {
         phuongThucPanel.add(topPanel, BorderLayout.NORTH);
 
         // Table
-        String[] columns = {"Mã thanh toán", "Tên thanh toán", "Loại thanh toán", "Trạng thái thanh toán"};
+        String[] columns = {"Mã thanh toán", "ID  đơn hàng", "Loại thanh toán", "Trạng thái thanh toán"};
         phuongThucTableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
