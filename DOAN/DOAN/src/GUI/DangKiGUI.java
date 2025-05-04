@@ -1,7 +1,10 @@
 package GUI;
 
+import BLL.TaiKhoanBLL;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -26,7 +29,10 @@ class BackgroundPanel extends JPanel {
 
 public class DangKiGUI extends JFrame {
 
+    private final TrangChuGUI trangChu;
+
     public DangKiGUI(TrangChuGUI trangChu) {
+        this.trangChu = trangChu;
 
         setTitle("Đăng Kí");
         setSize(600, 400);
@@ -76,13 +82,6 @@ public class DangKiGUI extends JFrame {
 
         gbc.gridwidth = 1;
         gbc.gridy++;
-        rightPanel.add(new JLabel("Họ và tên"), gbc);
-        gbc.gridx = 1;
-        JTextField fullNameField = new JTextField(15);
-        rightPanel.add(fullNameField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy++;
         rightPanel.add(new JLabel("Tên đăng nhập"), gbc);
         gbc.gridx = 1;
         JTextField usernameField = new JTextField(15);
@@ -94,13 +93,6 @@ public class DangKiGUI extends JFrame {
         gbc.gridx = 1;
         JPasswordField passwordField = new JPasswordField(15);
         rightPanel.add(passwordField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-        rightPanel.add(new JLabel("Số điện thoại"), gbc);
-        gbc.gridx = 1;
-        JTextField phoneField = new JTextField(15);
-        rightPanel.add(phoneField, gbc);
 
         // Nút đăng ký
         gbc.gridx = 0;
@@ -117,19 +109,25 @@ public class DangKiGUI extends JFrame {
 
         // Xử lý nút Đăng ký
         registerButton.addActionListener((ActionEvent e) -> {
-            String fullName = fullNameField.getText();
             String username = usernameField.getText();
             String password = new String(passwordField.getPassword());
-            String phone = phoneField.getText();
 
-            if (fullName.isEmpty() || username.isEmpty() || password.isEmpty() || phone.isEmpty()) {
+            if (username.isEmpty() || password.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin!", "Thông báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
-            JOptionPane.showMessageDialog(null, "Đăng ký thành công! Mời bạn đăng nhập.");
-            new DangNhapGUI(trangChu).setVisible(true); // Gọi đúng DangNhapGUI
-            dispose();
+            TaiKhoanBLL taiKhoanBLL = new TaiKhoanBLL();
+            boolean success = taiKhoanBLL.register(username, password);
+
+            if (success) {
+                JOptionPane.showMessageDialog(null, "Đăng ký thành công! Mời bạn đăng nhập.");
+                new DangNhapGUI(trangChu).setVisible(true);
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(null, "Đăng ký thất bại! Tên đăng nhập đã tồn tại.", 
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         backgroundPanel.add(leftPanel, BorderLayout.WEST);

@@ -1,6 +1,8 @@
 package GUI;
 
+import BLL.DanhMucBLL;
 import DAO.SanPhamDAO;
+import DTO.DanhMucDTO;
 import DTO.SanPhamDTO;
 import javax.swing.*;
 import java.awt.*;
@@ -10,12 +12,18 @@ import java.util.ArrayList;
 public class TrangChuGUI extends JFrame {
     
     private JPanel productDisplayPanel;
+    private JComboBox<String> categoryComboBox;
+    private DanhMucBLL danhMucBLL;
 
     public TrangChuGUI() {
         setTitle("Fashion Store");
         setSize(900, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+
+        // Khởi tạo DanhMucBLL và đăng ký GUI
+        danhMucBLL = new DanhMucBLL();
+        danhMucBLL.registerTrangChuGUI(this);
 
         // Panel Header
         JPanel headerPanel = new JPanel(new BorderLayout());
@@ -90,18 +98,18 @@ public class TrangChuGUI extends JFrame {
         }
 
         // ComboBox sản phẩm
-        String[] categories = {"Chọn danh mục", "Quần Áo", "Giày Dép", "Phụ Kiện"};
-        JComboBox<String> categoryComboBox = new JComboBox<>(categories);
+        categoryComboBox = new JComboBox<>();
         categoryComboBox.setFont(new Font("Serif", Font.PLAIN, 16));
         categoryComboBox.setBackground(new Color(100, 200, 100));
         categoryComboBox.setForeground(Color.WHITE);
+        updateCategoryComboBox(); // Tải danh mục từ cơ sở dữ liệu
         menuPanel.add(categoryComboBox);
 
         categoryComboBox.addActionListener(e -> {
             String selected = (String) categoryComboBox.getSelectedItem();
-            if ("Quần Áo".equals(selected)) showQuanAoGUI();
-            else if ("Giày Dép".equals(selected)) showGiayDepGUI();
-            else if ("Phụ Kiện".equals(selected)) showPhuKienGUI();
+            if (selected != null && !selected.equals("Chọn danh mục")) {
+                showCategoryProducts(selected);
+            }
         });
 
         // Search & Cart
@@ -132,30 +140,35 @@ public class TrangChuGUI extends JFrame {
         loadProducts();
     }
 
-    private void showQuanAoGUI() {
-        JFrame frame = new JFrame("Danh Mục Quần Áo");
-        frame.setSize(600, 500);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        frame.add(new QuanAoGUI());
-        frame.setVisible(true);
+    // Cập nhật JComboBox với danh mục từ cơ sở dữ liệu
+    public void updateCategoryComboBox() {
+        categoryComboBox.removeAllItems();
+        categoryComboBox.addItem("Chọn danh mục");
+        ArrayList<DanhMucDTO> danhMucList = danhMucBLL.getAllDanhMuc();
+        for (DanhMucDTO dm : danhMucList) {
+            categoryComboBox.addItem(dm.getTenDanhMuc());
+        }
     }
 
-    private void showGiayDepGUI() {
-        JFrame frame = new JFrame("Danh Mục Giày Dép");
+    private void showCategoryProducts(String categoryName) {
+        JFrame frame = new JFrame("Danh Mục " + categoryName);
         frame.setSize(600, 500);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLocationRelativeTo(null);
-        frame.add(new GiayDepGUI());
-        frame.setVisible(true);
-    }
 
-    private void showPhuKienGUI() {
-        JFrame frame = new JFrame("Danh Mục Phụ Kiện");
-        frame.setSize(600, 500);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        frame.add(new PhuKienGUI());
+        // Tùy thuộc vào danh mục, hiển thị giao diện tương ứng
+        if (categoryName.equals("Quần jean")) {
+            frame.add(new QuanJeanGUI());
+        } else if (categoryName.equals("Quần short")) {
+            frame.add(new QuanShortGUI());
+        } else if (categoryName.equals("Áo thun")) {
+            frame.add(new AoThunGUI());
+        } else if (categoryName.equals("Áo khoác")) {
+            frame.add(new QuanJeanGUI());
+        } else if (categoryName.equals("Áo hoodie")) {
+            frame.add(new AoThunGUI());
+        }
+        // Có thể thêm logic để hiển thị sản phẩm theo danh mục từ cơ sở dữ liệu
         frame.setVisible(true);
     }
 

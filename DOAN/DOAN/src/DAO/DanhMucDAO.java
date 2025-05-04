@@ -65,10 +65,21 @@ public class DanhMucDAO {
         }
     }
 
+    // Xóa danh mục
     public boolean delete(String idDanhMuc) {
-    System.out.println("Đã ngừng xóa dữ liệu trong cơ sở dữ liệu.");
-    return false; 
-}
+        String sql = "DELETE FROM danh_muc WHERE id_danh_muc = ?";
+
+        try (Connection con = JDBC.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+
+            pst.setString(1, idDanhMuc);
+            return pst.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Lỗi khi xóa danh mục: " + e.getMessage());
+            return false;
+        }
+    }
+
     // Tìm danh mục theo ID
     public DanhMucDTO selectById(String idDanhMuc) {
         String sql = "SELECT * FROM danh_muc WHERE id_danh_muc = ?";

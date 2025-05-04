@@ -1,6 +1,6 @@
 package GUI.panel;
 
-import DAO.DanhMucDAO;
+import BLL.DanhMucBLL;
 import DTO.DanhMucDTO;
 
 import javax.swing.*;
@@ -15,11 +15,12 @@ import java.util.ArrayList;
 public class DanhMucPanel extends JPanel {
     private JTable danhMucTable;
     private DefaultTableModel danhMucTableModel;
-    private DanhMucDAO danhMucDAO = new DanhMucDAO();
+    private DanhMucBLL danhMucBLL;
 
     public DanhMucPanel() {
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(600, 400));
+        danhMucBLL = new DanhMucBLL();
         taoGiaoDienDanhMuc();
     }
 
@@ -111,7 +112,7 @@ public class DanhMucPanel extends JPanel {
 
     private void taiDanhSachDanhMuc() {
         danhMucTableModel.setRowCount(0);
-        ArrayList<DanhMucDTO> list = danhMucDAO.selectAll();
+        ArrayList<DanhMucDTO> list = danhMucBLL.getAllDanhMuc();
         for (DanhMucDTO dm : list) {
             danhMucTableModel.addRow(new Object[]{dm.getIdDanhMuc(), dm.getTenDanhMuc()});
         }
@@ -121,17 +122,19 @@ public class DanhMucPanel extends JPanel {
         JTextField txtID = new JTextField();
         JTextField txtTen = new JTextField();
         JPanel panel = new JPanel(new GridLayout(0, 2));
-        panel.add(new JLabel("ID Danh mục:")); panel.add(txtID);
-        panel.add(new JLabel("Tên Danh mục:")); panel.add(txtTen);
+        panel.add(new JLabel("ID Danh mục:"));
+        panel.add(txtID);
+        panel.add(new JLabel("Tên Danh mục:"));
+        panel.add(txtTen);
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Thêm danh mục mới", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             DanhMucDTO dm = new DanhMucDTO(txtID.getText(), txtTen.getText());
-            if (danhMucDAO.insert(dm)) {
+            if (danhMucBLL.addDanhMuc(dm)) {
                 JOptionPane.showMessageDialog(this, "Thêm thành công!");
                 taiDanhSachDanhMuc();
             } else {
-                JOptionPane.showMessageDialog(this, "Thêm thất bại!");
+                JOptionPane.showMessageDialog(this, "Thêm thất bại! Kiểm tra ID danh mục hoặc kết nối cơ sở dữ liệu.");
             }
         }
     }
@@ -145,43 +148,48 @@ public class DanhMucPanel extends JPanel {
         JTextField txtID = new JTextField(danhMucTableModel.getValueAt(selectedRow, 0).toString());
         JTextField txtTen = new JTextField(danhMucTableModel.getValueAt(selectedRow, 1).toString());
         JPanel panel = new JPanel(new GridLayout(0, 2));
-        panel.add(new JLabel("ID Danh mục:")); panel.add(txtID);
-        panel.add(new JLabel("Tên Danh mục:")); panel.add(txtTen);
+        panel.add(new JLabel("ID Danh mục:"));
+        panel.add(txtID);
+        panel.add(new JLabel("Tên Danh mục:"));
+        panel.add(txtTen);
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Sửa danh mục", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
             DanhMucDTO dm = new DanhMucDTO(txtID.getText(), txtTen.getText());
-            if (danhMucDAO.update(dm)) {
+            if (danhMucBLL.updateDanhMuc(dm)) {
                 JOptionPane.showMessageDialog(this, "Cập nhật thành công!");
                 taiDanhSachDanhMuc();
             } else {
-                JOptionPane.showMessageDialog(this, "Cập nhật thất bại!");
+                JOptionPane.showMessageDialog(this, "Cập nhật thất bại! Kiểm tra ID danh mục hoặc kết nối cơ sở dữ liệu.");
             }
         }
     }
 
-        private void deleteDanhMuc(int selectedRow) {
+    private void deleteDanhMuc(int selectedRow) {
         if (selectedRow == -1) {
             JOptionPane.showMessageDialog(this, "Vui lòng chọn một danh mục để xóa");
             return;
         }
 
-        // Lấy ID danh mục từ dòng được chọn
         String id = danhMucTableModel.getValueAt(selectedRow, 0).toString();
-
-        // Xóa dòng trong bảng giao diện
-        danhMucTableModel.removeRow(selectedRow);
-
-        // Thông báo cho người dùng
-        JOptionPane.showMessageDialog(this, "Xóa thành công!");
+        int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn xóa danh mục " + id + "?", "Xác nhận xóa", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            if (danhMucBLL.deleteDanhMuc(id)) {
+                JOptionPane.showMessageDialog(this, "Xóa thành công!");
+                taiDanhSachDanhMuc();
+            } else {
+                JOptionPane.showMessageDialog(this, "Xóa thất bại! Có thể danh mục đang được sử dụng hoặc lỗi kết nối.");
+            }
+        }
     }
-   private void searchDanhMuc(String type, String keyword) {
+
+    private void searchDanhMuc(String type, String keyword) {
         if (keyword.trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập từ khóa tìm kiếm");
             return;
         }
         danhMucTableModel.setRowCount(0);
-        ArrayList<DanhMucDTO> list = danhMucDAO.selectAll();
+        ArrayList<DanhMucDTO> list = danhMucBLL.getAllDanhMuc();
         for (DanhMucDTO dm : list) {
             if ((type.equals("ID danh mục") && dm.getIdDanhMuc().toLowerCase().contains(keyword.toLowerCase())) ||
                 (type.equals("Tên danh mục") && dm.getTenDanhMuc().toLowerCase().contains(keyword.toLowerCase()))) {

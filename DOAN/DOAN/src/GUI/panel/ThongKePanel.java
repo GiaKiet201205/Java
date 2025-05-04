@@ -7,6 +7,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -14,10 +15,11 @@ public class ThongKePanel extends JPanel {
     private JPanel thongKePanel;
     private Color headerColor = new Color(200, 255, 200);
     private ThongKeBLL thongKeBLL = new ThongKeBLL();
-    private DefaultTableModel timeModel, methodModel, employeeModel, sanPhamModel, nhapHangModel;
+    private DefaultTableModel methodModel, employeeModel, hinhThucModel, sanPhamModel, nhapHangModel;
     private JTable table;
     private JPanel contentPanel;
     private DecimalFormat df = new DecimalFormat("#,###");
+    private String selectedTimeFilter = ""; // Biến lưu trữ thời gian được chọn
 
     public ThongKePanel() {
         setLayout(new BorderLayout());
@@ -40,8 +42,20 @@ public class ThongKePanel extends JPanel {
         JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         controlPanel.setOpaque(false);
 
-        JLabel lblFilter = new JLabel("Lọc theo:");
+        JLabel lblFilter = new JLabel("Chọn thời gian:");
         controlPanel.add(lblFilter);
+        JComboBox<String> cmbTimeFilter = new JComboBox<>(new String[]{
+            "Tất cả", "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6",
+            "Tháng 7", "Tháng 8", "Tháng 9", "Năm 2025"
+        });
+        cmbTimeFilter.setPreferredSize(new Dimension(150, 25));
+        controlPanel.add(cmbTimeFilter);
+
+        JButton btnView = new JButton("Xem");
+        btnView.setBackground(new Color(60, 141, 188));
+        btnView.setForeground(Color.WHITE);
+        controlPanel.add(btnView);
+
         JButton btnRefresh = new JButton("Làm mới");
         controlPanel.add(btnRefresh);
 
@@ -68,7 +82,19 @@ public class ThongKePanel extends JPanel {
         createLoiNhuanSection(contentPanel);
 
         // Actions
-        btnRefresh.addActionListener(e -> refreshData());
+        btnView.addActionListener(e -> {
+            selectedTimeFilter = (String) cmbTimeFilter.getSelectedItem();
+            if (selectedTimeFilter.equals("Tất cả")) {
+                selectedTimeFilter = "";
+            }
+            updateData(); // Chỉ cập nhật dữ liệu, không hiển thị thông báo
+        });
+
+        btnRefresh.addActionListener(e -> {
+            selectedTimeFilter = "";
+            cmbTimeFilter.setSelectedItem("Tất cả");
+            refreshData(); // Cập nhật dữ liệu và hiển thị thông báo
+        });
     }
 
     private void createDoanhThuSection(JPanel parent) {
@@ -85,7 +111,7 @@ public class ThongKePanel extends JPanel {
 
         // Main filter ComboBox
         controlPanel.add(new JLabel("Hiển thị theo:"));
-        JComboBox<String> cmbFilterType = new JComboBox<>(new String[]{"Tháng/Năm", "Phương thức thanh toán", "Nhân viên"});
+        JComboBox<String> cmbFilterType = new JComboBox<>(new String[]{"Phương thức thanh toán", "Nhân viên", "Hình thức mua hàng"});
         cmbFilterType.setPreferredSize(new Dimension(150, 25));
         controlPanel.add(cmbFilterType);
 
@@ -110,21 +136,21 @@ public class ThongKePanel extends JPanel {
         parent.add(Box.createVerticalStrut(10));
 
         // Table models
-        String[] timeColumns = {"STT", "Thời gian", "Doanh thu", "Số đơn hàng", "Trung bình"};
         String[] methodColumns = {"STT", "Phương thức", "Doanh thu", "Số đơn hàng", "Trung bình"};
         String[] employeeColumns = {"STT", "Mã NV", "Tên NV", "Doanh thu", "Số đơn hàng", "Trung bình"};
+        String[] hinhThucColumns = {"STT", "Hình thức", "Doanh thu", "Số đơn hàng", "Trung bình"};
 
-        timeModel = new DefaultTableModel(timeColumns, 0) {
-            public boolean isCellEditable(int row, int col) { return false; }
-        };
         methodModel = new DefaultTableModel(methodColumns, 0) {
             public boolean isCellEditable(int row, int col) { return false; }
         };
         employeeModel = new DefaultTableModel(employeeColumns, 0) {
             public boolean isCellEditable(int row, int col) { return false; }
         };
+        hinhThucModel = new DefaultTableModel(hinhThucColumns, 0) {
+            public boolean isCellEditable(int row, int col) { return false; }
+        };
 
-        table = new JTable(timeModel);
+        table = new JTable(methodModel);
         table.setRowHeight(25);
         setCenterRenderer(table);
 
@@ -142,27 +168,23 @@ public class ThongKePanel extends JPanel {
             cmbSecondaryFilter.removeAllItems();
             cmbSecondaryFilter.setVisible(true);
 
-            if (selectedFilter.equals("Tháng/Năm")) {
-                String[] timeOptions = {
-                    "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6",
-                    "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12",
-                    "Năm 2024", "Năm 2025"
-                };
-                for (String option : timeOptions) {
-                    cmbSecondaryFilter.addItem(option);
-                }
-            } else if (selectedFilter.equals("Phương thức thanh toán")) {
-                String[] methodOptions = {"Tiền mặt", "Chuyển khoản", "Online"};
+            if (selectedFilter.equals("Phương thức thanh toán")) {
+                String[] methodOptions = {"Tiền mặt", "Chuyển khoản"};
                 for (String option : methodOptions) {
                     cmbSecondaryFilter.addItem(option);
                 }
             } else if (selectedFilter.equals("Nhân viên")) {
                 cmbSecondaryFilter.setVisible(false);
-                updateEmployeeTable();
+                updateEmployeeTable(selectedTimeFilter);
                 table.setModel(employeeModel);
                 setCenterRenderer(table);
                 table.revalidate();
                 table.repaint();
+            } else if (selectedFilter.equals("Hình thức mua hàng")) {
+                String[] hinhThucOptions = {"Online", "Trực tiếp"};
+                for (String option : hinhThucOptions) {
+                    cmbSecondaryFilter.addItem(option);
+                }
             }
         });
 
@@ -172,17 +194,17 @@ public class ThongKePanel extends JPanel {
             String sortOption = (String) cmbSort.getSelectedItem();
 
             if (filterType.equals("Nhân viên")) {
-                updateEmployeeTable();
+                updateEmployeeTable(selectedTimeFilter);
                 table.setModel(employeeModel);
             } else {
                 String secondaryFilter = (String) cmbSecondaryFilter.getSelectedItem();
                 if (secondaryFilter != null) {
-                    if (filterType.equals("Tháng/Năm")) {
-                        updateTimeTable(secondaryFilter, sortOption);
-                        table.setModel(timeModel);
-                    } else if (filterType.equals("Phương thức thanh toán")) {
-                        updateMethodTable(secondaryFilter, sortOption);
+                    if (filterType.equals("Phương thức thanh toán")) {
+                        updateMethodTable(secondaryFilter, sortOption, selectedTimeFilter);
                         table.setModel(methodModel);
+                    } else if (filterType.equals("Hình thức mua hàng")) {
+                        updateHinhThucTable(secondaryFilter, sortOption, selectedTimeFilter);
+                        table.setModel(hinhThucModel);
                     }
                 }
             }
@@ -191,31 +213,46 @@ public class ThongKePanel extends JPanel {
             table.revalidate();
             table.repaint();
         });
+
+        // Load initial data
+        updateMethodTable("Tiền mặt", "Không sắp xếp", selectedTimeFilter);
     }
 
-    private void updateTimeTable(String timeFilter, String sortOption) {
-        timeModel.setRowCount(0);
-        List<Object[]> data = thongKeBLL.getDoanhThuTheoThoiGian(timeFilter);
-        data = thongKeBLL.sortData(data, sortOption, 2);
-        for (Object[] row : data) {
-            timeModel.addRow(row);
-        }
-    }
-
-    private void updateMethodTable(String methodFilter, String sortOption) {
+    private void updateMethodTable(String methodFilter, String sortOption, String timeFilter) {
         methodModel.setRowCount(0);
-        List<Object[]> data = thongKeBLL.getDoanhThuTheoPhuongThuc(methodFilter);
-        data = thongKeBLL.sortData(data, sortOption, 2);
-        for (Object[] row : data) {
-            methodModel.addRow(row);
+        List<Object[]> data = thongKeBLL.getDoanhThuTheoPhuongThuc(methodFilter, timeFilter);
+        if (data != null && !data.isEmpty()) {
+            data = thongKeBLL.sortData(new ArrayList<>(data), sortOption, 2);
+            for (Object[] row : data) {
+                row[2] = df.format(row[2]); // Định dạng lại doanh thu
+                row[4] = df.format(row[4]); // Định dạng lại trung bình
+                methodModel.addRow(row);
+            }
         }
     }
 
-    private void updateEmployeeTable() {
+    private void updateEmployeeTable(String timeFilter) {
         employeeModel.setRowCount(0);
-        List<Object[]> data = thongKeBLL.getDoanhThuTheoNhanVien();
-        for (Object[] row : data) {
-            employeeModel.addRow(row);
+        List<Object[]> data = thongKeBLL.getDoanhThuTheoNhanVien(timeFilter);
+        if (data != null && !data.isEmpty()) {
+            for (Object[] row : data) {
+                row[3] = df.format(row[3]); // Định dạng lại doanh thu
+                row[5] = df.format(row[5]); // Định dạng lại trung bình
+                employeeModel.addRow(row);
+            }
+        }
+    }
+
+    private void updateHinhThucTable(String hinhThucFilter, String sortOption, String timeFilter) {
+        hinhThucModel.setRowCount(0);
+        List<Object[]> data = thongKeBLL.getDoanhThuTheoHinhThuc(hinhThucFilter, timeFilter);
+        if (data != null && !data.isEmpty()) {
+            data = thongKeBLL.sortData(new ArrayList<>(data), sortOption, 2);
+            for (Object[] row : data) {
+                row[2] = df.format(row[2]); // Định dạng lại doanh thu
+                row[4] = df.format(row[4]); // Định dạng lại trung bình
+                hinhThucModel.addRow(row);
+            }
         }
     }
 
@@ -231,9 +268,9 @@ public class ThongKePanel extends JPanel {
         statsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Cập nhật dữ liệu thực
-        int banChay = thongKeBLL.getSanPhamBanChay();
-        int banCham = thongKeBLL.getSanPhamBanCham();
-        long sapHetHang = thongKeBLL.getSanPhamSapHetHang();
+        int banChay = thongKeBLL.getSanPhamBanChay(selectedTimeFilter);
+        int banCham = thongKeBLL.getSanPhamBanCham(selectedTimeFilter);
+        long sapHetHang = thongKeBLL.getSanPhamSapHetHang(selectedTimeFilter);
 
         statsPanel.add(createStatBox("SẢN PHẨM BÁN CHẠY", String.valueOf(banChay), "sp"));
         statsPanel.add(createStatBox("SẢN PHẨM BÁN CHẬM", String.valueOf(banCham), "sp"));
@@ -251,8 +288,9 @@ public class ThongKePanel extends JPanel {
         setCenterRenderer(table);
 
         // Load dữ liệu sản phẩm
-        List<Object[]> sanPhamData = thongKeBLL.getThongKeSanPham();
+        List<Object[]> sanPhamData = thongKeBLL.getThongKeSanPham(selectedTimeFilter);
         for (Object[] row : sanPhamData) {
+            row[4] = df.format(row[4]); // Định dạng lại doanh thu
             sanPhamModel.addRow(row);
         }
 
@@ -277,7 +315,7 @@ public class ThongKePanel extends JPanel {
         statsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Cập nhật dữ liệu thực
-        Map<String, Integer> donHangStats = thongKeBLL.getThongKeDonHang();
+        Map<String, Integer> donHangStats = thongKeBLL.getThongKeDonHang(selectedTimeFilter);
         statsPanel.add(createStatBox("ĐANG XỬ LÝ", String.valueOf(donHangStats.get("Đang xử lý")), "đơn"));
         statsPanel.add(createStatBox("ĐÃ GIAO", String.valueOf(donHangStats.get("Đã giao")), "đơn"));
         statsPanel.add(createStatBox("ĐÃ HỦY", String.valueOf(donHangStats.get("Đã hủy")), "đơn"));
@@ -290,7 +328,7 @@ public class ThongKePanel extends JPanel {
         ratePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Cập nhật tỷ lệ
-        Map<String, String> tyLe = thongKeBLL.getTyLeDonHangOnline();
+        Map<String, String> tyLe = thongKeBLL.getTyLeDonHangOnline(selectedTimeFilter);
         ratePanel.add(createRateBox("TỶ LỆ ONLINE THÀNH CÔNG", tyLe.get("Thành công"), new Color(40, 167, 69)));
         ratePanel.add(createRateBox("TỶ LỆ ONLINE THẤT BẠI", tyLe.get("Thất bại"), new Color(220, 53, 69)));
 
@@ -310,9 +348,9 @@ public class ThongKePanel extends JPanel {
         statsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Cập nhật dữ liệu thực
-        double tongChiPhi = thongKeBLL.getTongChiPhiNhap();
-        int nhapNhieu = thongKeBLL.getSanPhamNhapNhieuNhat();
-        int nhapIt = thongKeBLL.getSanPhamNhapItNhat();
+        double tongChiPhi = thongKeBLL.getTongChiPhiNhap(selectedTimeFilter);
+        int nhapNhieu = thongKeBLL.getSanPhamNhapNhieuNhat(selectedTimeFilter);
+        int nhapIt = thongKeBLL.getSanPhamNhapItNhat(selectedTimeFilter);
 
         statsPanel.add(createStatBox("TỔNG CHI PHÍ", df.format(tongChiPhi), "VND"));
         statsPanel.add(createStatBox("NHẬP NHIỀU NHẤT", String.valueOf(nhapNhieu), "sp"));
@@ -333,8 +371,9 @@ public class ThongKePanel extends JPanel {
         setCenterRenderer(table);
 
         // Load dữ liệu nhập hàng
-        List<Object[]> nhapHangData = thongKeBLL.getThongKeNhapHang();
+        List<Object[]> nhapHangData = thongKeBLL.getThongKeNhapHang(selectedTimeFilter);
         for (Object[] row : nhapHangData) {
+            row[5] = df.format(row[5]); // Định dạng lại chi phí
             nhapHangModel.addRow(row);
         }
 
@@ -359,7 +398,7 @@ public class ThongKePanel extends JPanel {
         statsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         // Cập nhật dữ liệu thực
-        Map<String, String> loiNhuan = thongKeBLL.getThongKeLoiNhuan();
+        Map<String, String> loiNhuan = thongKeBLL.getThongKeLoiNhuan(selectedTimeFilter);
         statsPanel.add(createStatBox("TỔNG LỢI NHUẬN", loiNhuan.get("Tổng lợi nhuận"), ""));
         statsPanel.add(createStatBox("TỶ LỆ LỢI NHUẬN", loiNhuan.get("Tỷ lệ lợi nhuận"), ""));
 
@@ -421,7 +460,7 @@ public class ThongKePanel extends JPanel {
         }
     }
 
-    private void refreshData() {
+    private void updateData() {
         contentPanel.removeAll();
         createDoanhThuSection(contentPanel);
         createSanPhamSection(contentPanel);
@@ -430,6 +469,10 @@ public class ThongKePanel extends JPanel {
         createLoiNhuanSection(contentPanel);
         contentPanel.revalidate();
         contentPanel.repaint();
+    }
+
+    private void refreshData() {
+        updateData();
         JOptionPane.showMessageDialog(this, "Dữ liệu đã được làm mới!");
     }
 }

@@ -5,7 +5,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PhuKienGUI extends JPanel {
+public class AoThunGUI extends JPanel {
     private List<String> danhSachSanPham;
     private JPanel gridPanel;
     private JButton Prev, Next, btnGioHang;
@@ -16,7 +16,7 @@ public class PhuKienGUI extends JPanel {
     private int totalPrice = 0;
     private JFrame parentFrame;
 
-    public PhuKienGUI(JFrame parentFrame) {
+    public AoThunGUI(JFrame parentFrame) {
         super();
         this.parentFrame = parentFrame;
         setLayout(new BorderLayout());
@@ -25,7 +25,7 @@ public class PhuKienGUI extends JPanel {
         // Header
         JPanel headerPanel = new JPanel();
         headerPanel.setBackground(new Color(100, 200, 100));
-        JLabel titleLabel = new JLabel("PHỤ KIỆN", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("ÁO THUN", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         titleLabel.setForeground(Color.WHITE);
         headerPanel.add(titleLabel);
@@ -78,7 +78,7 @@ public class PhuKienGUI extends JPanel {
         loadSanPham();
     }
 
-    public PhuKienGUI() {
+    public AoThunGUI() {
         this(new JFrame());
     }
 
@@ -149,12 +149,12 @@ public class PhuKienGUI extends JPanel {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Danh Mục Phụ Kiện");
+            JFrame frame = new JFrame("Danh Mục Áo Thun");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(600, 500);
             frame.setLocationRelativeTo(null);
 
-            frame.add(new PhuKienGUI(frame));
+            frame.add(new AoThunGUI(frame));
             frame.setVisible(true);
         });
     }

@@ -29,34 +29,11 @@ public class ThongKeBLL {
     private PhuongThucThanhToanDAO phuongThucThanhToanDAO = new PhuongThucThanhToanDAO();
     private DecimalFormat df = new DecimalFormat("#,###");
     private SimpleDateFormat sdf = new SimpleDateFormat("MM/yyyy");
-
-    // Thống kê doanh thu theo tháng/năm
-    public List<Object[]> getDoanhThuTheoThoiGian(String thoiGian) {
-        List<DonHangDTO> donHangs = donHangDAO.selectAll();
-        Map<String, Double> doanhThuMap = new HashMap<>();
-        Map<String, Integer> soDonHangMap = new HashMap<>();
-
-        for (DonHangDTO donHang : donHangs) {
-            String key = sdf.format(donHang.getNgayDatHang());
-            if (thoiGian.equals("Năm " + key.split("/")[1]) || thoiGian.equals("Tháng " + key.split("/")[0])) {
-                doanhThuMap.merge(key, (double) donHang.getTongTien(), Double::sum);
-                soDonHangMap.merge(key, 1, Integer::sum);
-            }
-        }
-
-        List<Object[]> result = new ArrayList<>();
-        int stt = 1;
-        for (String key : doanhThuMap.keySet()) {
-            double doanhThu = doanhThuMap.get(key);
-            int soDonHang = soDonHangMap.get(key);
-            double trungBinh = soDonHang > 0 ? doanhThu / soDonHang : 0;
-            result.add(new Object[]{stt++, key, df.format(doanhThu), soDonHang, df.format(trungBinh)});
-        }
-        return result;
-    }
+    private SimpleDateFormat monthFormat = new SimpleDateFormat("MM");
+    private SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
 
     // Thống kê doanh thu theo phương thức thanh toán
-    public List<Object[]> getDoanhThuTheoPhuongThuc(String loaiThanhToan) {
+    public List<Object[]> getDoanhThuTheoPhuongThuc(String loaiThanhToan, String thoiGian) {
         List<PhuongThucThanhToanDTO> pttts = phuongThucThanhToanDAO.selectAll();
         List<DonHangDTO> donHangs = donHangDAO.selectAll();
         Map<String, Double> doanhThuMap = new HashMap<>();
@@ -66,7 +43,76 @@ public class ThongKeBLL {
             if (pttt.getLoaiThanhToan().equals(loaiThanhToan)) {
                 DonHangDTO donHang = donHangDAO.selectById(pttt.getIdDonHang());
                 if (donHang != null) {
-                    String key = loaiThanhToan;
+                    String keyMonth = monthFormat.format(donHang.getNgayDatHang());
+                    String keyYear = yearFormat.format(donHang.getNgayDatHang());
+                    boolean matchesTimeFilter = thoiGian == null || thoiGian.isEmpty() || 
+                        thoiGian.equals("Tháng " + keyMonth) || thoiGian.equals("Năm " + keyYear);
+                    if (matchesTimeFilter) {
+                        String key = loaiThanhToan;
+                        doanhThuMap.merge(key, (double) donHang.getTongTien(), Double::sum);
+                        soDonHangMap.merge(key, 1, Integer::sum);
+                    }
+                }
+            }
+        }
+
+        List<Object[]> result = new ArrayList<>();
+        int stt = 1;
+        for (String key : doanhThuMap.keySet()) {
+            double doanhThu = doanhThuMap.get(key);
+            int soDonHang = soDonHangMap.get(key);
+            double trungBinh = soDonHang > 0 ? doanhThu / soDonHang : 0;
+            result.add(new Object[]{stt++, key, doanhThu, soDonHang, trungBinh});
+        }
+        return result;
+    }
+
+    // Thống kê doanh thu theo nhân viên
+    public List<Object[]> getDoanhThuTheoNhanVien(String thoiGian) {
+        List<DonHangDTO> donHangs = donHangDAO.selectAll();
+        Map<String, Double> doanhThuMap = new HashMap<>();
+        Map<String, Integer> soDonHangMap = new HashMap<>();
+        Map<String, String> tenNhanVienMap = new HashMap<>();
+
+        for (DonHangDTO donHang : donHangs) {
+            String keyMonth = monthFormat.format(donHang.getNgayDatHang());
+            String keyYear = yearFormat.format(donHang.getNgayDatHang());
+            boolean matchesTimeFilter = thoiGian == null || thoiGian.isEmpty() || 
+                thoiGian.equals("Tháng " + keyMonth) || thoiGian.equals("Năm " + keyYear);
+            if (matchesTimeFilter) {
+                String idNhanVien = donHang.getIdNhanVien();
+                doanhThuMap.merge(idNhanVien, (double) donHang.getTongTien(), Double::sum);
+                soDonHangMap.merge(idNhanVien, 1, Integer::sum);
+                NhanVienDTO nhanVien = nhanVienDAO.selectById(idNhanVien);
+                tenNhanVienMap.put(idNhanVien, nhanVien != null ? nhanVien.getHoTenNV() : "NV " + idNhanVien);
+            }
+        }
+
+        List<Object[]> result = new ArrayList<>();
+        int stt = 1;
+        for (String idNhanVien : doanhThuMap.keySet()) {
+            double doanhThu = doanhThuMap.get(idNhanVien);
+            int soDonHang = soDonHangMap.get(idNhanVien);
+            double trungBinh = soDonHang > 0 ? doanhThu / soDonHang : 0;
+            result.add(new Object[]{stt++, idNhanVien, tenNhanVienMap.get(idNhanVien), doanhThu, soDonHang, trungBinh});
+        }
+        return result;
+    }
+
+    // Thống kê doanh thu theo hình thức mua hàng (Online/Trực tiếp)
+    public List<Object[]> getDoanhThuTheoHinhThuc(String hinhThuc, String thoiGian) {
+        List<DonHangDTO> donHangs = donHangDAO.selectAll();
+        Map<String, Double> doanhThuMap = new HashMap<>();
+        Map<String, Integer> soDonHangMap = new HashMap<>();
+
+        for (DonHangDTO donHang : donHangs) {
+            if (donHang.getHinhThucMuaHang().equals(hinhThuc)) {
+                String keyMonth = monthFormat.format(donHang.getNgayDatHang());
+                String keyYear = yearFormat.format(donHang.getNgayDatHang());
+                boolean matchesTimeFilter = thoiGian == null || thoiGian.isEmpty() || 
+                    thoiGian.equals("Tháng " + keyMonth) || thoiGian.equals("Năm " + keyYear);
+                if (matchesTimeFilter) {
+                    String key = hinhThuc;
                     doanhThuMap.merge(key, (double) donHang.getTongTien(), Double::sum);
                     soDonHangMap.merge(key, 1, Integer::sum);
                 }
@@ -79,49 +125,34 @@ public class ThongKeBLL {
             double doanhThu = doanhThuMap.get(key);
             int soDonHang = soDonHangMap.get(key);
             double trungBinh = soDonHang > 0 ? doanhThu / soDonHang : 0;
-            result.add(new Object[]{stt++, key, df.format(doanhThu), soDonHang, df.format(trungBinh)});
-        }
-        return result;
-    }
-
-    // Thống kê doanh thu theo nhân viên
-    public List<Object[]> getDoanhThuTheoNhanVien() {
-        List<DonHangDTO> donHangs = donHangDAO.selectAll();
-        Map<String, Double> doanhThuMap = new HashMap<>();
-        Map<String, Integer> soDonHangMap = new HashMap<>();
-        Map<String, String> tenNhanVienMap = new HashMap<>();
-
-        for (DonHangDTO donHang : donHangs) {
-            String idNhanVien = donHang.getIdNhanVien();
-            doanhThuMap.merge(idNhanVien, (double) donHang.getTongTien(), Double::sum);
-            soDonHangMap.merge(idNhanVien, 1, Integer::sum);
-            NhanVienDTO nhanVien = nhanVienDAO.selectById(idNhanVien);
-            tenNhanVienMap.put(idNhanVien, nhanVien != null ? nhanVien.getHoTenNV() : "NV " + idNhanVien);
-        }
-
-        List<Object[]> result = new ArrayList<>();
-        int stt = 1;
-        for (String idNhanVien : doanhThuMap.keySet()) {
-            double doanhThu = doanhThuMap.get(idNhanVien);
-            int soDonHang = soDonHangMap.get(idNhanVien);
-            double trungBinh = soDonHang > 0 ? doanhThu / soDonHang : 0;
-            result.add(new Object[]{stt++, idNhanVien, tenNhanVienMap.get(idNhanVien), df.format(doanhThu), soDonHang, df.format(trungBinh)});
+            result.add(new Object[]{stt++, key, doanhThu, soDonHang, trungBinh});
         }
         return result;
     }
 
     // Thống kê sản phẩm
-    public List<Object[]> getThongKeSanPham() {
+    public List<Object[]> getThongKeSanPham(String thoiGian) {
         List<ChiTietDonHangDTO> chiTiets = chiTietDonHangDAO.selectAll();
+        List<DonHangDTO> donHangs = donHangDAO.selectAll();
         Map<String, Integer> soLuongBanMap = new HashMap<>();
         Map<String, Double> doanhThuMap = new HashMap<>();
         Map<String, Integer> tonKhoMap = new HashMap<>();
         Map<String, String> tenSanPhamMap = new HashMap<>();
 
-        for (ChiTietDonHangDTO chiTiet : chiTiets) {
-            String idSanPham = chiTiet.getIdSanPham();
-            soLuongBanMap.merge(idSanPham, chiTiet.getSoLuong(), Integer::sum);
-            doanhThuMap.merge(idSanPham, chiTiet.getSoLuong() * (double) chiTiet.getGiaBan(), Double::sum);
+        for (DonHangDTO donHang : donHangs) {
+            String keyMonth = monthFormat.format(donHang.getNgayDatHang());
+            String keyYear = yearFormat.format(donHang.getNgayDatHang());
+            boolean matchesTimeFilter = thoiGian == null || thoiGian.isEmpty() || 
+                thoiGian.equals("Tháng " + keyMonth) || thoiGian.equals("Năm " + keyYear);
+            if (matchesTimeFilter) {
+                for (ChiTietDonHangDTO chiTiet : chiTiets) {
+                    if (chiTiet.getIdDonHang().equals(donHang.getIdDonHang())) {
+                        String idSanPham = chiTiet.getIdSanPham();
+                        soLuongBanMap.merge(idSanPham, chiTiet.getSoLuong(), Integer::sum);
+                        doanhThuMap.merge(idSanPham, chiTiet.getSoLuong() * (double) chiTiet.getGiaBan(), Double::sum);
+                    }
+                }
+            }
         }
 
         List<SanPhamDTO> sanPhams = sanPhamDAO.selectAll();
@@ -133,12 +164,13 @@ public class ThongKeBLL {
         List<Object[]> result = new ArrayList<>();
         int stt = 1;
         for (String idSanPham : soLuongBanMap.keySet()) {
+            double doanhThu = doanhThuMap.get(idSanPham);
             result.add(new Object[]{
                 stt++,
                 idSanPham,
                 tenSanPhamMap.getOrDefault(idSanPham, "SP " + idSanPham),
                 soLuongBanMap.get(idSanPham),
-                df.format(doanhThuMap.get(idSanPham)),
+                doanhThu,
                 tonKhoMap.getOrDefault(idSanPham, 0)
             });
         }
@@ -146,8 +178,8 @@ public class ThongKeBLL {
     }
 
     // Thống kê sản phẩm bán chạy
-    public int getSanPhamBanChay() {
-        List<Object[]> sanPhamData = getThongKeSanPham();
+    public int getSanPhamBanChay(String thoiGian) {
+        List<Object[]> sanPhamData = getThongKeSanPham(thoiGian);
         if (sanPhamData.isEmpty()) return 0;
         return (int) sanPhamData.stream()
             .max(Comparator.comparingInt(row -> (int) row[3]))
@@ -156,8 +188,8 @@ public class ThongKeBLL {
     }
 
     // Thống kê sản phẩm bán chậm
-    public int getSanPhamBanCham() {
-        List<Object[]> sanPhamData = getThongKeSanPham();
+    public int getSanPhamBanCham(String thoiGian) {
+        List<Object[]> sanPhamData = getThongKeSanPham(thoiGian);
         if (sanPhamData.isEmpty()) return 0;
         return (int) sanPhamData.stream()
             .min(Comparator.comparingInt(row -> (int) row[3]))
@@ -166,15 +198,15 @@ public class ThongKeBLL {
     }
 
     // Thống kê sản phẩm sắp hết hàng
-    public long getSanPhamSapHetHang() {
-        List<Object[]> sanPhamData = getThongKeSanPham();
+    public long getSanPhamSapHetHang(String thoiGian) {
+        List<Object[]> sanPhamData = getThongKeSanPham(thoiGian);
         return sanPhamData.stream()
             .filter(row -> (int) row[5] < 10)
             .count();
     }
 
     // Thống kê đơn hàng
-    public Map<String, Integer> getThongKeDonHang() {
+    public Map<String, Integer> getThongKeDonHang(String thoiGian) {
         List<DonHangDTO> donHangs = donHangDAO.selectAll();
         Map<String, Integer> result = new HashMap<>();
         result.put("Đang xử lý", 0);
@@ -182,29 +214,41 @@ public class ThongKeBLL {
         result.put("Đã hủy", 0);
 
         for (DonHangDTO donHang : donHangs) {
-            String trangThai = donHang.getTrangThai();
-            if (result.containsKey(trangThai)) {
-                result.merge(trangThai, 1, Integer::sum);
+            String keyMonth = monthFormat.format(donHang.getNgayDatHang());
+            String keyYear = yearFormat.format(donHang.getNgayDatHang());
+            boolean matchesTimeFilter = thoiGian == null || thoiGian.isEmpty() || 
+                thoiGian.equals("Tháng " + keyMonth) || thoiGian.equals("Năm " + keyYear);
+            if (matchesTimeFilter) {
+                String trangThai = donHang.getTrangThai();
+                if (result.containsKey(trangThai)) {
+                    result.merge(trangThai, 1, Integer::sum);
+                }
             }
         }
         return result;
     }
 
     // Tỷ lệ đơn hàng online
-    public Map<String, String> getTyLeDonHangOnline() {
+    public Map<String, String> getTyLeDonHangOnline(String thoiGian) {
         List<PhuongThucThanhToanDTO> pttts = phuongThucThanhToanDAO.selectAll();
         List<DonHangDTO> donHangs = donHangDAO.selectAll();
         int onlineThanhCong = 0, onlineThatBai = 0, totalOnline = 0;
 
         for (PhuongThucThanhToanDTO pttt : pttts) {
             if (pttt.getLoaiThanhToan().equals("Online")) {
-                totalOnline++;
                 DonHangDTO donHang = donHangDAO.selectById(pttt.getIdDonHang());
                 if (donHang != null) {
-                    if (donHang.getTrangThai().equals("Đã giao")) {
-                        onlineThanhCong++;
-                    } else if (donHang.getTrangThai().equals("Đã hủy")) {
-                        onlineThatBai++;
+                    String keyMonth = monthFormat.format(donHang.getNgayDatHang());
+                    String keyYear = yearFormat.format(donHang.getNgayDatHang());
+                    boolean matchesTimeFilter = thoiGian == null || thoiGian.isEmpty() || 
+                        thoiGian.equals("Tháng " + keyMonth) || thoiGian.equals("Năm " + keyYear);
+                    if (matchesTimeFilter) {
+                        totalOnline++;
+                        if (donHang.getTrangThai().equals("Đã giao")) {
+                            onlineThanhCong++;
+                        } else if (donHang.getTrangThai().equals("Đã hủy")) {
+                            onlineThatBai++;
+                        }
                     }
                 }
             }
@@ -220,7 +264,7 @@ public class ThongKeBLL {
     }
 
     // Thống kê nhập hàng
-    public List<Object[]> getThongKeNhapHang() {
+    public List<Object[]> getThongKeNhapHang(String thoiGian) {
         List<NhapHangDTO> nhapHangs = nhapHangDAO.selectAll();
         List<ChiTietNhapHangDTO> chiTiets = chiTietNhapHangDAO.selectAll();
         Map<String, Integer> soLuongNhapMap = new HashMap<>();
@@ -241,16 +285,23 @@ public class ThongKeBLL {
         List<Object[]> result = new ArrayList<>();
         int stt = 1;
         for (NhapHangDTO nhapHang : nhapHangs) {
-            for (ChiTietNhapHangDTO chiTiet : chiTietNhapHangDAO.selectAll()) {
-                if (chiTiet.getIdNhapHang().equals(nhapHang.getIdNhapHang())) {
-                    result.add(new Object[]{
-                        stt++,
-                        sdf.format(nhapHang.getNgayNhap()),
-                        chiTiet.getIdSanPham(),
-                        tenSanPhamMap.getOrDefault(chiTiet.getIdSanPham(), "SP " + chiTiet.getIdSanPham()),
-                        soLuongNhapMap.get(chiTiet.getIdSanPham()),
-                        df.format(chiPhiMap.get(chiTiet.getIdSanPham()))
-                    });
+            String keyMonth = monthFormat.format(nhapHang.getNgayNhap());
+            String keyYear = yearFormat.format(nhapHang.getNgayNhap());
+            boolean matchesTimeFilter = thoiGian == null || thoiGian.isEmpty() || 
+                thoiGian.equals("Tháng " + keyMonth) || thoiGian.equals("Năm " + keyYear);
+            if (matchesTimeFilter) {
+                for (ChiTietNhapHangDTO chiTiet : chiTietNhapHangDAO.selectAll()) {
+                    if (chiTiet.getIdNhapHang().equals(nhapHang.getIdNhapHang())) {
+                        double chiPhi = chiPhiMap.get(chiTiet.getIdSanPham());
+                        result.add(new Object[]{
+                            stt++,
+                            sdf.format(nhapHang.getNgayNhap()),
+                            chiTiet.getIdSanPham(),
+                            tenSanPhamMap.getOrDefault(chiTiet.getIdSanPham(), "SP " + chiTiet.getIdSanPham()),
+                            soLuongNhapMap.get(chiTiet.getIdSanPham()),
+                            chiPhi
+                        });
+                    }
                 }
             }
         }
@@ -258,14 +309,24 @@ public class ThongKeBLL {
     }
 
     // Tổng chi phí nhập hàng
-    public double getTongChiPhiNhap() {
+    public double getTongChiPhiNhap(String thoiGian) {
         List<NhapHangDTO> nhapHangs = nhapHangDAO.selectAll();
-        return nhapHangs.stream().mapToDouble(NhapHangDTO::getTongGiaTriNhap).sum();
+        double tongChiPhi = 0;
+        for (NhapHangDTO nhapHang : nhapHangs) {
+            String keyMonth = monthFormat.format(nhapHang.getNgayNhap());
+            String keyYear = yearFormat.format(nhapHang.getNgayNhap());
+            boolean matchesTimeFilter = thoiGian == null || thoiGian.isEmpty() || 
+                thoiGian.equals("Tháng " + keyMonth) || thoiGian.equals("Năm " + keyYear);
+            if (matchesTimeFilter) {
+                tongChiPhi += nhapHang.getTongGiaTriNhap();
+            }
+        }
+        return tongChiPhi;
     }
 
     // Sản phẩm nhập nhiều nhất
-    public int getSanPhamNhapNhieuNhat() {
-        List<Object[]> nhapHangData = getThongKeNhapHang();
+    public int getSanPhamNhapNhieuNhat(String thoiGian) {
+        List<Object[]> nhapHangData = getThongKeNhapHang(thoiGian);
         if (nhapHangData.isEmpty()) return 0;
         return (int) nhapHangData.stream()
             .max(Comparator.comparingInt(row -> (int) row[4]))
@@ -274,8 +335,8 @@ public class ThongKeBLL {
     }
 
     // Sản phẩm nhập ít nhất
-    public int getSanPhamNhapItNhat() {
-        List<Object[]> nhapHangData = getThongKeNhapHang();
+    public int getSanPhamNhapItNhat(String thoiGian) {
+        List<Object[]> nhapHangData = getThongKeNhapHang(thoiGian);
         if (nhapHangData.isEmpty()) return 0;
         return (int) nhapHangData.stream()
             .min(Comparator.comparingInt(row -> (int) row[4]))
@@ -284,12 +345,33 @@ public class ThongKeBLL {
     }
 
     // Thống kê lợi nhuận
-    public Map<String, String> getThongKeLoiNhuan() {
+    public Map<String, String> getThongKeLoiNhuan(String thoiGian) {
         List<DonHangDTO> donHangs = donHangDAO.selectAll();
         List<NhapHangDTO> nhapHangs = nhapHangDAO.selectAll();
 
-        double tongDoanhThu = donHangs.stream().mapToDouble(DonHangDTO::getTongTien).sum();
-        double tongChiPhi = nhapHangs.stream().mapToDouble(NhapHangDTO::getTongGiaTriNhap).sum();
+        double tongDoanhThu = 0;
+        double tongChiPhi = 0;
+
+        for (DonHangDTO donHang : donHangs) {
+            String keyMonth = monthFormat.format(donHang.getNgayDatHang());
+            String keyYear = yearFormat.format(donHang.getNgayDatHang());
+            boolean matchesTimeFilter = thoiGian == null || thoiGian.isEmpty() || 
+                thoiGian.equals("Tháng " + keyMonth) || thoiGian.equals("Năm " + keyYear);
+            if (matchesTimeFilter) {
+                tongDoanhThu += donHang.getTongTien();
+            }
+        }
+
+        for (NhapHangDTO nhapHang : nhapHangs) {
+            String keyMonth = monthFormat.format(nhapHang.getNgayNhap());
+            String keyYear = yearFormat.format(nhapHang.getNgayNhap());
+            boolean matchesTimeFilter = thoiGian == null || thoiGian.isEmpty() || 
+                thoiGian.equals("Tháng " + keyMonth) || thoiGian.equals("Năm " + keyYear);
+            if (matchesTimeFilter) {
+                tongChiPhi += nhapHang.getTongGiaTriNhap();
+            }
+        }
+
         double loiNhuan = tongDoanhThu - tongChiPhi;
         double tyLeLoiNhuan = tongDoanhThu > 0 ? (loiNhuan * 100.0 / tongDoanhThu) : 0;
 
@@ -301,24 +383,30 @@ public class ThongKeBLL {
 
     // Sắp xếp dữ liệu
     public List<Object[]> sortData(List<Object[]> data, String sortOption, int doanhThuIndex) {
-        if (sortOption.equals("Doanh thu tăng dần")) {
-            data.sort((a, b) -> {
-                String valA = (String) a[doanhThuIndex];
-                String valB = (String) b[doanhThuIndex];
-                return Integer.compare(
-                    Integer.parseInt(valA.replace(",", "")),
-                    Integer.parseInt(valB.replace(",", ""))
-                );
-            });
-        } else if (sortOption.equals("Doanh thu giảm dần")) {
-            data.sort((a, b) -> {
-                String valA = (String) a[doanhThuIndex];
-                String valB = (String) b[doanhThuIndex];
-                return Integer.compare(
-                    Integer.parseInt(valB.replace(",", "")),
-                    Integer.parseInt(valA.replace(",", ""))
-                );
-            });
+        if (data == null || data.isEmpty()) return data;
+
+        try {
+            if (sortOption.equals("Doanh thu tăng dần")) {
+                data.sort((a, b) -> {
+                    double numA = (double) a[doanhThuIndex];
+                    double numB = (double) b[doanhThuIndex];
+                    return Double.compare(numA, numB);
+                });
+            } else if (sortOption.equals("Doanh thu giảm dần")) {
+                data.sort((a, b) -> {
+                    double numA = (double) a[doanhThuIndex];
+                    double numB = (double) b[doanhThuIndex];
+                    return Double.compare(numB, numA);
+                });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Nếu có lỗi, giữ nguyên dữ liệu
+        }
+
+        // Cập nhật lại STT sau khi sắp xếp
+        for (int i = 0; i < data.size(); i++) {
+            data.get(i)[0] = i + 1;
         }
         return data;
     }

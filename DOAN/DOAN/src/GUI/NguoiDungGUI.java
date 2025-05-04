@@ -1,19 +1,29 @@
 package GUI;
 
+import BLL.DanhMucBLL;
+import DTO.DanhMucDTO;
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 public class NguoiDungGUI extends JFrame {
+
+    private JComboBox<String> categoryComboBox;
+    private DanhMucBLL danhMucBLL;
 
     public NguoiDungGUI() {
         setTitle("Fashion Store - Người Dùng");
         setSize(900, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // Cửa sổ hiển thị ở giữa màn hình
+        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        Color headerColor = new Color(160, 250, 160); // Header background
-        Color buttonColor = new Color(100, 200, 100); // Button background
+        // Khởi tạo DanhMucBLL và đăng ký GUI
+        danhMucBLL = new DanhMucBLL();
+        danhMucBLL.registerNguoiDungGUI(this);
+
+        Color headerColor = new Color(160, 250, 160);
+        Color buttonColor = new Color(100, 200, 100);
         Font buttonFont = new Font("Serif", Font.PLAIN, 18);
 
         // Header Panel
@@ -44,25 +54,23 @@ public class NguoiDungGUI extends JFrame {
 
             menuPanel.add(menuButton);
 
-            // Gắn action mẫu
             menuButton.addActionListener(e -> JOptionPane.showMessageDialog(this, "Bạn đã chọn: " + item));
         }
 
         // ComboBox sản phẩm
-        String[] categories = {"Chọn danh mục", "Quần Áo", "Giày Dép", "Phụ Kiện"};
-        JComboBox<String> categoryComboBox = new JComboBox<>(categories);
+        categoryComboBox = new JComboBox<>();
         categoryComboBox.setFont(new Font("Serif", Font.PLAIN, 16));
         categoryComboBox.setBackground(buttonColor);
         categoryComboBox.setForeground(Color.WHITE);
         categoryComboBox.setFocusable(false);
-
+        updateCategoryComboBox(); // Tải danh mục từ cơ sở dữ liệu
         menuPanel.add(categoryComboBox);
 
         categoryComboBox.addActionListener(e -> {
             String selected = (String) categoryComboBox.getSelectedItem();
-            if ("Quần Áo".equals(selected)) showQuanAoGUI();
-            else if ("Giày Dép".equals(selected)) showGiayDepGUI();
-            else if ("Phụ Kiện".equals(selected)) showPhuKienGUI();
+            if (selected != null && !selected.equals("Chọn danh mục")) {
+                showCategoryProducts(selected);
+            }
         });
 
         // Search Field and Buttons
@@ -89,30 +97,34 @@ public class NguoiDungGUI extends JFrame {
         add(menuPanel, BorderLayout.CENTER);
     }
 
-    private void showQuanAoGUI() {
-        JFrame frame = new JFrame("Danh Mục Quần Áo");
-        frame.setSize(600, 500);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        frame.add(new QuanAoGUI());
-        frame.setVisible(true);
+    // Cập nhật JComboBox với danh mục từ cơ sở dữ liệu
+    public void updateCategoryComboBox() {
+        categoryComboBox.removeAllItems();
+        categoryComboBox.addItem("Chọn danh mục");
+        ArrayList<DanhMucDTO> danhMucList = danhMucBLL.getAllDanhMuc();
+        for (DanhMucDTO dm : danhMucList) {
+            categoryComboBox.addItem(dm.getTenDanhMuc());
+        }
     }
 
-    private void showGiayDepGUI() {
-        JFrame frame = new JFrame("Danh Mục Giày Dép");
+    private void showCategoryProducts(String categoryName) {
+        JFrame frame = new JFrame("Danh Mục " + categoryName);
         frame.setSize(600, 500);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLocationRelativeTo(null);
-        frame.add(new GiayDepGUI());
-        frame.setVisible(true);
-    }
 
-    private void showPhuKienGUI() {
-        JFrame frame = new JFrame("Danh Mục Phụ Kiện");
-        frame.setSize(600, 500);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        frame.add(new PhuKienGUI());
+        // Tùy thuộc vào danh mục, hiển thị giao diện tương ứng
+        if (categoryName.equals("Quần jean")) {
+            frame.add(new QuanJeanGUI());
+        } else if (categoryName.equals("Quần short")) {
+            frame.add(new QuanShortGUI());
+        } else if (categoryName.equals("Áo thun")) {
+            frame.add(new AoThunGUI());
+        } else if (categoryName.equals("Áo khoác")) {
+            frame.add(new AoKhoacGUI());
+        } else if (categoryName.equals("Áo hoodie")) {
+            frame.add(new AoHoodieGUI());
+        }
         frame.setVisible(true);
     }
 
