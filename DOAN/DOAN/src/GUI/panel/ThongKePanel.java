@@ -85,7 +85,7 @@ public class ThongKePanel extends JPanel {
 
         // Main filter ComboBox
         controlPanel.add(new JLabel("Hiển thị theo:"));
-        JComboBox<String> cmbFilterType = new JComboBox<>(new String[]{"Tháng/Quý/Năm", "Phương thức thanh toán", "Nhân viên"});
+        JComboBox<String> cmbFilterType = new JComboBox<>(new String[]{"Tháng/Năm", "Phương thức thanh toán", "Nhân viên"});
         cmbFilterType.setPreferredSize(new Dimension(150, 25));
         controlPanel.add(cmbFilterType);
 
@@ -142,7 +142,7 @@ public class ThongKePanel extends JPanel {
             cmbSecondaryFilter.removeAllItems();
             cmbSecondaryFilter.setVisible(true);
 
-            if (selectedFilter.equals("Tháng/Quý/Năm")) {
+            if (selectedFilter.equals("Tháng/Năm")) {
                 String[] timeOptions = {
                     "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6",
                     "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12",
@@ -177,7 +177,7 @@ public class ThongKePanel extends JPanel {
             } else {
                 String secondaryFilter = (String) cmbSecondaryFilter.getSelectedItem();
                 if (secondaryFilter != null) {
-                    if (filterType.equals("Tháng/Quý/Năm")) {
+                    if (filterType.equals("Tháng/Năm")) {
                         updateTimeTable(secondaryFilter, sortOption);
                         table.setModel(timeModel);
                     } else if (filterType.equals("Phương thức thanh toán")) {
