@@ -12,11 +12,19 @@ import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class NhapHangPanel extends JPanel {
     private JTable nhapHangTable;
@@ -101,6 +109,10 @@ public class NhapHangPanel extends JPanel {
         JButton btnReset = new JButton("Làm mới");
         btnReset.setBackground(new Color(240, 240, 240));
         searchPanel.add(btnReset);
+        
+        JButton btnExportExcel = new JButton("Xuất Excel");
+        btnReset.setBackground(new Color(240, 240, 240));
+        searchPanel.add(btnExportExcel);
 
         topPanel.add(searchPanel, BorderLayout.EAST);
 
@@ -146,6 +158,7 @@ public class NhapHangPanel extends JPanel {
         btnAdd.addActionListener(e -> addNhapHang());
         btnDelete.addActionListener(e -> deleteNhapHang(nhapHangTable.getSelectedRow()));
         btnEdit.addActionListener(e -> editNhapHang(nhapHangTable.getSelectedRow()));
+        btnExportExcel.addActionListener(e -> exportNhapHangToExcel());
 
         txtSearch.addKeyListener(new KeyAdapter() {
             @Override
@@ -693,4 +706,53 @@ public class NhapHangPanel extends JPanel {
 
         editDialog.setVisible(true);
     }
+    
+    private void exportNhapHangToExcel() {
+    JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Chọn nơi lưu file Excel");
+    fileChooser.setFileFilter(new FileNameExtensionFilter("Excel Files", "xlsx"));
+
+    int userSelection = fileChooser.showSaveDialog(this);
+
+    if (userSelection == JFileChooser.APPROVE_OPTION) {
+        String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+        if (!filePath.endsWith(".xlsx")) {
+            filePath += ".xlsx"; // đảm bảo có đuôi .xlsx
+        }
+
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("HoaDon");
+
+            // Tạo dòng header
+            Row headerRow = sheet.createRow(0);
+            for (int col = 0; col < nhapHangTable.getColumnCount(); col++) {
+                Cell cell = headerRow.createCell(col);
+                cell.setCellValue(nhapHangTable.getColumnName(col));
+            }
+
+            // Ghi dữ liệu các dòng
+            for (int row = 0; row < nhapHangTable.getRowCount(); row++) {
+                Row excelRow = sheet.createRow(row + 1); // +1 vì dòng 0 đã là header
+                for (int col = 0; col < nhapHangTable.getColumnCount(); col++) {
+                    Cell cell = excelRow.createCell(col);
+                    Object value = nhapHangTable.getValueAt(row, col);
+                    if (value != null) {
+                        cell.setCellValue(value.toString());
+                    }
+                }
+            }
+
+            // Ghi file ra đĩa
+            try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
+                workbook.write(fileOut);
+            }
+
+            JOptionPane.showMessageDialog(this, "Xuất file Excel thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Xuất file thất bại: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}
 }

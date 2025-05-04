@@ -149,7 +149,7 @@ public class GioHangGUI extends JFrame {
 
                 // Lấy ID nhân viên admin
                 NhanVienDAO nhanVienDAO = new NhanVienDAO();
-                String idNhanVien = "NV001"; // chỉ có admin duyệt hóa đơn
+                String idNhanVien = "NV001";
 
                 // Tạo đơn hàng
                 DonHangDTO donHang = new DonHangDTO();
@@ -157,7 +157,7 @@ public class GioHangGUI extends JFrame {
                 donHang.setIdNhanVien(idNhanVien);
                 donHang.setTongTien(totalPrice);
                 donHang.setNgayDatHang(new Timestamp(System.currentTimeMillis()));
-                donHang.setTrangThai("Đã thanh toán");
+                donHang.setTrangThai("Đang xử lý");
                 donHang.setHinhThucMuaHang(hinhThucThanhToan);
                 donHang.setDiaDiemGiao(diaChi);
 
