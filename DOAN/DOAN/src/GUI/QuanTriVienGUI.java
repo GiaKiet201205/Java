@@ -12,6 +12,7 @@ public class QuanTriVienGUI extends JFrame {
     private JButton btnNhapHang, btnChiTietNhapHang, btnNhanVien, btnKhachHang;
     private JButton btnDanhMuc, btnPhuongThucTT, btnThongKe, btnHome;
     private CardLayout cardLayout;
+    private final TrangChuGUI trangChuGUI; // Thêm tham chiếu đến TrangChuGUI
 
     // Các panel từ package GUI.panel
     private SanPhamPanel sanPhamPanel;
@@ -30,7 +31,8 @@ public class QuanTriVienGUI extends JFrame {
     private Font titleFont = new Font("Arial", Font.BOLD, 24);
     private Font menuItemFont = new Font("Arial", Font.PLAIN, 16);
 
-    public QuanTriVienGUI() {
+    public QuanTriVienGUI(TrangChuGUI trangChuGUI) {
+        this.trangChuGUI = trangChuGUI; // Lưu trữ tham chiếu đến TrangChuGUI
         setTitle("Quản Trị Viên");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1000, 600);
@@ -49,7 +51,7 @@ public class QuanTriVienGUI extends JFrame {
         mainPanel.add(contentPanel, BorderLayout.CENTER);
 
         // Khởi tạo các panel
-        sanPhamPanel = new SanPhamPanel();
+        sanPhamPanel = new SanPhamPanel(trangChuGUI); // Truyền trangChuGUI vào SanPhamPanel
         nhaCungCapPanel = new NhaCungCapPanel();
         hoaDonPanel = new HoaDonPanel();
         chiTietHoaDonPanel = new ChiTietHoaDonPanel();
@@ -68,7 +70,7 @@ public class QuanTriVienGUI extends JFrame {
         contentPanel.add(chiTietHoaDonPanel, "ChiTietHoaDon");
         contentPanel.add(nhapHangPanel, "NhapHang");
         contentPanel.add(chiTietNhapHangPanel, "ChiTietNhapHang");
-        contentPanel.add(nhanVienPanel, "NhanVien");    
+        contentPanel.add(nhanVienPanel, "NhanVien");
         contentPanel.add(khachHangPanel, "KhachHang");
         contentPanel.add(danhMucPanel, "DanhMuc");
         contentPanel.add(phuongThucTTPanel, "PhuongThucTT");
@@ -146,7 +148,11 @@ public class QuanTriVienGUI extends JFrame {
         btnDanhMuc.addActionListener(e -> cardLayout.show(contentPanel, "DanhMuc"));
         btnPhuongThucTT.addActionListener(e -> cardLayout.show(contentPanel, "PhuongThucTT"));
         btnThongKe.addActionListener(e -> cardLayout.show(contentPanel, "ThongKe"));
-        btnHome.addActionListener(e -> cardLayout.show(contentPanel, "SanPham"));
+        btnHome.addActionListener(e -> {
+            // Ẩn QuanTriVienGUI và hiển thị lại TrangChuGUI
+            setVisible(false);
+            trangChuGUI.setVisible(true);
+        });
     }
 
     private JButton createMenuButton(String text) {
@@ -190,7 +196,8 @@ public class QuanTriVienGUI extends JFrame {
         }
 
         SwingUtilities.invokeLater(() -> {
-            QuanTriVienGUI gui = new QuanTriVienGUI();
+            TrangChuGUI trangChuGUI = new TrangChuGUI();
+            QuanTriVienGUI gui = new QuanTriVienGUI(trangChuGUI);
             gui.setVisible(true);
         });
     }

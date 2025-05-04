@@ -2,13 +2,28 @@ package GUI;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.ActionEvent;
 import java.net.URL;
+
+class BackgroundPanel extends JPanel {
+    private final Image backgroundImage;
+
+    public BackgroundPanel(String imagePath) {
+        backgroundImage = new ImageIcon(getClass().getResource(imagePath)).getImage();
+        if (backgroundImage == null) {
+            System.out.println("Lỗi: Không tìm thấy ảnh nền!");
+        }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+    }
+}
 
 public class DangKiGUI extends JFrame {
 
-    // Tham chiếu đến Trang Chủ
     public DangKiGUI(TrangChuGUI trangChu) {
 
         setTitle("Đăng Kí");
@@ -40,7 +55,7 @@ public class DangKiGUI extends JFrame {
                 }
             });
         } else {
-            System.err.println("");
+            System.err.println("Không tìm thấy ảnh logo.");
         }
 
         // Panel phải - form đăng ký
@@ -97,9 +112,9 @@ public class DangKiGUI extends JFrame {
         registerButton.setBorder(BorderFactory.createLineBorder(new Color(0, 150, 0), 2));
         registerButton.setPreferredSize(new Dimension(109, 30));
         rightPanel.add(registerButton, gbc);
-        
+
         // Xử lý nút Đăng ký
-        registerButton.addActionListener((var e) -> {
+        registerButton.addActionListener((ActionEvent e) -> {
             String fullName = fullNameField.getText();
             String username = usernameField.getText();
             String password = new String(passwordField.getPassword());
@@ -108,12 +123,10 @@ public class DangKiGUI extends JFrame {
             if (fullName.isEmpty() || username.isEmpty() || password.isEmpty() || phone.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin!", "Thông báo", JOptionPane.WARNING_MESSAGE);
                 return;
-               }
+            }
 
             JOptionPane.showMessageDialog(null, "Đăng ký thành công! Mời bạn đăng nhập.");
-
-            DangNhapGUI dangNhapGUI = new DangNhapGUI(); // Truyền lại trang chủ
-            dangNhapGUI.setVisible(true);
+            new DangNhapGUI(trangChu).setVisible(true); // Gọi đúng DangNhapGUI
             dispose();
         });
 
@@ -123,8 +136,8 @@ public class DangKiGUI extends JFrame {
     }
 
     public static void main(String[] args) {
-    SwingUtilities.invokeLater(() -> {
-        new DangKiGUI(null).setVisible(true);
-    });
-}
+        SwingUtilities.invokeLater(() -> {
+            new DangKiGUI(null).setVisible(true);
+        });
+    }
 }
