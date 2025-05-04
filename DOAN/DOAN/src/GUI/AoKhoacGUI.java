@@ -5,7 +5,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GiayDepGUI extends JPanel {
+public class AoKhoacGUI extends JPanel {
     private List<String> danhSachSanPham;
     private JPanel gridPanel;
     private JButton Prev, Next, btnGioHang;
@@ -16,16 +16,16 @@ public class GiayDepGUI extends JPanel {
     private int totalPrice = 0;
     private JFrame parentFrame;
 
-    public GiayDepGUI(JFrame parentFrame) {
+    public AoKhoacGUI(JFrame parentFrame) {
         super();
         this.parentFrame = parentFrame;
         setLayout(new BorderLayout());
-        danhSachSanPham = getDanhSachGiayDep();
+        danhSachSanPham = getDanhSachPhuKien();
 
         // Header
         JPanel headerPanel = new JPanel();
         headerPanel.setBackground(new Color(100, 200, 100));
-        JLabel titleLabel = new JLabel("GIÀY DÉP", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("ÁO KHOÁC", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         titleLabel.setForeground(Color.WHITE);
         headerPanel.add(titleLabel);
@@ -61,7 +61,7 @@ public class GiayDepGUI extends JPanel {
             }
         });
 
-        // Nút Giỏ Hàng
+        // Nút giỏ hàng
         btnGioHang = new JButton("🛒");
         btnGioHang.setBackground(new Color(100, 200, 100));
         btnGioHang.setForeground(Color.WHITE);
@@ -78,8 +78,8 @@ public class GiayDepGUI extends JPanel {
         loadSanPham();
     }
 
-    public GiayDepGUI() {
-        this(new JFrame()); // Nếu chưa có frame thì tạo tạm
+    public AoKhoacGUI() {
+        this(new JFrame());
     }
 
     private void loadSanPham() {
@@ -128,11 +128,12 @@ public class GiayDepGUI extends JPanel {
         return (int) Math.ceil((double) danhSachSanPham.size() / itemsPerPage);
     }
 
-    private List<String> getDanhSachGiayDep() {
+    private List<String> getDanhSachPhuKien() {
         List<String> list = new ArrayList<>();
         for (int i = 1; i <= 20; i++) {
-            list.add("Giày " + i + " - 300000");
-            list.add("Dép " + i + " - 200000");
+            list.add("Mũ " + i + " - 50000");
+            list.add("Túi " + i + " - 100000");
+            list.add("Kính " + i + " - 120000");
         }
         return list;
     }
@@ -148,12 +149,12 @@ public class GiayDepGUI extends JPanel {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Danh Mục Giày Dép");
+            JFrame frame = new JFrame("Danh Mục Áo Khoác");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(600, 500);
             frame.setLocationRelativeTo(null);
 
-            frame.add(new GiayDepGUI(frame));
+            frame.add(new AoThunGUI(frame));
             frame.setVisible(true);
         });
     }

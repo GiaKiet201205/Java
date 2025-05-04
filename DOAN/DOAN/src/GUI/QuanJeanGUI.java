@@ -5,7 +5,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class QuanAoGUI extends JPanel {
+public class QuanJeanGUI extends JPanel {
     private List<String> danhSachSanPham;
     private JPanel gridPanel;
     private JButton Prev, Next, btnGioHang;
@@ -16,7 +16,7 @@ public class QuanAoGUI extends JPanel {
     private int totalPrice = 0;
     private JFrame parentFrame;
 
-    public QuanAoGUI(JFrame parentFrame) {
+    public QuanJeanGUI(JFrame parentFrame) {
         super();
         this.parentFrame = parentFrame;
         setLayout(new BorderLayout());
@@ -25,7 +25,7 @@ public class QuanAoGUI extends JPanel {
         // Header
         JPanel headerPanel = new JPanel();
         headerPanel.setBackground(new Color(100, 200, 100));
-        JLabel titleLabel = new JLabel("QUẦN ÁO", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("QUẦN JEAN", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         titleLabel.setForeground(Color.WHITE);
         headerPanel.add(titleLabel);
@@ -66,7 +66,7 @@ public class QuanAoGUI extends JPanel {
         btnGioHang.setBackground(new Color(100, 200, 100));
         btnGioHang.setForeground(Color.WHITE);
         btnGioHang.addActionListener(e -> {
-            // Mở giao diện Giỏ Hàng mà không đóng giao diện QuanAoGUI
+            // Mở giao diện Giỏ Hàng mà không đóng giao diện QuanJeanGUI
             new GioHangGUI(cart, totalPrice).setVisible(true);
         });
 
@@ -78,7 +78,7 @@ public class QuanAoGUI extends JPanel {
 
         loadSanPham();
     }
-    public QuanAoGUI() {
+    public QuanJeanGUI() {
     this(new JFrame()); // Tạo tạm 1 JFrame nếu chưa có
 }
 
@@ -148,12 +148,12 @@ public class QuanAoGUI extends JPanel {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Danh Mục Quần Áo");
+            JFrame frame = new JFrame("Danh Mục Quần JEAN");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setSize(600, 500);
             frame.setLocationRelativeTo(null);
 
-            frame.add(new QuanAoGUI(frame));
+            frame.add(new QuanJeanGUI(frame));
             frame.setVisible(true);
         });
     }

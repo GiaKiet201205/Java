@@ -1,15 +1,38 @@
 package GUI;
 
+import BLL.TaiKhoanBLL;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.net.URL;
+
+class BackgroundPanel extends JPanel {
+    private final Image backgroundImage;
+
+    public BackgroundPanel(String imagePath) {
+        backgroundImage = new ImageIcon(getClass().getResource(imagePath)).getImage();
+        if (backgroundImage == null) {
+            System.out.println("Lỗi: Không tìm thấy ảnh nền!");
+        }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+    }
+}
 
 public class DangKiGUI extends JFrame {
 
-    // Tham chiếu đến Trang Chủ
+    private final TrangChuGUI trangChu;
+
     public DangKiGUI(TrangChuGUI trangChu) {
+        this.trangChu = trangChu;
 
         setTitle("Đăng Kí");
         setSize(600, 400);
@@ -40,7 +63,7 @@ public class DangKiGUI extends JFrame {
                 }
             });
         } else {
-            System.err.println("");
+            System.err.println("Không tìm thấy ảnh logo.");
         }
 
         // Panel phải - form đăng ký
@@ -59,13 +82,6 @@ public class DangKiGUI extends JFrame {
 
         gbc.gridwidth = 1;
         gbc.gridy++;
-        rightPanel.add(new JLabel("Họ và tên"), gbc);
-        gbc.gridx = 1;
-        JTextField fullNameField = new JTextField(15);
-        rightPanel.add(fullNameField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy++;
         rightPanel.add(new JLabel("Tên đăng nhập"), gbc);
         gbc.gridx = 1;
         JTextField usernameField = new JTextField(15);
@@ -77,13 +93,6 @@ public class DangKiGUI extends JFrame {
         gbc.gridx = 1;
         JPasswordField passwordField = new JPasswordField(15);
         rightPanel.add(passwordField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-        rightPanel.add(new JLabel("Số điện thoại"), gbc);
-        gbc.gridx = 1;
-        JTextField phoneField = new JTextField(15);
-        rightPanel.add(phoneField, gbc);
 
         // Nút đăng ký
         gbc.gridx = 0;
@@ -97,24 +106,28 @@ public class DangKiGUI extends JFrame {
         registerButton.setBorder(BorderFactory.createLineBorder(new Color(0, 150, 0), 2));
         registerButton.setPreferredSize(new Dimension(109, 30));
         rightPanel.add(registerButton, gbc);
-        
+
         // Xử lý nút Đăng ký
-        registerButton.addActionListener((var e) -> {
-            String fullName = fullNameField.getText();
+        registerButton.addActionListener((ActionEvent e) -> {
             String username = usernameField.getText();
             String password = new String(passwordField.getPassword());
-            String phone = phoneField.getText();
 
-            if (fullName.isEmpty() || username.isEmpty() || password.isEmpty() || phone.isEmpty()) {
+            if (username.isEmpty() || password.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin!", "Thông báo", JOptionPane.WARNING_MESSAGE);
                 return;
-               }
+            }
 
-            JOptionPane.showMessageDialog(null, "Đăng ký thành công! Mời bạn đăng nhập.");
+            TaiKhoanBLL taiKhoanBLL = new TaiKhoanBLL();
+            boolean success = taiKhoanBLL.register(username, password);
 
-            DangNhapGUI dangNhapGUI = new DangNhapGUI(); // Truyền lại trang chủ
-            dangNhapGUI.setVisible(true);
-            dispose();
+            if (success) {
+                JOptionPane.showMessageDialog(null, "Đăng ký thành công! Mời bạn đăng nhập.");
+                new DangNhapGUI(trangChu).setVisible(true);
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(null, "Đăng ký thất bại! Tên đăng nhập đã tồn tại.", 
+                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         backgroundPanel.add(leftPanel, BorderLayout.WEST);
@@ -123,8 +136,8 @@ public class DangKiGUI extends JFrame {
     }
 
     public static void main(String[] args) {
-    SwingUtilities.invokeLater(() -> {
-        new DangKiGUI(null).setVisible(true);
-    });
-}
+        SwingUtilities.invokeLater(() -> {
+            new DangKiGUI(null).setVisible(true);
+        });
+    }
 }

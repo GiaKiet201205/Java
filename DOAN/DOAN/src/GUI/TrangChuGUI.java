@@ -1,17 +1,29 @@
 package GUI;
 
-import BLL.TaiKhoanBLL;
+import BLL.DanhMucBLL;
+import DAO.SanPhamDAO;
+import DTO.DanhMucDTO;
+import DTO.SanPhamDTO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.Arrays;
+import java.util.ArrayList;
 
 public class TrangChuGUI extends JFrame {
+    
+    private JPanel productDisplayPanel;
+    private JComboBox<String> categoryComboBox;
+    private DanhMucBLL danhMucBLL;
+
     public TrangChuGUI() {
         setTitle("Fashion Store");
         setSize(900, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+
+        // Khởi tạo DanhMucBLL và đăng ký GUI
+        danhMucBLL = new DanhMucBLL();
+        danhMucBLL.registerTrangChuGUI(this);
 
         // Panel Header
         JPanel headerPanel = new JPanel(new BorderLayout());
@@ -47,16 +59,14 @@ public class TrangChuGUI extends JFrame {
         authPanel.add(registerButton);
 
         // Liên kết giao diện đăng nhập
-        TaiKhoanBLL taiKhoanBLL = new TaiKhoanBLL();
-        loginButton.addActionListener((ActionEvent e) -> {
-            taiKhoanBLL.showLoginForm(this);
+        loginButton.addActionListener(e -> {
+            new DangNhapGUI(this).setVisible(true);
         });
 
         // Liên kết giao diện đăng ký
         registerButton.addActionListener((ActionEvent e) -> {
-            setVisible(false); // Ẩn TrangChuGUI tạm thời
-            DangKiGUI dangki = new DangKiGUI(TrangChuGUI.this); // Tạo đối tượng đăng ký
-            dangki.setVisible(true); // Hiển thị giao diện đăng ký
+            DangKiGUI dangki = new DangKiGUI(TrangChuGUI.this);
+            dangki.setVisible(true);
         });
 
         // Header Layout
@@ -88,18 +98,18 @@ public class TrangChuGUI extends JFrame {
         }
 
         // ComboBox sản phẩm
-        String[] categories = {"Chọn danh mục", "Quần Áo", "Giày Dép", "Phụ Kiện"};
-        JComboBox<String> categoryComboBox = new JComboBox<>(categories);
+        categoryComboBox = new JComboBox<>();
         categoryComboBox.setFont(new Font("Serif", Font.PLAIN, 16));
         categoryComboBox.setBackground(new Color(100, 200, 100));
         categoryComboBox.setForeground(Color.WHITE);
+        updateCategoryComboBox(); // Tải danh mục từ cơ sở dữ liệu
         menuPanel.add(categoryComboBox);
 
         categoryComboBox.addActionListener(e -> {
             String selected = (String) categoryComboBox.getSelectedItem();
-            if ("Quần Áo".equals(selected)) showQuanAoGUI();
-            else if ("Giày Dép".equals(selected)) showGiayDepGUI();
-            else if ("Phụ Kiện".equals(selected)) showPhuKienGUI();
+            if (selected != null && !selected.equals("Chọn danh mục")) {
+                showCategoryProducts(selected);
+            }
         });
 
         // Search & Cart
@@ -115,84 +125,50 @@ public class TrangChuGUI extends JFrame {
         menuPanel.add(searchButton);
         menuPanel.add(cartButton);
 
-        // Xử lý sự kiện nút giỏ hàng
-        cartButton.addActionListener((ActionEvent e) -> {
-            // Sample products for demonstration
-            java.util.List<String> products = Arrays.asList("Áo Polo Nam - 150000đ", "Quần Jean - 300000đ");
-            int totalPrice = 450000;
-            new GioHangGUI(products, totalPrice).setVisible(true);
-        });
+        // Thêm menuPanel vào một panel trung gian để tránh ghi đè
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.add(headerPanel, BorderLayout.NORTH);
+        topPanel.add(menuPanel, BorderLayout.CENTER);
+        add(topPanel, BorderLayout.NORTH);
 
-        // Add menuPanel vào center MỘT lần
-        add(menuPanel, BorderLayout.CENTER);
+        // Product Display Panel
+        productDisplayPanel = new JPanel(new GridLayout(0, 4, 10, 10));
+        productDisplayPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JScrollPane scrollPane = new JScrollPane(productDisplayPanel);
+        add(scrollPane, BorderLayout.CENTER);
 
-        // Product Panel
-        JPanel productPanel = new JPanel();
-        productPanel.setLayout(new BoxLayout(productPanel, BoxLayout.Y_AXIS));
-        productPanel.setBackground(Color.WHITE);
-        productPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        loadProducts();
+    }
 
-        JLabel productTitle = new JLabel("Các sản phẩm mẫu", SwingConstants.CENTER);
-        productTitle.setFont(new Font("Serif", Font.BOLD, 20));
-        productTitle.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-        productPanel.add(productTitle);
-
-        JPanel productContainer = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 15));
-        productContainer.setBackground(Color.WHITE);
-
-        String[] imagePaths = {"/images/aopolo.png", "/images/aopolo.png", "/images/aopolo.png"};
-        String[] titles = {"Áo Polo Nam", "Áo Polo Nam", "Áo Polo Nam"};
-
-        for (int i = 0; i < imagePaths.length; i++) {
-            java.net.URL imageUrl = getClass().getResource(imagePaths[i]);
-            if (imageUrl != null) {
-                ImageIcon icon = new ImageIcon(imageUrl);
-                Image scaledImage = icon.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
-                ImageIcon resizedIcon = new ImageIcon(scaledImage);
-                JLabel productLabel = new JLabel(resizedIcon);
-
-                JLabel titleLabel = new JLabel(titles[i], SwingConstants.CENTER);
-                titleLabel.setFont(new Font("Serif", Font.BOLD, 16));
-
-                JPanel itemPanel = new JPanel(new BorderLayout());
-                itemPanel.setBackground(Color.WHITE);
-                itemPanel.add(titleLabel, BorderLayout.NORTH);
-                itemPanel.add(productLabel, BorderLayout.CENTER);
-
-                productContainer.add(itemPanel);
-            } else {
-                System.out.println("Không tìm thấy ảnh: " + imagePaths[i]);
-            }
+    // Cập nhật JComboBox với danh mục từ cơ sở dữ liệu
+    public void updateCategoryComboBox() {
+        categoryComboBox.removeAllItems();
+        categoryComboBox.addItem("Chọn danh mục");
+        ArrayList<DanhMucDTO> danhMucList = danhMucBLL.getAllDanhMuc();
+        for (DanhMucDTO dm : danhMucList) {
+            categoryComboBox.addItem(dm.getTenDanhMuc());
         }
-
-        productPanel.add(productContainer);
-        add(productPanel, BorderLayout.SOUTH);
     }
 
-    private void showQuanAoGUI() {
-        JFrame frame = new JFrame("Danh Mục Quần Áo");
+    private void showCategoryProducts(String categoryName) {
+        JFrame frame = new JFrame("Danh Mục " + categoryName);
         frame.setSize(600, 500);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLocationRelativeTo(null);
-        frame.add(new QuanAoGUI());
-        frame.setVisible(true);
-    }
 
-    private void showGiayDepGUI() {
-        JFrame frame = new JFrame("Danh Mục Giày Dép");
-        frame.setSize(600, 500);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        frame.add(new GiayDepGUI());
-        frame.setVisible(true);
-    }
-
-    private void showPhuKienGUI() {
-        JFrame frame = new JFrame("Danh Mục Phụ Kiện");
-        frame.setSize(600, 500);
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setLocationRelativeTo(null);
-        frame.add(new PhuKienGUI());
+        // Tùy thuộc vào danh mục, hiển thị giao diện tương ứng
+        if (categoryName.equals("Quần jean")) {
+            frame.add(new QuanJeanGUI());
+        } else if (categoryName.equals("Quần short")) {
+            frame.add(new QuanShortGUI());
+        } else if (categoryName.equals("Áo thun")) {
+            frame.add(new AoThunGUI());
+        } else if (categoryName.equals("Áo khoác")) {
+            frame.add(new QuanJeanGUI());
+        } else if (categoryName.equals("Áo hoodie")) {
+            frame.add(new AoThunGUI());
+        }
+        // Có thể thêm logic để hiển thị sản phẩm theo danh mục từ cơ sở dữ liệu
         frame.setVisible(true);
     }
 
@@ -202,6 +178,83 @@ public class TrangChuGUI extends JFrame {
 
     private void showCSKHContent() {
         JOptionPane.showMessageDialog(this, "Bạn có thể liên lạc với chúng tôi qua DISCORD:java");
+    }
+
+    // Hàm xử lý sau khi đăng nhập thành công
+    public void onLoginSuccess(String vaiTro) {
+        setVisible(false); // Ẩn TrangChuGUI
+        if ("admin".equalsIgnoreCase(vaiTro)) {
+            QuanTriVienGUI quanTriVienGUI = new QuanTriVienGUI(this);
+            quanTriVienGUI.setVisible(true);
+        } else {
+            NguoiDungGUI nguoiDungGUI = new NguoiDungGUI();
+            nguoiDungGUI.setVisible(true);
+        }
+    }
+
+    private void loadProducts() {
+        SanPhamDAO dao = new SanPhamDAO();
+        ArrayList<SanPhamDTO> productList = dao.selectAll();
+        productDisplayPanel.removeAll();
+
+        for (SanPhamDTO sp : productList) {
+            if (sp.getSoLuongTonKho() > 0) {
+                addProductToView(sp);
+            }
+        }
+
+        productDisplayPanel.revalidate();
+        productDisplayPanel.repaint();
+    }
+
+    public void addProductToView(SanPhamDTO sp) {
+        JPanel productPanel = new JPanel(new BorderLayout());
+        productPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+        productPanel.putClientProperty("idSanPham", sp.getIdSanPham()); // Lưu ID sản phẩm
+
+        JLabel imageLabel;
+        try {
+            if (sp.getHinhAnh() != null && !sp.getHinhAnh().isEmpty()) {
+                ImageIcon icon = new ImageIcon(sp.getHinhAnh());
+                if (icon.getImageLoadStatus() == java.awt.MediaTracker.COMPLETE) {
+                    Image scaledImage = icon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+                    imageLabel = new JLabel(new ImageIcon(scaledImage));
+                } else {
+                    imageLabel = new JLabel("Invalid Image", SwingConstants.CENTER);
+                }
+            } else {
+                imageLabel = new JLabel("No Image", SwingConstants.CENTER);
+            }
+        } catch (Exception e) {
+            imageLabel = new JLabel("Error Loading Image", SwingConstants.CENTER);
+            e.printStackTrace();
+        }
+
+        JLabel nameLabel = new JLabel(sp.getTenSanPham(), SwingConstants.CENTER);
+        nameLabel.setFont(new Font("Serif", Font.BOLD, 14));
+
+        productPanel.add(imageLabel, BorderLayout.CENTER);
+        productPanel.add(nameLabel, BorderLayout.SOUTH);
+
+        productDisplayPanel.add(productPanel);
+
+        productDisplayPanel.revalidate();
+        productDisplayPanel.repaint();
+    }
+
+    public void removeProductFromView(String idSanPham) {
+        for (Component comp : productDisplayPanel.getComponents()) {
+            if (comp instanceof JPanel) {
+                JPanel productPanel = (JPanel) comp;
+                String panelId = (String) productPanel.getClientProperty("idSanPham");
+                if (idSanPham.equals(panelId)) {
+                    productDisplayPanel.remove(productPanel);
+                    break;
+                }
+            }
+        }
+        productDisplayPanel.revalidate();
+        productDisplayPanel.repaint();
     }
 
     public static void main(String[] args) {

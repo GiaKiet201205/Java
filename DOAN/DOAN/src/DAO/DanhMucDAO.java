@@ -2,12 +2,13 @@ package DAO;
 
 import DTO.DanhMucDTO;
 import config.JDBC;
+
 import java.sql.*;
 import java.util.ArrayList;
 
 public class DanhMucDAO {
 
-    // Phương thức selectAll: Lấy danh sách tất cả danh mục
+    // Lấy toàn bộ danh mục
     public ArrayList<DanhMucDTO> selectAll() {
         ArrayList<DanhMucDTO> danhMucList = new ArrayList<>();
         String sql = "SELECT * FROM danh_muc";
@@ -26,10 +27,11 @@ public class DanhMucDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return danhMucList;
     }
 
-    // Phương thức insert: Thêm một danh mục mới
+    // Thêm danh mục mới
     public boolean insert(DanhMucDTO danhMuc) {
         String sql = "INSERT INTO danh_muc (id_danh_muc, ten_danh_muc) VALUES (?, ?)";
 
@@ -41,14 +43,14 @@ public class DanhMucDAO {
 
             return pst.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Lỗi khi thêm danh mục: " + e.getMessage());
             return false;
         }
     }
 
-    // Phương thức update: Cập nhật thông tin danh mục
+    // Cập nhật thông tin danh mục
     public boolean update(DanhMucDTO danhMuc) {
-        String sql = "UPDATE danh_muc SET ten_danh_muc=? WHERE id_danh_muc=?";
+        String sql = "UPDATE danh_muc SET ten_danh_muc = ? WHERE id_danh_muc = ?";
 
         try (Connection con = JDBC.getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
@@ -58,14 +60,14 @@ public class DanhMucDAO {
 
             return pst.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Lỗi khi cập nhật danh mục: " + e.getMessage());
             return false;
         }
     }
 
-    // Phương thức delete: Xóa một danh mục theo id
+    // Xóa danh mục
     public boolean delete(String idDanhMuc) {
-        String sql = "DELETE FROM danh_muc WHERE id_danh_muc=?";
+        String sql = "DELETE FROM danh_muc WHERE id_danh_muc = ?";
 
         try (Connection con = JDBC.getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
@@ -73,31 +75,33 @@ public class DanhMucDAO {
             pst.setString(1, idDanhMuc);
             return pst.executeUpdate() > 0;
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Lỗi khi xóa danh mục: " + e.getMessage());
             return false;
         }
     }
 
-    // Phương thức selectById: Lấy thông tin danh mục theo id
+    // Tìm danh mục theo ID
     public DanhMucDTO selectById(String idDanhMuc) {
-        String sql = "SELECT * FROM danh_muc WHERE id_danh_muc=?";
+        String sql = "SELECT * FROM danh_muc WHERE id_danh_muc = ?";
         DanhMucDTO danhMuc = null;
 
         try (Connection con = JDBC.getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
 
             pst.setString(1, idDanhMuc);
-            ResultSet rs = pst.executeQuery();
-
-            if (rs.next()) {
-                danhMuc = new DanhMucDTO(
-                    rs.getString("id_danh_muc"),
-                    rs.getString("ten_danh_muc")
-                );
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    danhMuc = new DanhMucDTO(
+                        rs.getString("id_danh_muc"),
+                        rs.getString("ten_danh_muc")
+                    );
+                }
             }
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Lỗi khi truy vấn danh mục theo ID: " + e.getMessage());
         }
+
         return danhMuc;
     }
 }
