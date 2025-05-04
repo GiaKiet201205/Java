@@ -1,6 +1,6 @@
 package GUI.panel;
 
-import DAO.KhachHangDAO;
+import BLL.KhachHangBLL;
 import DTO.KhachHangDTO;
 
 import javax.swing.*;
@@ -12,10 +12,14 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
+/**
+ * Lớp KhachHangPanel hiển thị giao diện quản lý khách hàng.
+ * Sử dụng KhachHangBLL để xử lý logic nghiệp vụ.
+ */
 public class KhachHangPanel extends JPanel {
     private JTable table;
     private DefaultTableModel model;
-    private KhachHangDAO dao = new KhachHangDAO();
+    private KhachHangBLL bll = new KhachHangBLL();
 
     public KhachHangPanel() {
         setLayout(new BorderLayout());
@@ -133,21 +137,18 @@ public class KhachHangPanel extends JPanel {
 
     private void loadTable() {
         model.setRowCount(0);
-        ArrayList<KhachHangDTO> list = dao.selectAll();
+        ArrayList<KhachHangDTO> list = bll.getAllKhachHang();
         for (KhachHangDTO kh : list) {
             model.addRow(new Object[]{kh.getIdKhachHang(), kh.getHoTen(), kh.getEmail(), kh.getSdt()});
         }
     }
 
     private void showAddDialog() {
-        JTextField txtID = new JTextField();
         JTextField txtTen = new JTextField();
         JTextField txtEmail = new JTextField();
         JTextField txtSDT = new JTextField();
 
         JPanel panel = new JPanel(new GridLayout(0, 2));
-        panel.add(new JLabel("ID Khách hàng:"));
-        panel.add(txtID);
         panel.add(new JLabel("Tên khách hàng:"));
         panel.add(txtTen);
         panel.add(new JLabel("Email:"));
@@ -157,20 +158,11 @@ public class KhachHangPanel extends JPanel {
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Thêm khách hàng mới", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
-            // Kiểm tra dữ liệu đầu vào
-            if (txtID.getText().trim().isEmpty() || txtTen.getText().trim().isEmpty() ||
-                txtEmail.getText().trim().isEmpty() || txtSDT.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng điền đầy đủ thông tin!");
-                return;
-            }
-
-            KhachHangDTO kh = new KhachHangDTO(txtID.getText().trim(), txtTen.getText().trim(),
-                    txtEmail.getText().trim(), txtSDT.getText().trim());
-            if (dao.insert(kh)) {
-                JOptionPane.showMessageDialog(this, "Thêm thành công!");
+            KhachHangDTO kh = new KhachHangDTO("", txtTen.getText().trim(), txtEmail.getText().trim(), txtSDT.getText().trim());
+            String message = bll.addKhachHang(kh);
+            JOptionPane.showMessageDialog(this, message);
+            if (message.contains("thành công")) {
                 loadTable();
-            } else {
-                JOptionPane.showMessageDialog(this, "Thêm thất bại!");
             }
         }
     }
@@ -182,6 +174,7 @@ public class KhachHangPanel extends JPanel {
         }
 
         JTextField txtID = new JTextField(model.getValueAt(selectedRow, 0).toString());
+        txtID.setEditable(false); // Không cho sửa ID
         JTextField txtTen = new JTextField(model.getValueAt(selectedRow, 1).toString());
         JTextField txtEmail = new JTextField(model.getValueAt(selectedRow, 2).toString());
         JTextField txtSDT = new JTextField(model.getValueAt(selectedRow, 3).toString());
@@ -198,20 +191,11 @@ public class KhachHangPanel extends JPanel {
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Sửa khách hàng", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
-            // Kiểm tra dữ liệu đầu vào
-            if (txtID.getText().trim().isEmpty() || txtTen.getText().trim().isEmpty() ||
-                txtEmail.getText().trim().isEmpty() || txtSDT.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Vui lòng điền đầy đủ thông tin!");
-                return;
-            }
-
-            KhachHangDTO kh = new KhachHangDTO(txtID.getText().trim(), txtTen.getText().trim(),
-                    txtEmail.getText().trim(), txtSDT.getText().trim());
-            if (dao.update(kh)) {
-                JOptionPane.showMessageDialog(this, "Cập nhật thành công!");
+            KhachHangDTO kh = new KhachHangDTO(txtID.getText().trim(), txtTen.getText().trim(), txtEmail.getText().trim(), txtSDT.getText().trim());
+            String message = bll.updateKhachHang(kh);
+            JOptionPane.showMessageDialog(this, message);
+            if (message.contains("thành công")) {
                 loadTable();
-            } else {
-                JOptionPane.showMessageDialog(this, "Cập nhật thất bại!");
             }
         }
     }
@@ -225,31 +209,27 @@ public class KhachHangPanel extends JPanel {
         int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc muốn xóa khách hàng này?", "Xác nhận", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             String id = model.getValueAt(selectedRow, 0).toString();
-            if (dao.delete(id)) {
-                JOptionPane.showMessageDialog(this, "Xóa thành công!");
-                loadTable();
-            } else {
-                JOptionPane.showMessageDialog(this, "Xóa thất bại!");
+            String message = bll.deleteKhachHang(id);
+            JOptionPane.showMessageDialog(this, message);
+            if (message.contains("thành công")) {
+                model.removeRow(selectedRow); // Xóa hàng khỏi bảng trên giao diện
             }
         }
     }
 
     private void searchKhachHang(String type, String keyword) {
         if (keyword.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập từ khóa tìm kiếm");
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập từ khóa tìm kiếm!");
             return;
         }
 
-        ArrayList<KhachHangDTO> result = new ArrayList<>();
-        if (type.equals("ID khách hàng")) {
-            KhachHangDTO kh = dao.selectById(keyword.trim());
-            if (kh != null) result.add(kh);
-        } else if (type.equals("Tên khách hàng")) {
-            result = dao.selectByKeyword(keyword.trim());
-        } else if (type.equals("Email")) {
-            result = dao.selectByKeyword(keyword.trim());  // Dùng selectByKeyword cho cả email
-        } else if (type.equals("SĐT")) {
-            result = dao.selectByKeyword(keyword.trim());  // Dùng selectByKeyword cho cả sdt
+        model.setRowCount(0);
+        ArrayList<KhachHangDTO> result = bll.searchKhachHang(type, keyword);
+        for (KhachHangDTO kh : result) {
+            model.addRow(new Object[]{kh.getIdKhachHang(), kh.getHoTen(), kh.getEmail(), kh.getSdt()});
+        }
+        if (result.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Không tìm thấy khách hàng phù hợp!");
         }
     }
 }
