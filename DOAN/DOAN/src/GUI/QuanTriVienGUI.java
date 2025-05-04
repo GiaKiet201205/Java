@@ -114,7 +114,7 @@ public class QuanTriVienGUI extends JFrame {
         addMenuButton(btnSanPham);
         addMenuButton(btnNhaCungCap);
         addMenuButton(btnHoaDon);
-        addMenuButton(btnChiTietHoaDon);
+        addMenuButton(btnChiTietHoaDon); 
         addMenuButton(btnNhapHang);
         addMenuButton(btnChiTietNhapHang);
         addMenuButton(btnNhanVien);
@@ -196,6 +196,7 @@ public class QuanTriVienGUI extends JFrame {
         }
 
         SwingUtilities.invokeLater(() -> {
+            
             TrangChuGUI trangChuGUI = new TrangChuGUI();
             QuanTriVienGUI gui = new QuanTriVienGUI(trangChuGUI);
             gui.setVisible(true);
