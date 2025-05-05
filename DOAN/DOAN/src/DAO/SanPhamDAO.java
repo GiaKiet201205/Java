@@ -4,6 +4,7 @@ import DTO.SanPhamDTO;
 import config.JDBC;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.*;
 
 public class SanPhamDAO {
     private Connection connection;
@@ -160,5 +161,37 @@ public class SanPhamDAO {
     }
     public boolean deleteProductFromUI(String idSanPham) {
         return true;  
+    }
+    
+    public List<SanPhamDTO> laySanPhamTheoDanhMuc(String idDanhMuc) {
+        List<SanPhamDTO> danhSach = new ArrayList<>();
+
+        try {
+            Connection conn = JDBC.getConnection();
+            String sql = "SELECT * FROM san_pham WHERE id_danh_muc = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, idDanhMuc);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                SanPhamDTO sp = new SanPhamDTO();
+                sp.setIdSanPham(rs.getString("id_san_pham"));
+                sp.setIdDanhMuc(rs.getString("id_danh_muc"));
+                sp.setIdNhaCungCap(rs.getString("id_nha_cung_cap"));
+                sp.setHinhAnh(rs.getString("hinh_anh"));
+                sp.setGia(Integer.parseInt(rs.getString("gia")));
+                sp.setTenSanPham(rs.getString("ten_san_pham"));
+                sp.setSoLuongTonKho(Integer.parseInt(rs.getString("so_luong_ton_kho")));
+                danhSach.add(sp);
+            }
+
+            rs.close();
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return danhSach;
     }
 }

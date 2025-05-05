@@ -1,12 +1,14 @@
 package GUI;
 
+import DAO.SanPhamDAO;
+import DTO.SanPhamDTO;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class QuanShortGUI extends JPanel {
-    private List<String> danhSachSanPham;
+    private List<SanPhamDTO> danhSachSanPham;
     private JPanel gridPanel;
     private JButton Prev, Next, btnGioHang;
     private JLabel lblPage;
@@ -20,7 +22,9 @@ public class QuanShortGUI extends JPanel {
         super();
         this.parentFrame = parentFrame;
         setLayout(new BorderLayout());
-        danhSachSanPham = getDanhSachGiayDep();
+        
+        SanPhamDAO spDAO = new SanPhamDAO();
+        danhSachSanPham = spDAO.laySanPhamTheoDanhMuc("DM002");
 
         // Header
         JPanel headerPanel = new JPanel();
@@ -89,13 +93,15 @@ public class QuanShortGUI extends JPanel {
         int end = Math.min(start + itemsPerPage, danhSachSanPham.size());
 
         for (int i = start; i < end; i++) {
-            String tenSanPham = danhSachSanPham.get(i);
+            SanPhamDTO sp = danhSachSanPham.get(i);
+            String tenSanPham = sp.getTenSanPham();
+            int giaSanPham = sp.getGia();
 
             JPanel panel = new JPanel();
             panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             panel.setLayout(new BorderLayout());
 
-            JLabel lblTen = new JLabel(tenSanPham, SwingConstants.CENTER);
+            JLabel lblTen = new JLabel(tenSanPham + " - " + giaSanPham + "₫", SwingConstants.CENTER);
             JLabel lblHinh = new JLabel("[Hình ảnh]", SwingConstants.CENTER);
             lblHinh.setPreferredSize(new Dimension(100, 100));
 
@@ -105,7 +111,7 @@ public class QuanShortGUI extends JPanel {
 
             btnThemGio.addActionListener(e -> {
                 cart.add(tenSanPham);
-                totalPrice += layGiaSanPham(tenSanPham);
+                totalPrice += giaSanPham;
                 JOptionPane.showMessageDialog(this, "Đã thêm sản phẩm vào giỏ hàng!");
             });
 
@@ -126,24 +132,6 @@ public class QuanShortGUI extends JPanel {
 
     private int getTotalPage() {
         return (int) Math.ceil((double) danhSachSanPham.size() / itemsPerPage);
-    }
-
-    private List<String> getDanhSachGiayDep() {
-        List<String> list = new ArrayList<>();
-        for (int i = 1; i <= 20; i++) {
-            list.add("Giày " + i + " - 300000");
-            list.add("Dép " + i + " - 200000");
-        }
-        return list;
-    }
-
-    private int layGiaSanPham(String tenSanPham) {
-        try {
-            String[] parts = tenSanPham.split("-");
-            return Integer.parseInt(parts[1].trim());
-        } catch (Exception e) {
-            return 0;
-        }
     }
 
     public static void main(String[] args) {

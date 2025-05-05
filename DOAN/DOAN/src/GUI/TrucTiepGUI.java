@@ -400,7 +400,7 @@ public class TrucTiepGUI extends JFrame {
                 String diaDiemGiao = "Tại cửa hàng";
 
                 // Gọi createDonHang với idKhachHang là null
-                String idDonHang = hoaDonBLL.createDonHang(donHang, "KH001", idNhanVien, tongTien, 
+                String idDonHang = hoaDonBLL.createDonHang(donHang, "Admin", idNhanVien, tongTien, 
                                                           trangThai, hinhThucMuaHang, diaDiemGiao);
 
                 if (idDonHang != null) {
