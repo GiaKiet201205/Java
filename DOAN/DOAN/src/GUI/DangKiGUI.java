@@ -49,7 +49,7 @@ public class DangKiGUI extends JFrame {
         JLabel logoLabel = new JLabel();
         leftPanel.add(logoLabel);
 
-        URL logoURL = getClass().getResource("/images/anhnen.jpeg");
+        URL logoURL = getClass().getResource("/images/anhnendki.jpeg");
         if (logoURL != null) {
             ImageIcon originalIcon = new ImageIcon(logoURL);
             leftPanel.addComponentListener(new ComponentAdapter() {

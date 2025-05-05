@@ -25,7 +25,7 @@ public class SanPhamPanel extends JPanel {
     private final Set<String> outOfStockProducts = new HashSet<>();
     private final TrangChuGUI trangChuGUI;
 
-     public SanPhamPanel(TrangChuGUI trangChuGUI) {
+    public SanPhamPanel(TrangChuGUI trangChuGUI) {
         this.trangChuGUI = trangChuGUI; // Lưu trữ tham chiếu đến TrangChuGUI
         setLayout(new BorderLayout());
         createSanPhamPanel(); // Khởi tạo giao diện
@@ -233,72 +233,72 @@ public class SanPhamPanel extends JPanel {
         }
     }
 
- private void editSanPham(int selectedRow) {
-    if (selectedRow == -1) {
-        JOptionPane.showMessageDialog(this, "Vui lòng chọn sản phẩm để sửa!", "Thông báo", JOptionPane.WARNING_MESSAGE);
-        return;
-    }
+    private void editSanPham(int selectedRow) {
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn sản phẩm để sửa!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
-    // Lấy dữ liệu từ bảng
-    String idSanPham = sanPhamTableModel.getValueAt(selectedRow, 0).toString();
-    String tenSanPham = sanPhamTableModel.getValueAt(selectedRow, 1).toString();
-    int gia = Integer.parseInt(sanPhamTableModel.getValueAt(selectedRow, 2).toString());
-    int soLuong = Integer.parseInt(sanPhamTableModel.getValueAt(selectedRow, 3).toString());
-    String idDanhMuc = sanPhamTableModel.getValueAt(selectedRow, 4).toString();
-    String hinhAnh = sanPhamTableModel.getValueAt(selectedRow, 5).toString();
-    String idNhaCungCap = sanPhamTableModel.getValueAt(selectedRow, 6).toString();
+        // Lấy dữ liệu từ bảng
+        String idSanPham = sanPhamTableModel.getValueAt(selectedRow, 0).toString();
+        String tenSanPham = sanPhamTableModel.getValueAt(selectedRow, 1).toString();
+        int gia = Integer.parseInt(sanPhamTableModel.getValueAt(selectedRow, 2).toString());
+        int soLuong = Integer.parseInt(sanPhamTableModel.getValueAt(selectedRow, 3).toString());
+        String idDanhMuc = sanPhamTableModel.getValueAt(selectedRow, 4).toString();
+        String hinhAnh = sanPhamTableModel.getValueAt(selectedRow, 5).toString();
+        String idNhaCungCap = sanPhamTableModel.getValueAt(selectedRow, 6).toString();
 
-    // Hiển thị hộp thoại nhập dữ liệu mới
-    JTextField tenSanPhamField = new JTextField(tenSanPham);
-    JTextField giaField = new JTextField(String.valueOf(gia));
-    JTextField soLuongField = new JTextField(String.valueOf(soLuong));
-    JTextField idDanhMucField = new JTextField(idDanhMuc);
-    JTextField hinhAnhField = new JTextField(hinhAnh);
-    JTextField idNhaCungCapField = new JTextField(idNhaCungCap);
+        // Hiển thị hộp thoại nhập dữ liệu mới
+        JTextField tenSanPhamField = new JTextField(tenSanPham);
+        JTextField giaField = new JTextField(String.valueOf(gia));
+        JTextField soLuongField = new JTextField(String.valueOf(soLuong));
+        JTextField idDanhMucField = new JTextField(idDanhMuc);
+        JTextField hinhAnhField = new JTextField(hinhAnh);
+        JTextField idNhaCungCapField = new JTextField(idNhaCungCap);
 
-    JPanel panel = new JPanel(new GridLayout(6, 2));
-    panel.add(new JLabel("Tên sản phẩm:"));
-    panel.add(tenSanPhamField);
-    panel.add(new JLabel("Giá:"));
-    panel.add(giaField);
-    panel.add(new JLabel("Số lượng tồn kho:"));
-    panel.add(soLuongField);
-    panel.add(new JLabel("ID danh mục:"));
-    panel.add(idDanhMucField);
-    panel.add(new JLabel("Hình ảnh:"));
-    panel.add(hinhAnhField);
-    panel.add(new JLabel("ID nhà cung cấp:"));
-    panel.add(idNhaCungCapField);
+        JPanel panel = new JPanel(new GridLayout(6, 2));
+        panel.add(new JLabel("Tên sản phẩm:"));
+        panel.add(tenSanPhamField);
+        panel.add(new JLabel("Giá:"));
+        panel.add(giaField);
+        panel.add(new JLabel("Số lượng tồn kho:"));
+        panel.add(soLuongField);
+        panel.add(new JLabel("ID danh mục:"));
+        panel.add(idDanhMucField);
+        panel.add(new JLabel("Hình ảnh:"));
+        panel.add(hinhAnhField);
+        panel.add(new JLabel("ID nhà cung cấp:"));
+        panel.add(idNhaCungCapField);
 
-    int result = JOptionPane.showConfirmDialog(this, panel, "Sửa sản phẩm", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        int result = JOptionPane.showConfirmDialog(this, panel, "Sửa sản phẩm", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
-    if (result == JOptionPane.OK_OPTION) {
-        try {
-            // Tạo DTO mới từ dữ liệu người dùng nhập
-            SanPhamDTO sp = new SanPhamDTO();
-            sp.setIdSanPham(idSanPham);
-            sp.setTenSanPham(tenSanPhamField.getText());
-            sp.setGia(Integer.parseInt(giaField.getText()));
-            sp.setSoLuongTonKho(Integer.parseInt(soLuongField.getText()));
-            sp.setIdDanhMuc(idDanhMucField.getText());
-            sp.setHinhAnh(hinhAnhField.getText());
-            sp.setIdNhaCungCap(idNhaCungCapField.getText());
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                // Tạo DTO mới từ dữ liệu người dùng nhập
+                SanPhamDTO sp = new SanPhamDTO();
+                sp.setIdSanPham(idSanPham);
+                sp.setTenSanPham(tenSanPhamField.getText());
+                sp.setGia(Integer.parseInt(giaField.getText()));
+                sp.setSoLuongTonKho(Integer.parseInt(soLuongField.getText()));
+                sp.setIdDanhMuc(idDanhMucField.getText());
+                sp.setHinhAnh(hinhAnhField.getText());
+                sp.setIdNhaCungCap(idNhaCungCapField.getText());
 
-            // Gọi DAO để cập nhật
-            SanPhamDAO dao = new SanPhamDAO();
-            if (dao.update(sp)) {
-                JOptionPane.showMessageDialog(this, "Sửa sản phẩm thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-                loadDataFromDatabase(); // làm mới bảng
-            } else {
-                JOptionPane.showMessageDialog(this, "Sửa sản phẩm thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                // Gọi DAO để cập nhật
+                SanPhamDAO dao = new SanPhamDAO();
+                if (dao.update(sp)) {
+                    JOptionPane.showMessageDialog(this, "Sửa sản phẩm thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+                    loadDataFromDatabase(); // làm mới bảng
+                } else {
+                    JOptionPane.showMessageDialog(this, "Sửa sản phẩm thất bại!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Vui lòng nhập đúng định dạng số cho giá và số lượng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập đúng định dạng số cho giá và số lượng!", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
-}
 
- private void searchSanPham(String searchType, String keyword) {
+    private void searchSanPham(String searchType, String keyword) {
         if (keyword.trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập từ khóa tìm kiếm!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             return;
@@ -312,20 +312,18 @@ public class SanPhamPanel extends JPanel {
     }
 
     private void markProductOutOfStock(int selectedRow) {
-    if (selectedRow == -1) {
-        JOptionPane.showMessageDialog(this, "Vui lòng chọn một sản phẩm!", "Thông báo", JOptionPane.WARNING_MESSAGE);
-        return;
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một sản phẩm!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // Lấy ID sản phẩm từ bảng
+        String idSanPham = sanPhamTableModel.getValueAt(selectedRow, 0).toString();
+
+        // Xóa sản phẩm khỏi bảng
+        sanPhamTableModel.removeRow(selectedRow);
+
+        // Thông báo
+        JOptionPane.showMessageDialog(this, "Xóa thành cong!");
     }
-
-    // Lấy ID sản phẩm từ bảng
-    String idSanPham = sanPhamTableModel.getValueAt(selectedRow, 0).toString();
-
-    // Xóa sản phẩm khỏi bảng
-    sanPhamTableModel.removeRow(selectedRow);
-
-    // Thông báo
-    JOptionPane.showMessageDialog(this, "Xóa thành cong!");
-
-}
-
 }
