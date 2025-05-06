@@ -147,7 +147,7 @@ public class GioHangGUI extends JFrame {
             try {
                 String idKhachHang = Session.getIdKhachHang();
 
-                // Lấy ID nhân viên admin
+                // Lấy ID nhân viên
                 NhanVienDAO nhanVienDAO = new NhanVienDAO();
                 String idNhanVien = "NV001";
 
@@ -158,7 +158,7 @@ public class GioHangGUI extends JFrame {
                 donHang.setTongTien(totalPrice);
                 donHang.setNgayDatHang(new Timestamp(System.currentTimeMillis()));
                 donHang.setTrangThai("Đang xử lý");
-                donHang.setHinhThucMuaHang(hinhThucThanhToan);
+                donHang.setHinhThucMuaHang("Online");
                 donHang.setDiaDiemGiao(diaChi);
 
                 DonHangDAO donHangDAO = new DonHangDAO();

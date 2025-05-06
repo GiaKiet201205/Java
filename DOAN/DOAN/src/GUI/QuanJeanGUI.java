@@ -1,12 +1,15 @@
 package GUI;
 
+import DAO.SanPhamDAO;
+import DTO.SanPhamDTO;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class QuanJeanGUI extends JPanel {
-    private List<String> danhSachSanPham;
+    private List<SanPhamDTO> danhSachSanPham;
     private JPanel gridPanel;
     private JButton Prev, Next, btnGioHang;
     private JLabel lblPage;
@@ -20,7 +23,10 @@ public class QuanJeanGUI extends JPanel {
         super();
         this.parentFrame = parentFrame;
         setLayout(new BorderLayout());
-        danhSachSanPham = getDanhSachQuanAo();
+
+        // Gọi DAO để lấy danh sách sản phẩm thuộc danh mục "DM001" (quần jean)
+        SanPhamDAO spDAO = new SanPhamDAO();
+        danhSachSanPham = spDAO.laySanPhamTheoDanhMuc("DM001");
 
         // Header
         JPanel headerPanel = new JPanel();
@@ -61,12 +67,11 @@ public class QuanJeanGUI extends JPanel {
             }
         });
 
-        // Thêm nút Giỏ Hàng
+        // Giỏ hàng
         btnGioHang = new JButton("🛒");
         btnGioHang.setBackground(new Color(100, 200, 100));
         btnGioHang.setForeground(Color.WHITE);
         btnGioHang.addActionListener(e -> {
-            // Mở giao diện Giỏ Hàng mà không đóng giao diện QuanJeanGUI
             new GioHangGUI(cart, totalPrice).setVisible(true);
         });
 
@@ -76,11 +81,13 @@ public class QuanJeanGUI extends JPanel {
         navigationPanel.add(btnGioHang);
         add(navigationPanel, BorderLayout.SOUTH);
 
+        // Load dữ liệu
         loadSanPham();
     }
+
     public QuanJeanGUI() {
-    this(new JFrame()); // Tạo tạm 1 JFrame nếu chưa có
-}
+        this(new JFrame()); // Khởi tạo tạm nếu không có frame truyền vào
+    }
 
     private void loadSanPham() {
         gridPanel.removeAll();
@@ -89,13 +96,15 @@ public class QuanJeanGUI extends JPanel {
         int end = Math.min(start + itemsPerPage, danhSachSanPham.size());
 
         for (int i = start; i < end; i++) {
-            String tenSanPham = danhSachSanPham.get(i);
+            SanPhamDTO sp = danhSachSanPham.get(i);
+            String tenSanPham = sp.getTenSanPham();
+            int giaSanPham = sp.getGia();
 
             JPanel panel = new JPanel();
             panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             panel.setLayout(new BorderLayout());
 
-            JLabel lblTen = new JLabel(tenSanPham, SwingConstants.CENTER);
+            JLabel lblTen = new JLabel(tenSanPham + " - " + giaSanPham + "₫", SwingConstants.CENTER);
             JLabel lblHinh = new JLabel("[Hình ảnh]", SwingConstants.CENTER);
             lblHinh.setPreferredSize(new Dimension(100, 100));
 
@@ -105,7 +114,7 @@ public class QuanJeanGUI extends JPanel {
 
             btnThemGio.addActionListener(e -> {
                 cart.add(tenSanPham);
-                totalPrice += layGiaSanPham(tenSanPham);
+                totalPrice += giaSanPham;
                 JOptionPane.showMessageDialog(this, "Đã thêm sản phẩm vào giỏ hàng!");
             });
 
@@ -126,24 +135,6 @@ public class QuanJeanGUI extends JPanel {
 
     private int getTotalPage() {
         return (int) Math.ceil((double) danhSachSanPham.size() / itemsPerPage);
-    }
-
-    private List<String> getDanhSachQuanAo() {
-        List<String> list = new ArrayList<>();
-        for (int i = 1; i <= 20; i++) {
-            list.add("Quần " + i + " - 200000");
-            list.add("Áo " + i + " - 150000");
-        }
-        return list;
-    }
-
-    private int layGiaSanPham(String tenSanPham) {
-        try {
-            String[] parts = tenSanPham.split("-");
-            return Integer.parseInt(parts[1].trim());
-        } catch (Exception e) {
-            return 0;
-        }
     }
 
     public static void main(String[] args) {

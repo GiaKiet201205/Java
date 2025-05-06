@@ -1,5 +1,6 @@
 package GUI;
 
+import BLL.Session;
 import DAO.TaiKhoanDAO;
 import DTO.TaiKhoanDTO;
 import javax.swing.*;
@@ -109,6 +110,8 @@ public class DangNhapGUI extends JFrame {
             TaiKhoanDTO tk = taiKhoanDAO.login(username, password);
 
             if (tk != null) {
+                Session.setCurrentTaiKhoan(tk);
+                
                 String quyen = tk.getPhanQuyen();
                 if (ADMIN_ROLE.equals(quyen)) {
                     JOptionPane.showMessageDialog(this, "Đăng nhập thành công! (Admin)");

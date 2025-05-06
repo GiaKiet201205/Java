@@ -43,7 +43,7 @@ public class DonHangDAO {
         // Lấy id_khach_hang từ session
         String idKhachHang = Session.getIdKhachHang();
         if (idKhachHang == null) {
-        idKhachHang = "KH001";
+        idKhachHang = "Admin";
         }
     
         try (Connection con = JDBC.getConnection();

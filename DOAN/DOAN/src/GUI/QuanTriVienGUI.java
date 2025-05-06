@@ -187,7 +187,7 @@ public class QuanTriVienGUI extends JFrame {
         panel.add(button);
         menuPanel.add(panel);
     }
-
+    
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

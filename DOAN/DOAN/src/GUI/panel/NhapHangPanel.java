@@ -30,33 +30,30 @@ public class NhapHangPanel extends JPanel {
     private JTable nhapHangTable;
     private DefaultTableModel nhapHangTableModel;
     private JPanel nhapHangPanel;
-    private Color headerColor = new Color(200, 255, 200); // Light green
+    private Color headerColor = new Color(200, 255, 200);
     private NhapHangBLL nhapHangBLL;
     private DecimalFormat decimalFormat;
 
     public NhapHangPanel() {
-        decimalFormat = new DecimalFormat("#,###");
+        // Định dạng số không có phần thập phân
+        decimalFormat = new DecimalFormat("#,###"); // Không hiển thị phần thập phân
+
         nhapHangBLL = new NhapHangBLL();
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(600, 400));
         createNhapHangPanel();
         add(nhapHangPanel, BorderLayout.CENTER);
+        add(new JLabel("Nhập Hàng", SwingConstants.CENTER), BorderLayout.NORTH);
         loadDataFromDatabase();
     }
 
     private void createNhapHangPanel() {
         nhapHangPanel = new JPanel(new BorderLayout());
 
-        // Top Panel
+        // ===== Top Panel =====
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBackground(headerColor);
         topPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-
-        // Title Label
-        JLabel lblTitle = new JLabel("NHẬP HÀNG", SwingConstants.CENTER);
-        lblTitle.setFont(new Font("Arial", Font.BOLD, 24));
-        topPanel.add(lblTitle, BorderLayout.NORTH);
-
 
         JLabel lblChucNang = new JLabel("Chức năng");
         topPanel.add(lblChucNang, BorderLayout.WEST);
@@ -66,17 +63,14 @@ public class NhapHangPanel extends JPanel {
 
         JButton btnAdd = new JButton("Thêm");
         btnAdd.setToolTipText("Thêm nhập hàng");
-        btnAdd.setBackground(new Color(240, 240, 240));
         buttonPanel.add(btnAdd);
 
         JButton btnDelete = new JButton("Xóa");
         btnDelete.setToolTipText("Xóa nhập hàng");
-        btnDelete.setBackground(new Color(240, 240, 240));
         buttonPanel.add(btnDelete);
 
         JButton btnEdit = new JButton("Sửa");
         btnEdit.setToolTipText("Sửa nhập hàng");
-        btnEdit.setBackground(new Color(240, 240, 240));
         buttonPanel.add(btnEdit);
 
         JPanel labelPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -103,6 +97,7 @@ public class NhapHangPanel extends JPanel {
         JComboBox<String> cmbSearchType = new JComboBox<>(new String[]{"ID Nhập Hàng", "ID Nhà Cung Cấp", "ID Nhân Viên"});
         cmbSearchType.setPreferredSize(new Dimension(120, 25));
         searchPanel.add(cmbSearchType);
+
         JTextField txtSearch = new JTextField();
         txtSearch.setPreferredSize(new Dimension(200, 25));
         searchPanel.add(txtSearch);
@@ -114,9 +109,9 @@ public class NhapHangPanel extends JPanel {
         JButton btnReset = new JButton("Làm mới");
         btnReset.setBackground(new Color(240, 240, 240));
         searchPanel.add(btnReset);
-
+        
         JButton btnExportExcel = new JButton("Xuất Excel");
-        btnExportExcel.setBackground(new Color(240, 240, 240));
+        btnReset.setBackground(new Color(240, 240, 240));
         searchPanel.add(btnExportExcel);
 
         topPanel.add(searchPanel, BorderLayout.EAST);
@@ -245,10 +240,11 @@ public class NhapHangPanel extends JPanel {
         addDialog.setSize(600, 600);
         addDialog.setLocationRelativeTo(this);
         addDialog.setLayout(new BorderLayout());
+        addDialog.getContentPane().setBackground(new Color(240, 248, 255));
 
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
-        formPanel.setBackground(new Color(230, 255, 230));
+        formPanel.setBackground(new Color(240, 248, 255));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -257,28 +253,34 @@ public class NhapHangPanel extends JPanel {
         Font labelFont = new Font("Arial", Font.BOLD, 14);
         Font fieldFont = new Font("Arial", Font.PLAIN, 14);
 
+        // Thông tin phiếu nhập
         JLabel lblIdNhaCungCap = new JLabel("ID Nhà Cung Cấp:");
         lblIdNhaCungCap.setFont(labelFont);
         JTextField txtIdNhaCungCap = new JTextField(20);
         txtIdNhaCungCap.setFont(fieldFont);
+        txtIdNhaCungCap.setBorder(BorderFactory.createLineBorder(new Color(100, 149, 237), 1));
 
         JLabel lblIdNhanVien = new JLabel("ID Nhân Viên:");
         lblIdNhanVien.setFont(labelFont);
         JTextField txtIdNhanVien = new JTextField(20);
         txtIdNhanVien.setFont(fieldFont);
+        txtIdNhanVien.setBorder(BorderFactory.createLineBorder(new Color(100, 149, 237), 1));
 
         JLabel lblNgayNhap = new JLabel("Ngày Nhập (dd/MM/yyyy):");
         lblNgayNhap.setFont(labelFont);
         JTextField txtNgayNhap = new JTextField(new SimpleDateFormat("dd/MM/yyyy").format(new Date()), 20);
         txtNgayNhap.setFont(fieldFont);
+        txtNgayNhap.setBorder(BorderFactory.createLineBorder(new Color(100, 149, 237), 1));
 
         JLabel lblTongGiaTriNhap = new JLabel("Tổng Giá Trị Nhập:");
         lblTongGiaTriNhap.setFont(labelFont);
         JTextField txtTongGiaTriNhap = new JTextField(20);
         txtTongGiaTriNhap.setFont(fieldFont);
+        txtTongGiaTriNhap.setBorder(BorderFactory.createLineBorder(new Color(100, 149, 237), 1));
         txtTongGiaTriNhap.setEditable(false);
         txtTongGiaTriNhap.setBackground(new Color(220, 220, 220));
 
+        // Bảng chi tiết sản phẩm
         String[] columns = {"ID Sản Phẩm", "Số Lượng Nhập", "Giá Nhập"};
         DefaultTableModel productTableModel = new DefaultTableModel(columns, 0);
         JTable productTable = new JTable(productTableModel);
@@ -287,14 +289,12 @@ public class NhapHangPanel extends JPanel {
         productScrollPane.setPreferredSize(new Dimension(500, 200));
 
         JPanel productButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        productButtonPanel.setBackground(new Color(230, 255, 230));
         JButton btnAddProduct = new JButton("Thêm Sản Phẩm");
-        btnAddProduct.setBackground(new Color(255, 255, 255));
         JButton btnRemoveProduct = new JButton("Xóa Sản Phẩm");
-        btnRemoveProduct.setBackground(new Color(255, 255, 255));
         productButtonPanel.add(btnAddProduct);
         productButtonPanel.add(btnRemoveProduct);
 
+        // Thêm các thành phần vào form
         gbc.gridx = 0; gbc.gridy = 0; formPanel.add(lblIdNhaCungCap, gbc);
         gbc.gridx = 1; formPanel.add(txtIdNhaCungCap, gbc);
         gbc.gridx = 0; gbc.gridy = 1; formPanel.add(lblIdNhanVien, gbc);
@@ -306,31 +306,31 @@ public class NhapHangPanel extends JPanel {
         gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2; formPanel.add(productButtonPanel, gbc);
         gbc.gridy = 5; formPanel.add(productScrollPane, gbc);
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        buttonPanel.setBackground(new Color(255, 255, 255));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.setBackground(new Color(240, 248, 255));
         buttonPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         JButton btnAdd = new JButton("Thêm");
         btnAdd.setFont(new Font("Arial", Font.BOLD, 14));
-        btnAdd.setForeground(Color.BLACK);
+        btnAdd.setBackground(new Color(50, 205, 50));
+        btnAdd.setForeground(Color.WHITE);
         btnAdd.setPreferredSize(new Dimension(100, 35));
-        btnAdd.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         JButton btnCancel = new JButton("Hủy");
         btnCancel.setFont(new Font("Arial", Font.BOLD, 14));
-        btnCancel.setForeground(Color.BLACK);
+        btnCancel.setBackground(new Color(220, 20, 60));
+        btnCancel.setForeground(Color.WHITE);
         btnCancel.setPreferredSize(new Dimension(100, 35));
-        btnCancel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         buttonPanel.add(btnAdd);
         buttonPanel.add(btnCancel);
 
         addDialog.add(formPanel, BorderLayout.CENTER);
         addDialog.add(buttonPanel, BorderLayout.SOUTH);
 
+        // Sự kiện thêm sản phẩm
         btnAddProduct.addActionListener(e -> {
             JDialog productDialog = new JDialog(addDialog, "Thêm Sản Phẩm", Dialog.ModalityType.APPLICATION_MODAL);
             productDialog.setSize(400, 250);
             productDialog.setLocationRelativeTo(addDialog);
             productDialog.setLayout(new GridBagLayout());
-            productDialog.getContentPane().setBackground(new Color(240, 255, 240));
             GridBagConstraints gbcProduct = new GridBagConstraints();
             gbcProduct.insets = new Insets(10, 10, 10, 10);
             gbcProduct.fill = GridBagConstraints.HORIZONTAL;
@@ -358,18 +358,9 @@ public class NhapHangPanel extends JPanel {
             gbcProduct.gridx = 0; gbcProduct.gridy = 2; productDialog.add(lblGiaNhap, gbcProduct);
             gbcProduct.gridx = 1; productDialog.add(txtGiaNhap, gbcProduct);
 
-            JPanel productBtnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-            productBtnPanel.setBackground(new Color(255, 255, 255));
+            JPanel productBtnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
             JButton btnSaveProduct = new JButton("Lưu");
-            btnSaveProduct.setFont(new Font("Arial", Font.BOLD, 14));
-            btnSaveProduct.setForeground(Color.BLACK);
-            btnSaveProduct.setPreferredSize(new Dimension(100, 35));
-            btnSaveProduct.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             JButton btnCancelProduct = new JButton("Hủy");
-            btnCancelProduct.setFont(new Font("Arial", Font.BOLD, 14));
-            btnCancelProduct.setForeground(Color.BLACK);
-            btnCancelProduct.setPreferredSize(new Dimension(100, 35));
-            btnCancelProduct.setBorder(BorderFactory.createLineBorder(Color.BLACK));
             productBtnPanel.add(btnSaveProduct);
             productBtnPanel.add(btnCancelProduct);
 
@@ -419,6 +410,7 @@ public class NhapHangPanel extends JPanel {
             productDialog.setVisible(true);
         });
 
+        // Sự kiện xóa sản phẩm
         btnRemoveProduct.addActionListener(e -> {
             int selectedRow = productTable.getSelectedRow();
             if (selectedRow >= 0) {
@@ -429,8 +421,10 @@ public class NhapHangPanel extends JPanel {
             }
         });
 
+        // Sự kiện thêm phiếu nhập
         btnAdd.addActionListener(e -> {
             try {
+                // Validate input
                 if (txtIdNhaCungCap.getText().trim().isEmpty() || txtIdNhanVien.getText().trim().isEmpty() ||
                     txtNgayNhap.getText().trim().isEmpty() || productTableModel.getRowCount() == 0) {
                     JOptionPane.showMessageDialog(addDialog, "Vui lòng điền đầy đủ thông tin và thêm ít nhất một sản phẩm",
@@ -438,6 +432,7 @@ public class NhapHangPanel extends JPanel {
                     return;
                 }
 
+                // Tạo NhapHangDTO
                 NhapHangDTO nhapHang = new NhapHangDTO();
                 nhapHang.setIdNhaCungCap(txtIdNhaCungCap.getText().trim());
                 nhapHang.setIdNhanVien(txtIdNhanVien.getText().trim());
@@ -446,6 +441,7 @@ public class NhapHangPanel extends JPanel {
                 String tongGiaTriStr = txtTongGiaTriNhap.getText().replace(",", "");
                 nhapHang.setTongGiaTriNhap(Double.parseDouble(tongGiaTriStr));
 
+                // Tạo danh sách ChiTietNhapHangDTO
                 List<ChiTietNhapHangDTO> chiTietList = new ArrayList<>();
                 for (int i = 0; i < productTableModel.getRowCount(); i++) {
                     ChiTietNhapHangDTO chiTiet = new ChiTietNhapHangDTO();
@@ -456,6 +452,7 @@ public class NhapHangPanel extends JPanel {
                     chiTietList.add(chiTiet);
                 }
 
+                // Thêm qua BLL
                 nhapHangBLL.addNhapHang(nhapHang, chiTietList);
                 JOptionPane.showMessageDialog(addDialog, "Thêm nhập hàng thành công",
                         "Thông báo", JOptionPane.INFORMATION_MESSAGE);
@@ -481,6 +478,7 @@ public class NhapHangPanel extends JPanel {
                 int giaNhap = Integer.parseInt(giaNhapStr);
                 tongGiaTri += soLuong * giaNhap;
             } catch (NumberFormatException ex) {
+                // Bỏ qua dòng lỗi
                 continue;
             }
         }
@@ -534,11 +532,11 @@ public class NhapHangPanel extends JPanel {
         editDialog.setSize(450, 500);
         editDialog.setLocationRelativeTo(this);
         editDialog.setLayout(new BorderLayout());
-        editDialog.getContentPane().setBackground(new Color(230, 255, 230));
+        editDialog.getContentPane().setBackground(new Color(240, 248, 255));
 
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
-        formPanel.setBackground(new Color(230, 255, 230));
+        formPanel.setBackground(new Color(240, 248, 255));
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -552,43 +550,50 @@ public class NhapHangPanel extends JPanel {
         JTextField txtIdNhapHang = new JTextField(nhapHang.getIdNhapHang(), 20);
         txtIdNhapHang.setFont(fieldFont);
         txtIdNhapHang.setEditable(false);
-        txtIdNhapHang.setBackground(new Color(220, 220, 220));
+        txtIdNhapHang.setBorder(BorderFactory.createLineBorder(new Color(100, 149, 237), 1));
 
         JLabel lblIdNhaCungCap = new JLabel("ID Nhà Cung Cấp:");
         lblIdNhaCungCap.setFont(labelFont);
         JTextField txtIdNhaCungCap = new JTextField(nhapHang.getIdNhaCungCap(), 20);
         txtIdNhaCungCap.setFont(fieldFont);
+        txtIdNhaCungCap.setBorder(BorderFactory.createLineBorder(new Color(100, 149, 237), 1));
 
         JLabel lblIdNhanVien = new JLabel("ID Nhân Viên:");
         lblIdNhanVien.setFont(labelFont);
         JTextField txtIdNhanVien = new JTextField(nhapHang.getIdNhanVien(), 20);
         txtIdNhanVien.setFont(fieldFont);
+        txtIdNhanVien.setBorder(BorderFactory.createLineBorder(new Color(100, 149, 237), 1));
 
         JLabel lblIdSanPham = new JLabel("ID Sản Phẩm:");
         lblIdSanPham.setFont(labelFont);
         JTextField txtIdSanPham = new JTextField(chiTiet.getIdSanPham(), 20);
         txtIdSanPham.setFont(fieldFont);
+        txtIdSanPham.setBorder(BorderFactory.createLineBorder(new Color(100, 149, 237), 1));
 
         JLabel lblNgayNhap = new JLabel("Ngày Nhập (dd/MM/yyyy):");
         lblNgayNhap.setFont(labelFont);
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         JTextField txtNgayNhap = new JTextField(sdf.format(nhapHang.getNgayNhap()), 20);
         txtNgayNhap.setFont(fieldFont);
+        txtNgayNhap.setBorder(BorderFactory.createLineBorder(new Color(100, 149, 237), 1));
 
         JLabel lblSoLuongNhap = new JLabel("Số Lượng Nhập:");
         lblSoLuongNhap.setFont(labelFont);
         JTextField txtSoLuongNhap = new JTextField(String.valueOf(chiTiet.getSoLuongNhap()), 20);
         txtSoLuongNhap.setFont(fieldFont);
+        txtSoLuongNhap.setBorder(BorderFactory.createLineBorder(new Color(100, 149, 237), 1));
 
         JLabel lblGiaNhap = new JLabel("Giá Nhập:");
         lblGiaNhap.setFont(labelFont);
         JTextField txtGiaNhap = new JTextField(String.valueOf(chiTiet.getGiaNhap()), 20);
         txtGiaNhap.setFont(fieldFont);
+        txtGiaNhap.setBorder(BorderFactory.createLineBorder(new Color(100, 149, 237), 1));
 
         JLabel lblTongGiaTriNhap = new JLabel("Tổng Giá Trị Nhập:");
         lblTongGiaTriNhap.setFont(labelFont);
         JTextField txtTongGiaTriNhap = new JTextField(decimalFormat.format(nhapHang.getTongGiaTriNhap()), 20);
         txtTongGiaTriNhap.setFont(fieldFont);
+        txtTongGiaTriNhap.setBorder(BorderFactory.createLineBorder(new Color(100, 149, 237), 1));
         txtTongGiaTriNhap.setEditable(false);
         txtTongGiaTriNhap.setBackground(new Color(220, 220, 220));
 
@@ -643,19 +648,19 @@ public class NhapHangPanel extends JPanel {
         gbc.gridx = 0; gbc.gridy = 7; formPanel.add(lblTongGiaTriNhap, gbc);
         gbc.gridx = 1; formPanel.add(txtTongGiaTriNhap, gbc);
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        buttonPanel.setBackground(new Color(255, 255, 255));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.setBackground(new Color(240, 248, 255));
         buttonPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         JButton btnSave = new JButton("Lưu");
         btnSave.setFont(new Font("Arial", Font.BOLD, 14));
-        btnSave.setForeground(Color.BLACK);
+        btnSave.setBackground(new Color(50, 205, 50));
+        btnSave.setForeground(Color.WHITE);
         btnSave.setPreferredSize(new Dimension(100, 35));
-        btnSave.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         JButton btnCancel = new JButton("Hủy");
         btnCancel.setFont(new Font("Arial", Font.BOLD, 14));
-        btnCancel.setForeground(Color.BLACK);
+        btnCancel.setBackground(new Color(220, 20, 60));
+        btnCancel.setForeground(Color.WHITE);
         btnCancel.setPreferredSize(new Dimension(100, 35));
-        btnCancel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         buttonPanel.add(btnSave);
         buttonPanel.add(btnCancel);
 
@@ -664,6 +669,7 @@ public class NhapHangPanel extends JPanel {
 
         btnSave.addActionListener(e -> {
             try {
+                // Validate input
                 if (txtIdNhaCungCap.getText().trim().isEmpty() || txtIdNhanVien.getText().trim().isEmpty() ||
                     txtIdSanPham.getText().trim().isEmpty() || txtNgayNhap.getText().trim().isEmpty() ||
                     txtSoLuongNhap.getText().trim().isEmpty() || txtGiaNhap.getText().trim().isEmpty()) {
@@ -672,16 +678,19 @@ public class NhapHangPanel extends JPanel {
                     return;
                 }
 
+                // Cập nhật NhapHangDTO
                 nhapHang.setIdNhaCungCap(txtIdNhaCungCap.getText().trim());
                 nhapHang.setIdNhanVien(txtIdNhanVien.getText().trim());
                 nhapHang.setNgayNhap(sdf.parse(txtNgayNhap.getText().trim()));
                 String tongGiaTriStr = txtTongGiaTriNhap.getText().trim().replace(",", "");
                 nhapHang.setTongGiaTriNhap(Double.parseDouble(tongGiaTriStr));
 
+                // Cập nhật ChiTietNhapHangDTO
                 chiTiet.setIdSanPham(txtIdSanPham.getText().trim());
                 chiTiet.setSoLuongNhap(Integer.parseInt(txtSoLuongNhap.getText().trim()));
                 chiTiet.setGiaNhap(Integer.parseInt(txtGiaNhap.getText().trim()));
 
+                // Lưu qua BLL
                 nhapHangBLL.updateNhapHang(nhapHang, chiTiet);
                 JOptionPane.showMessageDialog(editDialog, "Cập nhật nhập hàng thành công",
                         "Thông báo", JOptionPane.INFORMATION_MESSAGE);
@@ -697,50 +706,53 @@ public class NhapHangPanel extends JPanel {
 
         editDialog.setVisible(true);
     }
-
+    
     private void exportNhapHangToExcel() {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Chọn nơi lưu file Excel");
-        fileChooser.setFileFilter(new FileNameExtensionFilter("Excel Files", "xlsx"));
+    JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle("Chọn nơi lưu file Excel");
+    fileChooser.setFileFilter(new FileNameExtensionFilter("Excel Files", "xlsx"));
 
-        int userSelection = fileChooser.showSaveDialog(this);
+    int userSelection = fileChooser.showSaveDialog(this);
 
-        if (userSelection == JFileChooser.APPROVE_OPTION) {
-            String filePath = fileChooser.getSelectedFile().getAbsolutePath();
-            if (!filePath.endsWith(".xlsx")) {
-                filePath += ".xlsx";
+    if (userSelection == JFileChooser.APPROVE_OPTION) {
+        String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+        if (!filePath.endsWith(".xlsx")) {
+            filePath += ".xlsx"; // đảm bảo có đuôi .xlsx
+        }
+
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("HoaDon");
+
+            // Tạo dòng header
+            Row headerRow = sheet.createRow(0);
+            for (int col = 0; col < nhapHangTable.getColumnCount(); col++) {
+                Cell cell = headerRow.createCell(col);
+                cell.setCellValue(nhapHangTable.getColumnName(col));
             }
 
-            try (Workbook workbook = new XSSFWorkbook()) {
-                Sheet sheet = workbook.createSheet("HoaDon");
-
-                Row headerRow = sheet.createRow(0);
+            // Ghi dữ liệu các dòng
+            for (int row = 0; row < nhapHangTable.getRowCount(); row++) {
+                Row excelRow = sheet.createRow(row + 1); // +1 vì dòng 0 đã là header
                 for (int col = 0; col < nhapHangTable.getColumnCount(); col++) {
-                    Cell cell = headerRow.createCell(col);
-                    cell.setCellValue(nhapHangTable.getColumnName(col));
-                }
-
-                for (int row = 0; row < nhapHangTable.getRowCount(); row++) {
-                    Row excelRow = sheet.createRow(row + 1);
-                    for (int col = 0; col < nhapHangTable.getColumnCount(); col++) {
-                        Cell cell = excelRow.createCell(col);
-                        Object value = nhapHangTable.getValueAt(row, col);
-                        if (value != null) {
-                            cell.setCellValue(value.toString());
-                        }
+                    Cell cell = excelRow.createCell(col);
+                    Object value = nhapHangTable.getValueAt(row, col);
+                    if (value != null) {
+                        cell.setCellValue(value.toString());
                     }
                 }
-
-                try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
-                    workbook.write(fileOut);
-                }
-
-                JOptionPane.showMessageDialog(this, "Xuất file Excel thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
-
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Xuất file thất bại: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
+
+            // Ghi file ra đĩa
+            try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
+                workbook.write(fileOut);
+            }
+
+            JOptionPane.showMessageDialog(this, "Xuất file Excel thành công!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Xuất file thất bại: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
+}
 }
