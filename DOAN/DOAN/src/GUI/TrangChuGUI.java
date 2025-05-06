@@ -14,12 +14,14 @@ public class TrangChuGUI extends JFrame {
     private JPanel productDisplayPanel;
     private JComboBox<String> categoryComboBox;
     private DanhMucBLL danhMucBLL;
+    private JTextField searchField;
 
     public TrangChuGUI() {
         setTitle("Fashion Store");
-        setSize(900, 500);
+        setSize(1000, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+        setBackground(Color.WHITE); // Đặt nền JFrame thành màu trắng
 
         // Khởi tạo DanhMucBLL và đăng ký GUI
         danhMucBLL = new DanhMucBLL();
@@ -76,7 +78,7 @@ public class TrangChuGUI extends JFrame {
 
         // Menu Panel
         JPanel menuPanel = new JPanel();
-        menuPanel.setBackground(Color.WHITE);
+        menuPanel.setBackground(Color.WHITE); // Đặt nền menuPanel thành màu trắng
         menuPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10));
 
         String[] menuItems = {"Hot trend", "Blog", "CSKH"};
@@ -109,35 +111,59 @@ public class TrangChuGUI extends JFrame {
             String selected = (String) categoryComboBox.getSelectedItem();
             if (selected != null && !selected.equals("Chọn danh mục")) {
                 showCategoryProducts(selected);
+            } else {
+                loadProducts(null); // Tải lại tất cả sản phẩm nếu chọn "Chọn danh mục"
             }
         });
 
-        // Search & Cart
-        JTextField searchField = new JTextField(20);
+        // Search
+        searchField = new JTextField(20);
         JButton searchButton = new JButton("🔍");
-        JButton cartButton = new JButton("🛒");
         searchButton.setBackground(new Color(100, 200, 100));
-        cartButton.setBackground(new Color(100, 200, 100));
         searchButton.setForeground(Color.WHITE);
-        cartButton.setForeground(Color.WHITE);
+
+        // Chức năng tìm kiếm
+        searchButton.addActionListener(e -> {
+            String keyword = searchField.getText().trim().toLowerCase();
+            SanPhamDAO dao = new SanPhamDAO();
+            ArrayList<SanPhamDTO> allProducts = dao.selectAll();
+            ArrayList<SanPhamDTO> filteredProducts = new ArrayList<>();
+
+            for (SanPhamDTO sp : allProducts) {
+                if (sp.getSoLuongTonKho() > 0 && sp.getTenSanPham().toLowerCase().contains(keyword)) {
+                    filteredProducts.add(sp);
+                }
+            }
+
+            if (filteredProducts.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Không tìm thấy sản phẩm nào!", "Thông báo", JOptionPane.INFORMATION_MESSAGE);
+            }
+
+            loadProducts(filteredProducts);
+        });
 
         menuPanel.add(searchField);
         menuPanel.add(searchButton);
-        menuPanel.add(cartButton);
 
         // Thêm menuPanel vào một panel trung gian để tránh ghi đè
         JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(Color.WHITE); // Đặt nền topPanel thành màu trắng
         topPanel.add(headerPanel, BorderLayout.NORTH);
         topPanel.add(menuPanel, BorderLayout.CENTER);
         add(topPanel, BorderLayout.NORTH);
 
         // Product Display Panel
-        productDisplayPanel = new JPanel(new GridLayout(0, 4, 10, 10));
+        productDisplayPanel = new JPanel(new GridLayout(0, 3, 10, 10));
+        productDisplayPanel.setBackground(Color.WHITE); // Đặt nền productDisplayPanel thành màu trắng
         productDisplayPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JScrollPane scrollPane = new JScrollPane(productDisplayPanel);
+        scrollPane.setBackground(Color.WHITE); // Đặt nền scrollPane thành màu trắng
+        scrollPane.setOpaque(true);
+        scrollPane.getVerticalScrollBar().setBackground(Color.WHITE); // Thanh cuộn dọc màu trắng
+        scrollPane.getHorizontalScrollBar().setBackground(Color.WHITE); // Thanh cuộn ngang màu trắng
         add(scrollPane, BorderLayout.CENTER);
 
-        loadProducts();
+        loadProducts(null); // Tải tất cả sản phẩm ban đầu
     }
 
     // Cập nhật JComboBox với danh mục từ cơ sở dữ liệu
@@ -152,23 +178,22 @@ public class TrangChuGUI extends JFrame {
 
     private void showCategoryProducts(String categoryName) {
         JFrame frame = new JFrame("Danh Mục " + categoryName);
-        frame.setSize(600, 500);
+        frame.setSize(800, 700);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLocationRelativeTo(null);
 
         // Tùy thuộc vào danh mục, hiển thị giao diện tương ứng
         if (categoryName.equals("Quần jean")) {
-            frame.add(new QuanJeanGUI());
+            frame.add(new QuanJeanGUI(frame));
         } else if (categoryName.equals("Quần short")) {
-            frame.add(new QuanShortGUI());
+            frame.add(new QuanShortGUI(frame));
         } else if (categoryName.equals("Áo thun")) {
-            frame.add(new AoThunGUI());
+            frame.add(new AoThunGUI(frame));
         } else if (categoryName.equals("Áo khoác")) {
-            frame.add(new QuanJeanGUI());
+            frame.add(new AoKhoacGUI(frame));
         } else if (categoryName.equals("Áo hoodie")) {
-            frame.add(new AoThunGUI());
+            frame.add(new AoHoodieGUI(frame));
         }
-        // Có thể thêm logic để hiển thị sản phẩm theo danh mục từ cơ sở dữ liệu
         frame.setVisible(true);
     }
 
@@ -192,10 +217,14 @@ public class TrangChuGUI extends JFrame {
         }
     }
 
-    private void loadProducts() {
-        SanPhamDAO dao = new SanPhamDAO();
-        ArrayList<SanPhamDTO> productList = dao.selectAll();
+    private void loadProducts(ArrayList<SanPhamDTO> productList) {
         productDisplayPanel.removeAll();
+
+        // Nếu productList là null, tải tất cả sản phẩm từ DAO
+        if (productList == null) {
+            SanPhamDAO dao = new SanPhamDAO();
+            productList = dao.selectAll();
+        }
 
         for (SanPhamDTO sp : productList) {
             if (sp.getSoLuongTonKho() > 0) {
@@ -209,6 +238,7 @@ public class TrangChuGUI extends JFrame {
 
     public void addProductToView(SanPhamDTO sp) {
         JPanel productPanel = new JPanel(new BorderLayout());
+        productPanel.setBackground(Color.WHITE); // Đặt nền productPanel thành màu trắng
         productPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         productPanel.putClientProperty("idSanPham", sp.getIdSanPham()); // Lưu ID sản phẩm
 
@@ -217,7 +247,7 @@ public class TrangChuGUI extends JFrame {
             if (sp.getHinhAnh() != null && !sp.getHinhAnh().isEmpty()) {
                 ImageIcon icon = new ImageIcon(sp.getHinhAnh());
                 if (icon.getImageLoadStatus() == java.awt.MediaTracker.COMPLETE) {
-                    Image scaledImage = icon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+                    Image scaledImage = icon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
                     imageLabel = new JLabel(new ImageIcon(scaledImage));
                 } else {
                     imageLabel = new JLabel("Invalid Image", SwingConstants.CENTER);
@@ -229,6 +259,7 @@ public class TrangChuGUI extends JFrame {
             imageLabel = new JLabel("Error Loading Image", SwingConstants.CENTER);
             e.printStackTrace();
         }
+        imageLabel.setPreferredSize(new Dimension(200, 200));
 
         JLabel nameLabel = new JLabel(sp.getTenSanPham(), SwingConstants.CENTER);
         nameLabel.setFont(new Font("Serif", Font.BOLD, 14));

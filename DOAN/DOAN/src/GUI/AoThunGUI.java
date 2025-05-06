@@ -22,6 +22,7 @@ public class AoThunGUI extends JPanel {
         super();
         this.parentFrame = parentFrame;
         setLayout(new BorderLayout());
+        setBackground(Color.WHITE); // Set background to white
 
         SanPhamDAO spDAO = new SanPhamDAO();
         danhSachSanPham = spDAO.laySanPhamTheoDanhMuc("DM003");
@@ -37,19 +38,30 @@ public class AoThunGUI extends JPanel {
 
         // Grid Panel
         gridPanel = new JPanel(new GridLayout(3, 3, 10, 10));
+        gridPanel.setBackground(Color.WHITE); // Set background to white
         gridPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         add(gridPanel, BorderLayout.CENTER);
 
         // Navigation
         JPanel navigationPanel = new JPanel();
+        navigationPanel.setBackground(Color.WHITE); // Set background to white
         Prev = new JButton("<< Trang trước");
         Next = new JButton("Trang sau >>");
         lblPage = new JLabel("Trang: " + currentPage);
+        btnGioHang = new JButton("🛒");
+
+        // Set uniform size for buttons
+        Dimension buttonSize = new Dimension(120, 30);
+        Prev.setPreferredSize(buttonSize);
+        Next.setPreferredSize(buttonSize);
+        btnGioHang.setPreferredSize(buttonSize);
 
         Prev.setBackground(new Color(100, 200, 100));
         Prev.setForeground(Color.WHITE);
         Next.setBackground(new Color(100, 200, 100));
         Next.setForeground(Color.WHITE);
+        btnGioHang.setBackground(new Color(100, 200, 100));
+        btnGioHang.setForeground(Color.WHITE);
 
         Prev.addActionListener(e -> {
             if (currentPage > 1) {
@@ -66,11 +78,13 @@ public class AoThunGUI extends JPanel {
         });
 
         // Nút giỏ hàng
-        btnGioHang = new JButton("🛒");
-        btnGioHang.setBackground(new Color(100, 200, 100));
-        btnGioHang.setForeground(Color.WHITE);
         btnGioHang.addActionListener(e -> {
-            new GioHangGUI(cart, totalPrice).setVisible(true);
+            // Note: For a compact GioHangGUI, consider using a JTable or GridLayout with minimal padding
+            // and a smaller frame size (e.g., 600x400) to display cart items and total price.
+            GioHangGUI gioHang = new GioHangGUI(cart, totalPrice);
+            gioHang.setSize(600, 400); // Set smaller size for compact display
+            gioHang.setLocationRelativeTo(parentFrame);
+            gioHang.setVisible(true);
         });
 
         navigationPanel.add(Prev);
@@ -100,10 +114,29 @@ public class AoThunGUI extends JPanel {
             JPanel panel = new JPanel();
             panel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
             panel.setLayout(new BorderLayout());
+            panel.setBackground(Color.WHITE); // Set product panel background to white
+
+            // Tải và hiển thị hình ảnh
+            JLabel lblHinh;
+            try {
+                if (sp.getHinhAnh() != null && !sp.getHinhAnh().isEmpty()) {
+                    ImageIcon icon = new ImageIcon(sp.getHinhAnh());
+                    if (icon.getImageLoadStatus() == java.awt.MediaTracker.COMPLETE) {
+                        Image scaledImage = icon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+                        lblHinh = new JLabel(new ImageIcon(scaledImage));
+                    } else {
+                        lblHinh = new JLabel("Invalid Image", SwingConstants.CENTER);
+                    }
+                } else {
+                    lblHinh = new JLabel("No Image", SwingConstants.CENTER);
+                }
+            } catch (Exception e) {
+                lblHinh = new JLabel("Error Loading Image", SwingConstants.CENTER);
+                e.printStackTrace();
+            }
+            lblHinh.setPreferredSize(new Dimension(200, 200));
 
             JLabel lblTen = new JLabel(tenSanPham + " - " + giaSanPham + "₫", SwingConstants.CENTER);
-            JLabel lblHinh = new JLabel("[Hình ảnh]", SwingConstants.CENTER);
-            lblHinh.setPreferredSize(new Dimension(100, 100));
 
             JButton btnThemGio = new JButton("Thêm vào giỏ hàng");
             btnThemGio.setBackground(Color.WHITE);
@@ -112,10 +145,19 @@ public class AoThunGUI extends JPanel {
             btnThemGio.addActionListener(e -> {
                 cart.add(tenSanPham);
                 totalPrice += giaSanPham;
+                // Customize JOptionPane button color
+                Color originalButtonBackground = UIManager.getColor("Button.background");
+                Color originalButtonForeground = UIManager.getColor("Button.foreground");
+                UIManager.put("Button.background", Color.WHITE);
+                UIManager.put("Button.foreground", Color.BLACK);
                 JOptionPane.showMessageDialog(this, "Đã thêm sản phẩm vào giỏ hàng!");
+                // Restore original UI settings
+                UIManager.put("Button.background", originalButtonBackground);
+                UIManager.put("Button.foreground", originalButtonForeground);
             });
 
             JPanel bottomPanel = new JPanel(new BorderLayout());
+            bottomPanel.setBackground(Color.WHITE); // Set bottom panel background to white
             bottomPanel.add(lblTen, BorderLayout.CENTER);
             bottomPanel.add(btnThemGio, BorderLayout.SOUTH);
 
@@ -138,7 +180,7 @@ public class AoThunGUI extends JPanel {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Danh Mục Áo Thun");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(600, 500);
+            frame.setSize(800, 700);
             frame.setLocationRelativeTo(null);
 
             frame.add(new AoThunGUI(frame));
