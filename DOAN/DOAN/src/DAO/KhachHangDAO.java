@@ -58,19 +58,42 @@ public class KhachHangDAO {
 
         try (Connection con = JDBC.getConnection();
              PreparedStatement pst = con.prepareStatement(sql)) {
-        String newId = generateNextId();
-        khachHang.setIdKhachHang(newId); // Gán lại ID mới cho DTO
-        pst.setString(1, newId);
-        pst.setString(2, khachHang.getHoTen());
-        pst.setString(3, khachHang.getEmail());
-        pst.setString(4, khachHang.getSdt());
+            String newId = generateNextId();
+            khachHang.setIdKhachHang(newId);
 
+            pst.setString(1, newId);
+            pst.setString(2, khachHang.getHoTen());
+            pst.setString(3, khachHang.getEmail());
+            pst.setString(4, khachHang.getSdt());
 
             return pst.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
+    }
+
+    // Thêm khách hàng mới và trả về id_khach_hang
+    public String insertAndReturnID(String ten, String email, String sdt) {
+        String sql = "INSERT INTO khach_hang (id_khach_hang, ho_ten, email, sdt) VALUES (?, ?, ?, ?)";
+
+        try (Connection conn = JDBC.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            String newId = generateNextId();
+            stmt.setString(1, newId);
+            stmt.setString(2, ten);
+            stmt.setString(3, email);
+            stmt.setString(4, sdt);
+
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                return newId;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // Trả về null nếu chèn thất bại
     }
 
     // Cập nhật thông tin khách hàng
@@ -97,7 +120,6 @@ public class KhachHangDAO {
     public boolean delete(String idKhachHang) {
         return true; // luôn trả về thành công để giao diện xóa hàng khỏi bảng
     }
-
 
     // Lấy khách hàng theo ID
     public KhachHangDTO selectById(String idKhachHang) {
