@@ -4,6 +4,7 @@ import DTO.SanPhamDTO;
 import config.JDBC;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.*;
 
 public class SanPhamDAO {
     private Connection connection;
@@ -37,39 +38,39 @@ public class SanPhamDAO {
         }
         return ds;
     }
-public boolean insert(SanPhamDTO sp) {
-    String checkQuery = "SELECT COUNT(*) FROM nha_cung_cap WHERE id_nha_cung_cap = ?";
-    try (Connection con = JDBC.getConnection();
-         PreparedStatement pstCheck = con.prepareStatement(checkQuery)) {
+    public boolean insert(SanPhamDTO sp) {
+        String checkQuery = "SELECT COUNT(*) FROM nha_cung_cap WHERE id_nha_cung_cap = ?";
+        try (Connection con = JDBC.getConnection();
+             PreparedStatement pstCheck = con.prepareStatement(checkQuery)) {
 
-        pstCheck.setString(1, sp.getIdNhaCungCap());
-        try (ResultSet rs = pstCheck.executeQuery()) {
-            if (rs.next() && rs.getInt(1) == 0) {
-                System.out.println("id_nha_cung_cap không tồn tại trong bảng nha_cung_cap.");
-                return false;
+            pstCheck.setString(1, sp.getIdNhaCungCap());
+            try (ResultSet rs = pstCheck.executeQuery()) {
+                if (rs.next() && rs.getInt(1) == 0) {
+                    System.out.println("id_nha_cung_cap không tồn tại trong bảng nha_cung_cap.");
+                    return false;
+                }
             }
-        }
 
-        String sql = "INSERT INTO san_pham (id_san_pham, id_danh_muc, id_nha_cung_cap, hinh_anh, gia, ten_san_pham, so_luong_ton_kho) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement pst = con.prepareStatement(sql)) {
-            pst.setString(1, sp.getIdSanPham());
-            pst.setString(2, sp.getIdDanhMuc());
-            pst.setString(3, sp.getIdNhaCungCap());
-            pst.setString(4, sp.getHinhAnh());  // Lưu đường dẫn hình ảnh
-            pst.setInt(5, sp.getGia());
-            pst.setString(6, sp.getTenSanPham());
-            pst.setInt(7, sp.getSoLuongTonKho());
+            String sql = "INSERT INTO san_pham (id_san_pham, id_danh_muc, id_nha_cung_cap, hinh_anh, gia, ten_san_pham, so_luong_ton_kho) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement pst = con.prepareStatement(sql)) {
+                pst.setString(1, sp.getIdSanPham());
+                pst.setString(2, sp.getIdDanhMuc());
+                pst.setString(3, sp.getIdNhaCungCap());
+                pst.setString(4, sp.getHinhAnh());  // Lưu đường dẫn hình ảnh
+                pst.setInt(5, sp.getGia());
+                pst.setString(6, sp.getTenSanPham());
+                pst.setInt(7, sp.getSoLuongTonKho());
 
-            int rowsInserted = pst.executeUpdate();
-            System.out.println("Rows inserted: " + rowsInserted);
-            return rowsInserted > 0;
+                int rowsInserted = pst.executeUpdate();
+                System.out.println("Rows inserted: " + rowsInserted);
+                return rowsInserted > 0;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error when inserting: " + e.getMessage());
+            e.printStackTrace();
+            return false;
         }
-    } catch (SQLException e) {
-        System.out.println("Error when inserting: " + e.getMessage());
-        e.printStackTrace();
-        return false;
     }
-}
     // Cập nhật thông tin sản phẩm
     public boolean update(SanPhamDTO sp) {
         // Kiểm tra sự tồn tại của id_nha_cung_cap trước khi cập nhật
@@ -103,6 +104,33 @@ public boolean insert(SanPhamDTO sp) {
             return false;
         }
     }
+    
+    public SanPhamDTO getSanPhamById(String idSanPham) {
+        SanPhamDTO sanPham = null;
+        String sql = "SELECT * FROM san_pham WHERE id_san_pham = ?";
+
+        try (Connection con = JDBC.getConnection();
+             PreparedStatement pst = con.prepareStatement(sql)) {
+
+            pst.setString(1, idSanPham);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    sanPham = new SanPhamDTO();
+                    sanPham.setIdSanPham(rs.getString("id_san_pham"));
+                    sanPham.setIdDanhMuc(rs.getString("id_danh_muc"));
+                    sanPham.setIdNhaCungCap(rs.getString("id_nha_cung_cap"));
+                    sanPham.setHinhAnh(rs.getString("hinh_anh"));
+                    sanPham.setGia(Integer.parseInt(rs.getString("gia")));
+                    sanPham.setTenSanPham(rs.getString("ten_san_pham"));
+                    sanPham.setSoLuongTonKho(Integer.parseInt(rs.getString("so_luong_ton_kho")));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return sanPham;  // Trả về sản phẩm tìm được hoặc null nếu không tìm thấy
+    }
+
 
     // Tìm kiếm sản phẩm theo tên
     public ArrayList<SanPhamDTO> searchByName(String keyword) {
@@ -134,4 +162,37 @@ public boolean insert(SanPhamDTO sp) {
     public boolean deleteProductFromUI(String idSanPham) {
         return true;  
     }
+    
+    public List<SanPhamDTO> laySanPhamTheoDanhMuc(String idDanhMuc) {
+        List<SanPhamDTO> danhSach = new ArrayList<>();
+
+        try {
+            Connection conn = JDBC.getConnection();
+            String sql = "SELECT * FROM san_pham WHERE id_danh_muc = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, idDanhMuc);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                SanPhamDTO sp = new SanPhamDTO();
+                sp.setIdSanPham(rs.getString("id_san_pham"));
+                sp.setIdDanhMuc(rs.getString("id_danh_muc"));
+                sp.setIdNhaCungCap(rs.getString("id_nha_cung_cap"));
+                sp.setHinhAnh(rs.getString("hinh_anh"));
+                sp.setGia(Integer.parseInt(rs.getString("gia")));
+                sp.setTenSanPham(rs.getString("ten_san_pham"));
+                sp.setSoLuongTonKho(Integer.parseInt(rs.getString("so_luong_ton_kho")));
+                danhSach.add(sp);
+            }
+
+            rs.close();
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return danhSach;
+    }
 }
+

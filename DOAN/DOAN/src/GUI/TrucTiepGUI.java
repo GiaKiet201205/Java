@@ -3,11 +3,13 @@ package GUI;
 import BLL.HoaDonBLL;
 import BLL.NhanVienBLL;
 import BLL.SanPhamBLL;
+
 import DAO.ChiTietDonHangDAO;
 import DTO.ChiTietDonHangDTO;
 import DTO.DonHangDTO;
 import DTO.NhanVienDTO;
 import DTO.SanPhamDTO;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
@@ -314,6 +316,20 @@ public class TrucTiepGUI extends JFrame {
                 String idNhanVien = txtEmployeeID.getText().trim();
                 String quantityStr = txtQuantity.getText().trim();
                 String totalStr = txtTotal.getText().trim();
+                int soLuongMua = Integer.parseInt(txtQuantity.getText().trim());
+
+                // Lấy sản phẩm hiện tại
+                SanPhamDTO sanPham = sanPhamBLL.getSanPhamById(idSanPham);
+                if (sanPham == null) {
+                    JOptionPane.showMessageDialog(null, "Sản phẩm không tồn tại!");
+                    return;
+                }
+
+                int tonKhoHienTai = sanPham.getSoLuongTonKho();
+                if (soLuongMua > tonKhoHienTai) {
+                    JOptionPane.showMessageDialog(null, "Không đủ hàng trong kho!");
+                    return;
+                }
 
                 // Kiểm tra các trường bắt buộc
                 if (idSanPham.isEmpty() || idNhanVien.isEmpty() || quantityStr.isEmpty() || totalStr.isEmpty()) {
@@ -384,7 +400,7 @@ public class TrucTiepGUI extends JFrame {
                 String diaDiemGiao = "Tại cửa hàng";
 
                 // Gọi createDonHang với idKhachHang là null
-                String idDonHang = hoaDonBLL.createDonHang(donHang, "KH001", idNhanVien, tongTien, 
+                String idDonHang = hoaDonBLL.createDonHang(donHang, "Admin", idNhanVien, tongTien, 
                                                           trangThai, hinhThucMuaHang, diaDiemGiao);
 
                 if (idDonHang != null) {
