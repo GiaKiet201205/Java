@@ -36,7 +36,7 @@ public class ThongKePanel extends JPanel {
         topPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         JLabel lblChucNang = new JLabel("Thống Kê");
-        lblChucNang.setFont(new Font("Arial", Font.BOLD, 16));
+        lblChucNang.setFont(new Font("Arial", Font.BOLD, 24));
         topPanel.add(lblChucNang, BorderLayout.WEST);
 
         JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -52,8 +52,7 @@ public class ThongKePanel extends JPanel {
         controlPanel.add(cmbTimeFilter);
 
         JButton btnView = new JButton("Xem");
-        btnView.setBackground(new Color(60, 141, 188));
-        btnView.setForeground(Color.WHITE);
+        btnView.setForeground(Color.BLACK);
         controlPanel.add(btnView);
 
         JButton btnRefresh = new JButton("Làm mới");
@@ -128,8 +127,7 @@ public class ThongKePanel extends JPanel {
         controlPanel.add(cmbSort);
 
         JButton btnView = new JButton("Xem");
-        btnView.setBackground(new Color(60, 141, 188));
-        btnView.setForeground(Color.WHITE);
+        btnView.setForeground(Color.BLACK);
         controlPanel.add(btnView);
 
         parent.add(controlPanel);
