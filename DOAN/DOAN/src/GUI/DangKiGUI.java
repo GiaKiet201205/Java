@@ -3,11 +3,7 @@ package GUI;
 import BLL.TaiKhoanBLL;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
+import java.awt.event.*;
 import java.net.URL;
 
 class BackgroundPanel extends JPanel {
@@ -35,7 +31,7 @@ public class DangKiGUI extends JFrame {
         this.trangChu = trangChu;
 
         setTitle("Đăng Kí");
-        setSize(600, 400);
+        setSize(600, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(true);
@@ -80,15 +76,34 @@ public class DangKiGUI extends JFrame {
         gbc.gridwidth = 2;
         rightPanel.add(titleLabel, gbc);
 
+        // Trường nhập Tên khách hàng
         gbc.gridwidth = 1;
         gbc.gridy++;
-        rightPanel.add(new JLabel("Tên đăng nhập"), gbc);
-        gbc.gridx = 1;
-        JTextField usernameField = new JTextField(15);
-        rightPanel.add(usernameField, gbc);
-
         gbc.gridx = 0;
+        rightPanel.add(new JLabel("Họ tên"), gbc);
+        gbc.gridx = 1;
+        JTextField nameField = new JTextField(15);
+        rightPanel.add(nameField, gbc);
+
+        // Email
         gbc.gridy++;
+        gbc.gridx = 0;
+        rightPanel.add(new JLabel("Email"), gbc);
+        gbc.gridx = 1;
+        JTextField emailField = new JTextField(15);
+        rightPanel.add(emailField, gbc);
+
+        // Số điện thoại
+        gbc.gridy++;
+        gbc.gridx = 0;
+        rightPanel.add(new JLabel("Số điện thoại"), gbc);
+        gbc.gridx = 1;
+        JTextField phoneField = new JTextField(15);
+        rightPanel.add(phoneField, gbc);
+
+        // Mật khẩu
+        gbc.gridy++;
+        gbc.gridx = 0;
         rightPanel.add(new JLabel("Mật khẩu"), gbc);
         gbc.gridx = 1;
         JPasswordField passwordField = new JPasswordField(15);
@@ -109,24 +124,31 @@ public class DangKiGUI extends JFrame {
 
         // Xử lý nút Đăng ký
         registerButton.addActionListener((ActionEvent e) -> {
-            String username = usernameField.getText();
-            String password = new String(passwordField.getPassword());
+            String ten_user = nameField.getText().trim();
+            String email = emailField.getText().trim();
+            String sdt = phoneField.getText().trim();
+            String password = new String(passwordField.getPassword()).trim();
 
-            if (username.isEmpty() || password.isEmpty()) {
+            if (ten_user.isEmpty() || email.isEmpty() || sdt.isEmpty() || password.isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Vui lòng nhập đầy đủ thông tin!", "Thông báo", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
-            TaiKhoanBLL taiKhoanBLL = new TaiKhoanBLL();
-            boolean success = taiKhoanBLL.register(username, password);
+            try {
+                TaiKhoanBLL taiKhoanBLL = new TaiKhoanBLL();
+                
+                boolean success = taiKhoanBLL.register(ten_user, email, sdt, password);
 
-            if (success) {
-                JOptionPane.showMessageDialog(null, "Đăng ký thành công! Mời bạn đăng nhập.");
-                new DangNhapGUI(trangChu).setVisible(true);
-                dispose();
-            } else {
-                JOptionPane.showMessageDialog(null, "Đăng ký thất bại! Tên đăng nhập đã tồn tại.", 
-                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+                if (success) {
+                    JOptionPane.showMessageDialog(null, "Đăng ký thành công! Mời bạn đăng nhập.");
+                    new DangNhapGUI(trangChu).setVisible(true);
+                    dispose();
+                } else {
+                    JOptionPane.showMessageDialog(null, "Đăng ký thất bại! Email hoặc số điện thoại đã tồn tại.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Lỗi hệ thống: " + ex.getMessage(), "Lỗi", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
             }
         });
 
