@@ -17,26 +17,22 @@ public class TrangChuGUI extends JFrame {
     private JTextField searchField;
 
     public TrangChuGUI() {
-        setTitle("Fashion Store");
+        setTitle("Cửa Hàng Thời Trang");
         setSize(1000, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
-        setBackground(Color.WHITE); // Đặt nền JFrame thành màu trắng
+        setBackground(Color.WHITE);
 
-        // Khởi tạo DanhMucBLL và đăng ký GUI
         danhMucBLL = new DanhMucBLL();
         danhMucBLL.registerTrangChuGUI(this);
 
-        // Panel Header
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(new Color(160, 250, 160));
         headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // Logo
         JLabel logoLabel = new JLabel("SSS", SwingConstants.CENTER);
         logoLabel.setFont(new Font("Serif", Font.BOLD, 30));
 
-        // Login & Register Buttons
         JPanel authPanel = new JPanel();
         authPanel.setBackground(new Color(160, 250, 160));
         JButton loginButton = new JButton("Đăng nhập");
@@ -60,28 +56,18 @@ public class TrangChuGUI extends JFrame {
         authPanel.add(loginButton);
         authPanel.add(registerButton);
 
-        // Liên kết giao diện đăng nhập
-        loginButton.addActionListener(e -> {
-            new DangNhapGUI(this).setVisible(true);
-        });
+        loginButton.addActionListener(e -> new DangNhapGUI(this).setVisible(true));
+        registerButton.addActionListener(e -> new DangKiGUI(TrangChuGUI.this).setVisible(true));
 
-        // Liên kết giao diện đăng ký
-        registerButton.addActionListener((ActionEvent e) -> {
-            DangKiGUI dangki = new DangKiGUI(TrangChuGUI.this);
-            dangki.setVisible(true);
-        });
-
-        // Header Layout
         headerPanel.add(logoLabel, BorderLayout.CENTER);
         headerPanel.add(authPanel, BorderLayout.EAST);
         add(headerPanel, BorderLayout.NORTH);
 
-        // Menu Panel
         JPanel menuPanel = new JPanel();
-        menuPanel.setBackground(Color.WHITE); // Đặt nền menuPanel thành màu trắng
+        menuPanel.setBackground(Color.WHITE);
         menuPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10));
 
-        String[] menuItems = {"Hot trend", "Blog", "CSKH"};
+        String[] menuItems = {"Hot Trend", "Blog", "CSKH"};
         for (String item : menuItems) {
             JButton menuButton = new JButton(item);
             menuButton.setContentAreaFilled(false);
@@ -92,19 +78,20 @@ public class TrangChuGUI extends JFrame {
             menuButton.setForeground(Color.WHITE);
             menuPanel.add(menuButton);
 
-            if (item.equals("Blog")) {
+            if (item.equals("Hot Trend")) {
+                menuButton.addActionListener(e -> showHotTrendContent());
+            } else if (item.equals("Blog")) {
                 menuButton.addActionListener(e -> showBlogContent());
             } else if (item.equals("CSKH")) {
                 menuButton.addActionListener(e -> showCSKHContent());
             }
         }
 
-        // ComboBox sản phẩm
         categoryComboBox = new JComboBox<>();
         categoryComboBox.setFont(new Font("Serif", Font.PLAIN, 16));
         categoryComboBox.setBackground(new Color(100, 200, 100));
         categoryComboBox.setForeground(Color.WHITE);
-        updateCategoryComboBox(); // Tải danh mục từ cơ sở dữ liệu
+        updateCategoryComboBox();
         menuPanel.add(categoryComboBox);
 
         categoryComboBox.addActionListener(e -> {
@@ -112,17 +99,15 @@ public class TrangChuGUI extends JFrame {
             if (selected != null && !selected.equals("Chọn danh mục")) {
                 showCategoryProducts(selected);
             } else {
-                loadProducts(null); // Tải lại tất cả sản phẩm nếu chọn "Chọn danh mục"
+                loadProducts(null);
             }
         });
 
-        // Search
         searchField = new JTextField(20);
         JButton searchButton = new JButton("🔍");
         searchButton.setBackground(new Color(100, 200, 100));
         searchButton.setForeground(Color.WHITE);
 
-        // Chức năng tìm kiếm
         searchButton.addActionListener(e -> {
             String keyword = searchField.getText().trim().toLowerCase();
             SanPhamDAO dao = new SanPhamDAO();
@@ -145,28 +130,25 @@ public class TrangChuGUI extends JFrame {
         menuPanel.add(searchField);
         menuPanel.add(searchButton);
 
-        // Thêm menuPanel vào một panel trung gian để tránh ghi đè
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(Color.WHITE); // Đặt nền topPanel thành màu trắng
+        topPanel.setBackground(Color.WHITE);
         topPanel.add(headerPanel, BorderLayout.NORTH);
         topPanel.add(menuPanel, BorderLayout.CENTER);
         add(topPanel, BorderLayout.NORTH);
 
-        // Product Display Panel
         productDisplayPanel = new JPanel(new GridLayout(0, 3, 10, 10));
-        productDisplayPanel.setBackground(Color.WHITE); // Đặt nền productDisplayPanel thành màu trắng
+        productDisplayPanel.setBackground(Color.WHITE);
         productDisplayPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JScrollPane scrollPane = new JScrollPane(productDisplayPanel);
-        scrollPane.setBackground(Color.WHITE); // Đặt nền scrollPane thành màu trắng
+        scrollPane.setBackground(Color.WHITE);
         scrollPane.setOpaque(true);
-        scrollPane.getVerticalScrollBar().setBackground(Color.WHITE); // Thanh cuộn dọc màu trắng
-        scrollPane.getHorizontalScrollBar().setBackground(Color.WHITE); // Thanh cuộn ngang màu trắng
+        scrollPane.getVerticalScrollBar().setBackground(Color.WHITE);
+        scrollPane.getHorizontalScrollBar().setBackground(Color.WHITE);
         add(scrollPane, BorderLayout.CENTER);
 
-        loadProducts(null); // Tải tất cả sản phẩm ban đầu
+        loadProducts(null);
     }
 
-    // Cập nhật JComboBox với danh mục từ cơ sở dữ liệu
     public void updateCategoryComboBox() {
         categoryComboBox.removeAllItems();
         categoryComboBox.addItem("Chọn danh mục");
@@ -182,7 +164,6 @@ public class TrangChuGUI extends JFrame {
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLocationRelativeTo(null);
 
-        // Tùy thuộc vào danh mục, hiển thị giao diện tương ứng
         if (categoryName.equals("Quần jean")) {
             frame.add(new QuanJeanGUI(frame));
         } else if (categoryName.equals("Quần short")) {
@@ -197,17 +178,210 @@ public class TrangChuGUI extends JFrame {
         frame.setVisible(true);
     }
 
+    private void showHotTrendContent() {
+        JFrame trendFrame = new JFrame("Hot Trend - Xu Hướng Thời Trang");
+        trendFrame.setSize(800, 600);
+        trendFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        trendFrame.setLocationRelativeTo(null);
+        trendFrame.setLayout(new BorderLayout());
+        trendFrame.setBackground(Color.WHITE);
+
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(Color.WHITE);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JLabel titleLabel = new JLabel("Xu Hướng Thời Trang Nổi Bật", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Serif", Font.BOLD, 28));
+        titleLabel.setForeground(new Color(100, 200, 100));
+        mainPanel.add(titleLabel, BorderLayout.NORTH);
+
+        JPanel contentPanel = new JPanel();
+        contentPanel.setBackground(Color.WHITE);
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+
+        JLabel introLabel = new JLabel("<html><p style='width: 700px; text-align: justify;'>"
+            + "Chào mừng bạn đến với góc xu hướng thời trang của ShopQuanAo123! Chúng tôi mang đến những phong cách mới nhất, "
+            + "từ thời trang đường phố năng động đến những bộ sưu tập thanh lịch, giúp bạn luôn dẫn đầu trong mọi hoàn cảnh. "
+            + "Mùa này, hãy khám phá những kiểu dáng đang làm mưa làm gió trên toàn cầu!</p></html>");
+        introLabel.setFont(new Font("Serif", Font.PLAIN, 16));
+        introLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contentPanel.add(introLabel);
+        contentPanel.add(Box.createVerticalStrut(20));
+
+        JLabel trendLabel = new JLabel("<html><p style='width: 700px; text-align: justify;'>"
+            + "<b>Xu Hướng Thu 2025:</b> Mùa thu năm nay, những gam màu đậm như xanh ngọc lục bảo, đỏ rượu vang và nâu đất đang chiếm lĩnh sàn diễn thời trang. "
+            + "Áo blazer oversize kết hợp với quần jeans ôm hoặc quần tây may đo tạo nên vẻ ngoài hiện đại và sành điệu. Đừng quên thêm một chiếc khăn len mỏng "
+            + "hoặc mũ beret để hoàn thiện phong cách. Ngoài ra, những chiếc áo khoác trench coat dài cùng bốt cao cổ cũng là lựa chọn không thể bỏ qua.</p></html>");
+        trendLabel.setFont(new Font("Serif", Font.PLAIN, 16));
+        trendLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contentPanel.add(trendLabel);
+        contentPanel.add(Box.createVerticalStrut(20));
+
+        JLabel tipsLabel = new JLabel("<html><p style='width: 700px; text-align: justify;'>"
+            + "<b>Mẹo Phối Đồ:</b> Để nổi bật, hãy thử kết hợp áo thun basic với quần short vải và áo khoác bomber cho phong cách trẻ trung. "
+            + "Nếu bạn yêu thích sự thanh lịch, một chiếc áo sơ mi lụa phối cùng chân váy midi và giày cao gót sẽ là lựa chọn hoàn hảo. "
+            + "Đừng ngần ngại thử nghiệm với các lớp layer như áo len mỏng bên trong áo khoác da để tạo điểm nhấn độc đáo. "
+            + "Hãy ghé qua cửa hàng của chúng tôi để tìm những món đồ phù hợp với phong cách của bạn!</p></html>");
+        tipsLabel.setFont(new Font("Serif", Font.PLAIN, 16));
+        tipsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contentPanel.add(tipsLabel);
+        contentPanel.add(Box.createVerticalStrut(20));
+
+        JButton shopButton = new JButton("Khám Phá Bộ Sưu Tập");
+        shopButton.setFont(new Font("Serif", Font.BOLD, 16));
+        shopButton.setBackground(new Color(100, 200, 100));
+        shopButton.setForeground(Color.WHITE);
+        shopButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        shopButton.addActionListener(e -> trendFrame.dispose());
+        contentPanel.add(shopButton);
+
+        JScrollPane scrollPane = new JScrollPane(contentPanel);
+        scrollPane.setBackground(Color.WHITE);
+        scrollPane.setBorder(null);
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+
+        trendFrame.add(mainPanel);
+        trendFrame.setVisible(true);
+    }
+
     private void showBlogContent() {
-        JOptionPane.showMessageDialog(this, "Đây là page của chúng tôi: ShopQuanAo123");
+        JFrame blogFrame = new JFrame("Blog - Tin Tức Thời Trang");
+        blogFrame.setSize(800, 600);
+        blogFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        blogFrame.setLocationRelativeTo(null);
+        blogFrame.setLayout(new BorderLayout());
+        blogFrame.setBackground(Color.WHITE);
+
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(Color.WHITE);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JLabel titleLabel = new JLabel("Chào Mừng Đến Với Blog Thời Trang", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Serif", Font.BOLD, 28));
+        titleLabel.setForeground(new Color(100, 200, 100));
+        mainPanel.add(titleLabel, BorderLayout.NORTH);
+
+        JPanel contentPanel = new JPanel();
+        contentPanel.setBackground(Color.WHITE);
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+
+        JLabel introLabel = new JLabel("<html><p style='width: 700px; text-align: justify;'>"
+            + "Blog thời trang của ShopQuanAo123 là nơi bạn tìm thấy nguồn cảm hứng bất tận! Chúng tôi cập nhật liên tục các xu hướng mới, "
+            + "hướng dẫn phối đồ chi tiết và những bí quyết để nâng tầm phong cách cá nhân. Hãy cùng khám phá những bài viết thú vị để biến mỗi ngày "
+            + "trở thành một sàn diễn thời trang của riêng bạn!</p></html>");
+        introLabel.setFont(new Font("Serif", Font.PLAIN, 16));
+        introLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contentPanel.add(introLabel);
+        contentPanel.add(Box.createVerticalStrut(20));
+
+        JLabel articleLabel = new JLabel("<html><p style='width: 700px; text-align: justify;'>"
+            + "<b>Thời Trang Mùa Thu 2025:</b> Mùa thu này, hãy làm mới tủ đồ của bạn với những gam màu ấm áp như cam cháy, vàng mù tạt và nâu đất. "
+            + "Áo khoác trench coat dài, khăn len oversized và bốt cao cổ là bộ ba hoàn hảo cho tiết trời se lạnh. Bạn có thể phối áo thun basic với quần short vải "
+            + "và thêm một chiếc áo cardigan mỏng để tạo phong cách năng động nhưng vẫn tinh tế. Đối với những dịp đặc biệt, hãy thử áo sơ mi lụa kết hợp với chân váy bút chì.</p></html>");
+        articleLabel.setFont(new Font("Serif", Font.PLAIN, 16));
+        articleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contentPanel.add(articleLabel);
+        contentPanel.add(Box.createVerticalStrut(20));
+
+        JLabel styleLabel = new JLabel("<html><p style='width: 700px; text-align: justify;'>"
+            + "<b>Bí Quyết Tạo Phong Cách:</b> Để tạo ấn tượng mạnh mẽ, hãy chú ý đến các chi tiết nhỏ như phụ kiện. Một chiếc đồng hồ tinh tế, khăn quàng cổ hoặc túi xách mini "
+            + "có thể nâng cấp toàn bộ outfit. Ngoài ra, hãy thử nghiệm với các lớp layer – ví dụ, mặc áo len mỏng bên trong áo khoác da hoặc kết hợp áo hoodie với áo blazer. "
+            + "Quan trọng nhất, hãy luôn tự tin với phong cách của bạn! Ghé thăm ShopQuanAo123 để tìm những món đồ phù hợp với mọi cá tính.</p></html>");
+        styleLabel.setFont(new Font("Serif", Font.PLAIN, 16));
+        styleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contentPanel.add(styleLabel);
+        contentPanel.add(Box.createVerticalStrut(20));
+
+        JButton visitShopButton = new JButton("Xem Bộ Sưu Tập");
+        visitShopButton.setFont(new Font("Serif", Font.BOLD, 16));
+        visitShopButton.setBackground(new Color(100, 200, 100));
+        visitShopButton.setForeground(Color.WHITE);
+        visitShopButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        visitShopButton.addActionListener(e -> blogFrame.dispose());
+        contentPanel.add(visitShopButton);
+
+        JScrollPane scrollPane = new JScrollPane(contentPanel);
+        scrollPane.setBackground(Color.WHITE);
+        scrollPane.setBorder(null);
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+
+        blogFrame.add(mainPanel);
+        blogFrame.setVisible(true);
     }
 
     private void showCSKHContent() {
-        JOptionPane.showMessageDialog(this, "Bạn có thể liên lạc với chúng tôi qua DISCORD:java");
+        JFrame cskhFrame = new JFrame("Chăm Sóc Khách Hàng - Liên Hệ");
+        cskhFrame.setSize(800, 600);
+        cskhFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        cskhFrame.setLocationRelativeTo(null);
+        cskhFrame.setLayout(new BorderLayout());
+        cskhFrame.setBackground(Color.WHITE);
+
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(Color.WHITE);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JLabel titleLabel = new JLabel("Chúng Tôi Luôn Sẵn Sàng Hỗ Trợ!", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Serif", Font.BOLD, 28));
+        titleLabel.setForeground(new Color(100, 200, 100));
+        mainPanel.add(titleLabel, BorderLayout.NORTH);
+
+        JPanel contentPanel = new JPanel();
+        contentPanel.setBackground(Color.WHITE);
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+
+        JLabel introLabel = new JLabel("<html><p style='width: 700px; text-align: justify;'>"
+            + "ShopQuanAo123 luôn đặt sự hài lòng của khách hàng lên hàng đầu. Đội ngũ chăm sóc khách hàng của chúng tôi sẵn sàng hỗ trợ bạn với mọi vấn đề, "
+            + "từ theo dõi đơn hàng, tư vấn sản phẩm đến giải đáp các thắc mắc về dịch vụ. Chúng tôi cam kết mang đến trải nghiệm mua sắm tuyệt vời nhất!</p></html>");
+        introLabel.setFont(new Font("Serif", Font.PLAIN, 16));
+        introLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contentPanel.add(introLabel);
+        contentPanel.add(Box.createVerticalStrut(20));
+
+        JLabel contactInfo = new JLabel("<html>"
+            + "<p style='width: 700px;'><b>Liên Hệ Với Chúng Tôi:</b></p>"
+            + "<p style='width: 700px;'>- <b>Email:</b> hotro@shopquanao123.com</p>"
+            + "<p style='width: 700px;'>- <b>Điện thoại:</b> (+84) 123 456 789</p>"
+            + "<p style='width: 700px;'>- <b>Discord:</b> ShopQuanAo123#1234</p>"
+            + "<p style='width: 700px;'>- <b>Giờ làm việc:</b> Thứ Hai - Thứ Bảy, 9h-18h</p>"
+            + "<p style='width: 700px; text-align: justify;'>Bạn có thể liên hệ qua email hoặc điện thoại để được hỗ trợ ngay lập tức. Ngoài ra, tham gia cộng đồng Discord của chúng tôi để nhận thông tin cập nhật và tương tác trực tiếp với đội ngũ!</p>"
+            + "</html>");
+        contactInfo.setFont(new Font("Serif", Font.PLAIN, 16));
+        contactInfo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contentPanel.add(contactInfo);
+        contentPanel.add(Box.createVerticalStrut(20));
+
+        JLabel faqLabel = new JLabel("<html><p style='width: 700px; text-align: justify;'>"
+            + "<b>Câu Hỏi Thường Gặp:</b><br>"
+            + "- <b>Làm thế nào để theo dõi đơn hàng?</b> Đăng nhập vào tài khoản của bạn và truy cập mục 'Đơn Hàng Của Tôi' để xem trạng thái đơn hàng.<br>"
+            + "- <b>Chính sách đổi trả của shop là gì?</b> Chúng tôi hỗ trợ đổi trả trong vòng 30 ngày đối với các sản phẩm chưa sử dụng và còn nguyên trạng.<br>"
+            + "- <b>Shop có giao hàng quốc tế không?</b> Có, chúng tôi giao hàng đến hơn 50 quốc gia. Vui lòng xem chi tiết tại trang thông tin vận chuyển.<br>"
+            + "- <b>Tôi có thể hủy đơn hàng không?</b> Bạn có thể hủy đơn hàng trước khi nó được xử lý. Liên hệ ngay với chúng tôi qua email hoặc điện thoại để được hỗ trợ.<br>"
+            + "- <b>Làm sao để chọn size phù hợp?</b> Mỗi sản phẩm đều có bảng size chi tiết. Nếu cần tư vấn, đội ngũ của chúng tôi luôn sẵn sàng giúp bạn!</p></html>");
+        faqLabel.setFont(new Font("Serif", Font.PLAIN, 16));
+        faqLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contentPanel.add(faqLabel);
+        contentPanel.add(Box.createVerticalStrut(20));
+
+        JButton contactButton = new JButton("Tham Gia Discord");
+        contactButton.setFont(new Font("Serif", Font.BOLD, 16));
+        contactButton.setBackground(new Color(100, 200, 100));
+        contactButton.setForeground(Color.WHITE);
+        contactButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        contactButton.addActionListener(e -> JOptionPane.showMessageDialog(cskhFrame, "Tham gia Discord: ShopQuanAo123#1234"));
+        contentPanel.add(contactButton);
+
+        JScrollPane scrollPane = new JScrollPane(contentPanel);
+        scrollPane.setBackground(Color.WHITE);
+        scrollPane.setBorder(null);
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+
+        cskhFrame.add(mainPanel);
+        cskhFrame.setVisible(true);
     }
 
-    // Hàm xử lý sau khi đăng nhập thành công
     public void onLoginSuccess(String vaiTro) {
-        setVisible(false); // Ẩn TrangChuGUI
+        setVisible(false);
         if ("admin".equalsIgnoreCase(vaiTro)) {
             QuanTriVienGUI quanTriVienGUI = new QuanTriVienGUI(this);
             quanTriVienGUI.setVisible(true);
@@ -220,7 +394,6 @@ public class TrangChuGUI extends JFrame {
     private void loadProducts(ArrayList<SanPhamDTO> productList) {
         productDisplayPanel.removeAll();
 
-        // Nếu productList là null, tải tất cả sản phẩm từ DAO
         if (productList == null) {
             SanPhamDAO dao = new SanPhamDAO();
             productList = dao.selectAll();
@@ -238,9 +411,9 @@ public class TrangChuGUI extends JFrame {
 
     public void addProductToView(SanPhamDTO sp) {
         JPanel productPanel = new JPanel(new BorderLayout());
-        productPanel.setBackground(Color.WHITE); // Đặt nền productPanel thành màu trắng
+        productPanel.setBackground(Color.WHITE);
         productPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        productPanel.putClientProperty("idSanPham", sp.getIdSanPham()); // Lưu ID sản phẩm
+        productPanel.putClientProperty("idSanPham", sp.getIdSanPham());
 
         JLabel imageLabel;
         try {
@@ -250,13 +423,13 @@ public class TrangChuGUI extends JFrame {
                     Image scaledImage = icon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
                     imageLabel = new JLabel(new ImageIcon(scaledImage));
                 } else {
-                    imageLabel = new JLabel("Invalid Image", SwingConstants.CENTER);
+                    imageLabel = new JLabel("Hình Ảnh Không Hợp Lệ", SwingConstants.CENTER);
                 }
             } else {
-                imageLabel = new JLabel("No Image", SwingConstants.CENTER);
+                imageLabel = new JLabel("Không Có Hình Ảnh", SwingConstants.CENTER);
             }
         } catch (Exception e) {
-            imageLabel = new JLabel("Error Loading Image", SwingConstants.CENTER);
+            imageLabel = new JLabel("Lỗi Tải Hình Ảnh", SwingConstants.CENTER);
             e.printStackTrace();
         }
         imageLabel.setPreferredSize(new Dimension(200, 200));
